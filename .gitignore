@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Homelab Hub Local Data & User State (Sensitive & Machine-specific)
+data/cards.json
+data/settings.json
+data/calendar_events.json
+data/tasks.json
+data/uploads/*
+!data/uploads/.gitkeep
+!data/tasks.json.example
+energy_stats.json
+smart_diagnostic.json
+docker_updates_cache.json
+pinned_containers.json
+
+# Backup & Temporary files
+*.bak
+*.bak_*
+templates/*.bak*
+templates/*.pre_*
+*.zip
+*.tar.gz
+*.txt
+!requirements.txt
+
+# Secrets & Environment Variables
+.env
+.env.*
+*.key
+*.pem
+*.cert
+
+# Operating System & IDEs
+# Private Local Emergency Recovery Passport & Screenshots
+templates/passport.html
+static/oracle_*.jpg

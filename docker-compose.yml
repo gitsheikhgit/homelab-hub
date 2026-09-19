@@ -1,0 +1,44 @@
+services:
+  homelab-hub:
+    image: ghcr.io/gitsheikhgit/homelab-hub:latest
+    build: .
+    container_name: homelab-hub
+    restart: unless-stopped
+    ports:
+      - "8095:8095"
+
+    # ── Persistent data ───────────────────────────────────────────────────────
+    volumes:
+      - ./data:/app/data                          # Cards, settings, uploads
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker fleet management
+      - /proc:/host/proc:ro                       # CPU, RAM, network stats
+      - /sys:/host/sys:ro                         # Thermal sensors, disk stats
+      - /dev:/dev:ro                              # Block device access for smartctl
+      # Mount any custom storage paths you want monitored (optional):
+      # - /mnt/storage:/mnt/storage:ro
+      # - /mnt/backup_hdd:/mnt/backup_hdd:ro
+      # - /mnt/WDDATA:/mnt/WDDATA:ro
+
+    # ── Required for smartctl / SMART health telemetry ────────────────────────
+    # smartctl needs raw block device access to read drive health.
+    # privileged: true  gives full hardware access (simplest — use if you trust your network).
+    # OR use the specific capabilities below for a narrower security surface:
+    privileged: true   # ← Allows smartctl to read /dev/sda, /dev/sdb, etc.
+    # If you prefer NOT using privileged, comment the line above and uncomment:
+    # cap_add:
+    #   - SYS_RAWIO       # Required for smartctl ATA passthrough
+    #   - SYS_ADMIN       # Required for some disk/filesystem stats
+    # devices:
+    #   - /dev/sda:/dev/sda   # Add one line per physical disk you want monitored
+    #   - /dev/sdb:/dev/sdb
+    #   - /dev/sdc:/dev/sdc
+    #   - /dev/sdd:/dev/sdd
+
+    environment:
+      - PORT=8095
+      - TAILSCALE_DOMAIN=homelab.ts.net
+      # Tell the app it's running inside Docker (adjusts smartctl call — no sudo)
+      - RUNNING_IN_DOCKER=1
+      # Paths to host /proc and /sys as mounted above
+      - HOST_PROC=/host/proc
+      - HOST_SYS=/host/sys

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Homelab Recovery Passport (Template)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0a0d14;
+            --bg-surface: #111622;
+            --bg-card: #161d2d;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --accent-primary: #38bdf8;
+            --accent-green: #34d399;
+            --accent-amber: #fbbf24;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .passport-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            max-width: 850px;
+            width: 100%;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-free {
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: var(--accent-green);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .alert-box {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #fde68a;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin: 24px 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            border: 1px solid var(--border-subtle);
+            text-align: left;
+        }
+
+        th { background: var(--bg-card); color: #fff; }
+        td { color: var(--text-secondary); }
+
+        .key-box {
+            background: #000;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-green);
+            font-size: 14px;
+            word-break: break-all;
+            margin: 8px 0 16px;
+            user-select: all;
+        }
+
+        pre {
+            background: #000;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #e2e8f0;
+            overflow-x: auto;
+            margin-bottom: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #050811;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: #fff;
+            border: 1px solid var(--border-subtle);
+        }
+
+        @media print {
+            body { background: #fff; color: #000; padding: 0; }
+            .passport-card { border: none; box-shadow: none; padding: 0; }
+            .btn-group { display: none; }
+            .key-box, pre { background: #f1f5f9; color: #000; border: 1px solid #cbd5e1; }
+            th { background: #e2e8f0; color: #000; }
+            td { color: #000; }
+            .section-title { color: #0284c7; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="passport-card">
+    <div class="header">
+        <div class="header-title">🛡️ Emergency Recovery Passport (Template)</div>
+        <div class="badge-free">✓ Encrypted Off-Site Backup</div>
+    </div>
+
+    <div class="alert-box">
+        ⚠️ <strong>SAVE THIS DOCUMENT:</strong> Save a copy into your Password Manager or secure physical storage. Fill in your own backup server and master encryption key.
+    </div>
+
+    <div class="section-title">1. Master Recovery Credentials & Cloud Info</div>
+    <table>
+        <tr>
+            <th style="width:35%;">Item</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td><strong>Backup Target</strong></td>
+            <td>Offsite SFTP / Restic REST Server</td>
+        </tr>
+        <tr>
+            <td><strong>Backup Server Host / IP</strong></td>
+            <td><code>&lt;YOUR_BACKUP_SERVER_IP&gt;</code></td>
+        </tr>
+        <tr>
+            <td><strong>Backup User</strong></td>
+            <td><code>backupuser</code></td>
+        </tr>
+        <tr>
+            <td><strong>SSH Key Location</strong></td>
+            <td><code>~/.ssh/id_ed25519</code></td>
+        </tr>
+        <tr>
+            <td><strong>Remote Storage Path</strong></td>
+            <td><code>/var/backups/restic</code></td>
+        </tr>
+    </table>
+
+    <div style="font-size: 12px; font-weight: 700; color: var(--accent-primary);">MASTER ENCRYPTION PASSWORD:</div>
+    <div class="key-box">&lt;GENERATE_WITH_OPENSSL_RAND_HEX_24&gt;</div>
+
+    <div class="section-title">2. Disaster Recovery Instructions</div>
+    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Run these commands on a fresh installation to restore all persistent volumes and data:</p>
+    
+    <pre><code># 1. Install Restic
+sudo apt update && sudo apt install -y restic
+
+# 2. Configure Password
+sudo mkdir -p /etc/restic
+echo "&lt;YOUR_ENCRYPTION_PASSWORD&gt;" | sudo tee /etc/restic/password
+sudo chmod 600 /etc/restic/password
+
+# 3. Restore all data from backup target
+sudo restic -r sftp:backupuser@&lt;YOUR_BACKUP_SERVER_IP&gt;:/var/backups/restic --password-file /etc/restic/password restore latest --target /
+
+# 4. Restart Docker services
+sudo systemctl restart docker</code></pre>
+
+    <div class="btn-group">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Print / Save as PDF</button>
+        <a href="/" class="btn btn-secondary">🏠 Back to Portal</a>
+    </div>
+</div>
+
+</body>
+</html>

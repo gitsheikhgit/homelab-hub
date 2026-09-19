@@ -1,0 +1,72 @@
+[
+  {
+    "id": "card_nextcloud",
+    "name": "Nextcloud Hub",
+    "subtitle": "Cloud Storage & Collaboration",
+    "lan_url": "http://localhost:8080",
+    "ts_url": "",
+    "icon": "/static/icons/nextcloud.png",
+    "category": "Cloud & Office",
+    "order": 1
+  },
+  {
+    "id": "card_immich",
+    "name": "Immich Photos",
+    "subtitle": "Self-Hosted Photo & Video Vault",
+    "lan_url": "http://localhost:2283",
+    "ts_url": "",
+    "icon": "/static/icons/immich.png",
+    "category": "Media",
+    "order": 2
+  },
+  {
+    "id": "card_homeassistant",
+    "name": "Home Assistant",
+    "subtitle": "Smart Home Automation Hub",
+    "lan_url": "http://localhost:8123",
+    "ts_url": "",
+    "icon": "/static/icons/homeassistant.png",
+    "category": "Smart Home",
+    "order": 3
+  },
+  {
+    "id": "card_portainer",
+    "name": "Portainer CE",
+    "subtitle": "Docker Container Fleet Management",
+    "lan_url": "http://localhost:9000",
+    "ts_url": "",
+    "icon": "/static/icons/portainer.png",
+    "category": "System",
+    "order": 4
+  },
+  {
+    "id": "card_stirling",
+    "name": "Stirling-PDF",
+    "subtitle": "All-in-One Local PDF Tools",
+    "lan_url": "http://localhost:8087",
+    "ts_url": "",
+    "icon": "/static/icons/stirling.png",
+    "category": "Cloud & Office",
+    "order": 5
+  },
+  {
+    "id": "card_navidrome",
+    "name": "Navidrome Music",
+    "subtitle": "Personal Audio Streaming Server",
+    "lan_url": "http://localhost:4533",
+    "ts_url": "",
+    "icon": "/static/icons/navidrome.png",
+    "category": "Media",
+    "order": 6
+  },
+  {
+    "id": "card_cockpit",
+    "name": "Cockpit Console",
+    "subtitle": "Linux Server Administration",
+    "lan_url": "https://localhost:9090",
+    "ts_url": "",
+    "icon": "/static/icons/cockpit.png",
+    "category": "System",
+    "order": 7
+  }
+]

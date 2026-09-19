@@ -1,0 +1,64 @@
+{
+  "search_provider": "google",
+  "search_providers": {
+    "google": {"name": "Google", "url": "https://www.google.com/search?q=", "icon": "🌐"},
+    "duckduckgo": {"name": "DuckDuckGo", "url": "https://duckduckgo.com/?q=", "icon": "🦆"},
+    "brave": {"name": "Brave", "url": "https://search.brave.com/search?q=", "icon": "🦁"},
+    "bing": {"name": "Bing", "url": "https://www.bing.com/search?q=", "icon": "🔍"}
+  },
+  "wallpaper": "",
+  "wallpaper_type": "default",
+  "wallpaper_blur": 0,
+  "wallpaper_brightness": 0.8,
+  "dock_position": "bottom",
+  "theme": "dark",
+  "initial_setup_completed": false,
+  "server_name": "",
+  "widgets": {
+    "calendar": true,
+    "host_overview": true,
+    "host_power": true,
+    "proxmox": false,
+    "portainer": true,
+    "cluster_nodes_strip": true,
+    "tailscale": true,
+    "storage": true,
+    "ssd_cleaner": true,
+    "speedtest": true,
+    "media_row": true
+  },
+  "cluster_nodes": [],
+  "proxmox_nodes": [],
+  "proxmox_tokens": [],
+  "widgets_layout": {
+    "col1": [
+      "cards_apps"
+    ],
+    "col2": [
+      "widget_calendar",
+      "widget_host_overview",
+      "widget_host_power"
+    ],
+    "col3": [
+      "widget_portainer",
+      "widget_tailscale",
+      "widget_storage",
+      "widget_ssd_cleaner",
+      "widget_speedtest"
+    ]
+  },
+  "quick_icon_size_px": 34,
+  "portainer_config": {
+    "title": "Portainer CE",
+    "subtitle": "Docker Container Fleet",
+    "lan_url": "",
+    "ts_url": "",
+    "click_action": "drawer"
+  },
+  "monitored_drives": [],
+  "lan_host": "",
+  "tailscale_domain": "",
+  "tailscale_ip": "",
+  "elec_rate_kwh": 0.23,
+  "base_platform_watts": 13.5
+}
