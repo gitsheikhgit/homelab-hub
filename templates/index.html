@@ -893,6 +893,68 @@
             font-weight: 600 !important;
         }
 
+        /* ── Telemetry Waveforms & Container Matrix Light Mode ── */
+        :root[data-active-theme="light"] .telemetry-waveforms-card {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        :root[data-active-theme="light"] .telemetry-chart-tile {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        :root[data-active-theme="light"] .chart-tile-title {
+            color: #0f172a !important;
+        }
+
+        :root[data-active-theme="light"] .chart-curr-val {
+            color: #0f172a !important;
+        }
+
+        :root[data-active-theme="light"] .chart-peak-pill {
+            background: #e2e8f0 !important;
+            color: #475569 !important;
+        }
+
+        :root[data-active-theme="light"] .telemetry-tab-group,
+        :root[data-active-theme="light"] .telemetry-range-group {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        :root[data-active-theme="light"] .telemetry-tab-btn,
+        :root[data-active-theme="light"] .telemetry-range-pill {
+            color: #475569 !important;
+        }
+
+        :root[data-active-theme="light"] .telemetry-tab-btn.active {
+            background: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        :root[data-active-theme="light"] .telemetry-range-pill.active {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        :root[data-active-theme="light"] .container-row-tile {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        :root[data-active-theme="light"] .container-row-tile:hover {
+            background: #eff6ff !important;
+            border-color: #bfdbfe !important;
+        }
+
+        :root[data-active-theme="light"] .c-mini-bar-track {
+            background: #e2e8f0 !important;
+        }
+
         .theme-opt-btn.active, .dock-pos-opt.active {
             background: var(--accent-blue) !important;
             border-color: var(--accent-blue) !important;
@@ -3865,6 +3927,234 @@
             color: #f87171;
         }
 
+        /* ── Beszel-Style Telemetry Waveforms & Container Matrix ── */
+        .telemetry-waveforms-card {
+            background: rgba(16, 22, 38, 0.75);
+            border: 1px solid var(--border-highlight);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .telemetry-tab-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .telemetry-tab-btn {
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .telemetry-tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .telemetry-tab-btn.active {
+            background: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.35);
+        }
+
+        .telemetry-range-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .telemetry-range-pill {
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .telemetry-range-pill:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .telemetry-range-pill.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .telemetry-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 820px) {
+            .telemetry-charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .telemetry-chart-tile {
+            background: rgba(10, 15, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 9px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .chart-tile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chart-tile-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .chart-tile-indicator {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .chart-tile-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chart-curr-val {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: monospace;
+            color: #f8fafc;
+        }
+
+        .chart-peak-pill {
+            font-size: 9.5px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 96px;
+            cursor: crosshair;
+        }
+
+        .waveform-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .chart-tooltip-tracker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+        }
+
+        .chart-tooltip-tracker::after {
+            content: attr(data-tip);
+            position: absolute;
+            top: -4px;
+            left: 4px;
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-family: monospace;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Docker Containers Matrix */
+        .containers-matrix-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 0 2px;
+        }
+
+        .containers-matrix-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .container-row-tile {
+            display: grid;
+            grid-template-columns: 20px minmax(100px, 135px) 1fr 52px;
+            align-items: center;
+            gap: 8px;
+            background: rgba(10, 15, 26, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 7px;
+            padding: 6px 10px;
+            transition: background 0.15s ease;
+        }
+
+        .container-row-tile:hover {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: rgba(59, 130, 246, 0.25);
+        }
+
+        .c-mini-bar-track {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .c-mini-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
         /* ── Appearance & System Settings Modal Tabs & Toggles ── */
         .modal-tabs-nav {
             display: flex;
@@ -5292,6 +5582,154 @@
                                 <div class="core-slider-track">
                                     <div class="core-slider-fill swap-fill" id="hostSwapSliderFill" style="width:0%"></div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2b. Live System & Container Telemetry Waveforms (Beszel Style) -->
+            <div class="draggable-widget-block" id="widget_telemetry_graphs" data-widget-id="widget_telemetry_graphs">
+                <div class="card-widget telemetry-waveforms-card">
+                    <div class="card-head">
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(59,130,246,0.18)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="card-title-text-wrap">
+                                    <div style="display:flex;align-items:center;gap:6px">
+                                        <div class="card-title">Live Telemetry Waveforms</div>
+                                        <span class="status-dot" style="width:7px;height:7px;background:#10b981;box-shadow:0 0 8px #10b981;display:inline-block"></span>
+                                    </div>
+                                    <div class="card-subtitle" id="telemetryLastSampleTime">Continuous 5s sampling • Hardware &amp; Containers</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-head-right">
+                            <!-- View Switcher Tabs -->
+                            <div class="telemetry-tab-group">
+                                <button type="button" class="telemetry-tab-btn active" id="btnTelTabWaveforms" onclick="switchTelemetryTab('waveforms')">📈 Charts</button>
+                                <button type="button" class="telemetry-tab-btn" id="btnTelTabContainers" onclick="switchTelemetryTab('containers')">🐳 Containers</button>
+                            </div>
+                            <!-- 3-Dot Options Menu -->
+                            <div class="widget-menu-wrap" onclick="event.stopPropagation()">
+                                <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_telemetry_graphs')" title="Card Options">⋮</button>
+                                <div class="widget-menu-dropdown" id="wmenu_widget_telemetry_graphs">
+                                    <button class="widget-menu-item" onclick="moveWidgetUp('widget_telemetry_graphs')">⬆️ Move Up</button>
+                                    <button class="widget-menu-item" onclick="moveWidgetDown('widget_telemetry_graphs')">⬇️ Move Down</button>
+                                    <button class="widget-menu-item" onclick="moveWidgetToCol('widget_telemetry_graphs', 'col1')">⬅️ Move to Left Col</button>
+                                    <button class="widget-menu-item" onclick="moveWidgetToCol('widget_telemetry_graphs', 'col3')">➡️ Move to Right Col</button>
+                                    <button class="widget-menu-item danger-text" onclick="toggleWidgetVisible('telemetry_graphs', false)">👁️ Hide Card</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px">
+                        <!-- TAB 1: WAVEFORMS VIEW -->
+                        <div id="telemetryWaveformsView">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px">
+                                <div style="font-size:11px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px">
+                                    <span class="status-dot" style="width:6px;height:6px;background:#38bdf8;box-shadow:0 0 6px #38bdf8;display:inline-block"></span>
+                                    <span>Continuous Sensor Feed</span>
+                                </div>
+                                <!-- Time Range Selector -->
+                                <div class="telemetry-range-group" id="telemetryRangeSelector">
+                                    <button type="button" class="telemetry-range-pill active" onclick="setTelemetryTimeRange(30, this)" title="Last 2.5 Minutes (30 points)">5m</button>
+                                    <button type="button" class="telemetry-range-pill" onclick="setTelemetryTimeRange(60, this)" title="Last 5 Minutes (60 points)">15m</button>
+                                    <button type="button" class="telemetry-range-pill" onclick="setTelemetryTimeRange(120, this)" title="All Recorded History (up to 120 points)">All</button>
+                                </div>
+                            </div>
+                            <div class="telemetry-charts-grid">
+                                <!-- 1. CPU Utilization Waveform -->
+                                <div class="telemetry-chart-tile">
+                                    <div class="chart-tile-header">
+                                        <div class="chart-tile-title">
+                                            <span class="chart-tile-indicator" style="background:#3b82f6"></span>
+                                            <span>CPU Utilization</span>
+                                        </div>
+                                        <div class="chart-tile-meta">
+                                            <span class="chart-curr-val" id="chartValCpu" style="color:#38bdf8">--%</span>
+                                            <span class="chart-peak-pill" id="chartPeakCpu">Peak --%</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-canvas-container" id="containerCanvasCpu">
+                                        <canvas id="canvasCpu" class="waveform-canvas"></canvas>
+                                        <div class="chart-tooltip-tracker" id="trackerCpu"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Memory (RAM) Waveform -->
+                                <div class="telemetry-chart-tile">
+                                    <div class="chart-tile-header">
+                                        <div class="chart-tile-title">
+                                            <span class="chart-tile-indicator" style="background:#10b981"></span>
+                                            <span>Memory (RAM)</span>
+                                        </div>
+                                        <div class="chart-tile-meta">
+                                            <span class="chart-curr-val" id="chartValMem" style="color:#34d399">--%</span>
+                                            <span class="chart-peak-pill" id="chartPeakMem">-- / -- GB</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-canvas-container" id="containerCanvasMem">
+                                        <canvas id="canvasMem" class="waveform-canvas"></canvas>
+                                        <div class="chart-tooltip-tracker" id="trackerMem"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Network Throughput Waveform -->
+                                <div class="telemetry-chart-tile">
+                                    <div class="chart-tile-header">
+                                        <div class="chart-tile-title">
+                                            <span class="chart-tile-indicator" style="background:#06b6d4"></span>
+                                            <span>Network Throughput</span>
+                                        </div>
+                                        <div class="chart-tile-meta">
+                                            <span class="chart-curr-val" style="color:#22d3ee" id="chartValNetDown">↓ -- KB/s</span>
+                                            <span class="chart-peak-pill" style="color:#c084fc;background:rgba(168,85,247,0.15)" id="chartValNetUp">↑ -- KB/s</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-canvas-container" id="containerCanvasNet">
+                                        <canvas id="canvasNet" class="waveform-canvas"></canvas>
+                                        <div class="chart-tooltip-tracker" id="trackerNet"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Disk I/O Activity Waveform -->
+                                <div class="telemetry-chart-tile">
+                                    <div class="chart-tile-header">
+                                        <div class="chart-tile-title">
+                                            <span class="chart-tile-indicator" style="background:#f59e0b"></span>
+                                            <span>Disk Read / Write I/O</span>
+                                        </div>
+                                        <div class="chart-tile-meta">
+                                            <span class="chart-curr-val" style="color:#fbbf24" id="chartValDiskRead">R: -- KB/s</span>
+                                            <span class="chart-peak-pill" style="color:#fde047;background:rgba(234,179,8,0.15)" id="chartValDiskWrite">W: -- KB/s</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-canvas-container" id="containerCanvasDisk">
+                                        <canvas id="canvasDisk" class="waveform-canvas"></canvas>
+                                        <div class="chart-tooltip-tracker" id="trackerDisk"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: DOCKER CONTAINERS RESOURCE MATRIX -->
+                        <div id="telemetryContainersView" style="display:none">
+                            <div class="containers-matrix-header">
+                                <div style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:8px">
+                                    <span>Live Container Resource Allocation</span>
+                                    <span class="badge" id="containerMatrixCountBadge" style="background:rgba(59,130,246,0.18);color:#60a5fa">-- Active</span>
+                                </div>
+                                <div style="font-size:11px;color:var(--text-muted)">Live 10s container metrics</div>
+                            </div>
+                            <div class="containers-matrix-grid" id="containerMatrixGrid">
+                                <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">Loading container telemetry...</div>
                             </div>
                         </div>
                     </div>
@@ -7175,6 +7613,17 @@
                     </div>
                     <label class="switch-pill">
                         <input type="checkbox" id="toggle_w_host_overview" checked onchange="toggleWidgetVisible('host_overview', this.checked)">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="widget-toggle-row">
+                    <div>
+                        <div class="widget-toggle-label"><span>📈</span> Live Telemetry Waveforms</div>
+                        <div class="widget-toggle-sub">Beszel-style rolling real-time CPU, RAM, Network &amp; Container waveforms</div>
+                    </div>
+                    <label class="switch-pill">
+                        <input type="checkbox" id="toggle_w_telemetry_graphs" checked onchange="toggleWidgetVisible('telemetry_graphs', this.checked)">
                         <span class="switch-slider"></span>
                     </label>
                 </div>
@@ -9413,7 +9862,7 @@ function resetWidgetsLayout() {
         : ["widget_portainer", "widget_tailscale", "widget_storage", "widget_speedtest"];
     const defaultLayout = {
         col1: ["cards_apps"],
-        col2: ["widget_calendar", "widget_host_overview", "widget_host_power"],
+        col2: ["widget_calendar", "widget_host_overview", "widget_telemetry_graphs", "widget_host_power"],
         col3: col3Widgets
     };
     applyWidgetsLayout(defaultLayout);
@@ -9427,6 +9876,7 @@ function applyWidgetVisibility() {
         cards_apps: '#cards_apps',
         calendar: '#widget_calendar',
         host_overview: '#widget_host_overview',
+        telemetry_graphs: '#widget_telemetry_graphs',
         host_power: '#widget_host_power',
         proxmox: '#widget_proxmox',
         portainer: '#widget_portainer',
@@ -11608,6 +12058,333 @@ function renderCoresTelemetry(data) {
     }
 }
 
+// ── Beszel-Style Live Telemetry Waveforms Engine ───────────────────
+let telemetryActiveTab = 'waveforms';
+let telemetryPointsLimit = 30; // default 5m (30 samples @ 5s)
+let telemetryCachedData = { history: [], containers: [] };
+
+function switchTelemetryTab(tab) {
+    telemetryActiveTab = tab;
+    const btnW = document.getElementById('btnTelTabWaveforms');
+    const btnC = document.getElementById('btnTelTabContainers');
+    const viewW = document.getElementById('telemetryWaveformsView');
+    const viewC = document.getElementById('telemetryContainersView');
+
+    if (tab === 'waveforms') {
+        if (btnW) btnW.classList.add('active');
+        if (btnC) btnC.classList.remove('active');
+        if (viewW) viewW.style.display = 'block';
+        if (viewC) viewC.style.display = 'none';
+        renderAllWaveforms();
+    } else {
+        if (btnW) btnW.classList.remove('active');
+        if (btnC) btnC.classList.add('active');
+        if (viewW) viewW.style.display = 'none';
+        if (viewC) viewC.style.display = 'block';
+        renderContainerMatrix(telemetryCachedData.containers || []);
+    }
+}
+
+function setTelemetryTimeRange(limit, btn) {
+    telemetryPointsLimit = limit;
+    document.querySelectorAll('.telemetry-range-pill').forEach(el => el.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderAllWaveforms();
+}
+
+async function fetchTelemetryHistory() {
+    try {
+        const res = await fetch('/api/telemetry/history');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status === 'success') {
+            telemetryCachedData = data;
+            const sub = document.getElementById('telemetryLastSampleTime');
+            if (sub && data.server_time) {
+                sub.textContent = `Continuous 5s sampling • Last sample: ${data.server_time} • ${data.count} points recorded`;
+            }
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('theme') === 'light') {
+                    document.documentElement.setAttribute('data-active-theme', 'light');
+                } else if (urlParams.get('theme') === 'dark') {
+                    document.documentElement.setAttribute('data-active-theme', 'dark');
+                }
+                if (urlParams.get('tab') === 'containers' && telemetryActiveTab !== 'containers') {
+                    switchTelemetryTab('containers');
+                    return;
+                }
+            } catch(e) {}
+            if (telemetryActiveTab === 'waveforms') {
+                renderAllWaveforms();
+            } else {
+                renderContainerMatrix(data.containers || []);
+            }
+        }
+    } catch (e) {
+        console.warn('Telemetry fetch error:', e);
+    }
+}
+
+function renderAllWaveforms() {
+    const rawHistory = telemetryCachedData.history || [];
+    if (!rawHistory.length) return;
+
+    const pts = rawHistory.slice(-telemetryPointsLimit);
+    const isLight = document.documentElement.getAttribute('data-active-theme') === 'light';
+
+    // 1. CPU Waveform
+    const latestCpu = pts[pts.length - 1].cpu || 0;
+    const peakCpu = Math.max(...pts.map(p => p.cpu || 0));
+    const valCpuEl = document.getElementById('chartValCpu');
+    const peakCpuEl = document.getElementById('chartPeakCpu');
+    if (valCpuEl) valCpuEl.textContent = `${latestCpu.toFixed(1)}%`;
+    if (peakCpuEl) peakCpuEl.textContent = `Peak ${peakCpu.toFixed(1)}%`;
+
+    drawWaveformChart('canvasCpu', 'trackerCpu', pts, [
+        { key: 'cpu', stroke: '#38bdf8', fillStart: 'rgba(56, 189, 248, 0.35)', fillEnd: 'rgba(56, 189, 248, 0.01)', label: 'CPU', unit: '%' }
+    ], { maxY: 100, isLight });
+
+    // 2. Memory Waveform
+    const latestMem = pts[pts.length - 1].mem || 0;
+    const valMemEl = document.getElementById('chartValMem');
+    const peakMemEl = document.getElementById('chartPeakMem');
+    if (valMemEl) valMemEl.textContent = `${latestMem.toFixed(1)}%`;
+    if (peakMemEl && typeof statsCache !== 'undefined' && statsCache && statsCache.memory) {
+        peakMemEl.textContent = `${statsCache.memory.used_gb || '--'} / ${statsCache.memory.total_gb || '--'} GB`;
+    }
+
+    drawWaveformChart('canvasMem', 'trackerMem', pts, [
+        { key: 'mem', stroke: '#34d399', fillStart: 'rgba(52, 211, 153, 0.35)', fillEnd: 'rgba(52, 211, 153, 0.01)', label: 'RAM', unit: '%' }
+    ], { maxY: 100, isLight });
+
+    // 3. Network Throughput Waveform
+    const latestDown = pts[pts.length - 1].net_down || 0;
+    const latestUp = pts[pts.length - 1].net_up || 0;
+    const valNetDownEl = document.getElementById('chartValNetDown');
+    const valNetUpEl = document.getElementById('chartValNetUp');
+    if (valNetDownEl) valNetDownEl.textContent = `↓ ${formatRateKb(latestDown)}`;
+    if (valNetUpEl) valNetUpEl.textContent = `↑ ${formatRateKb(latestUp)}`;
+
+    drawWaveformChart('canvasNet', 'trackerNet', pts, [
+        { key: 'net_down', stroke: '#22d3ee', fillStart: 'rgba(34, 211, 238, 0.3)', fillEnd: 'rgba(34, 211, 238, 0.01)', label: 'Down', unit: ' KB/s' },
+        { key: 'net_up', stroke: '#c084fc', fillStart: 'rgba(192, 132, 252, 0.25)', fillEnd: 'rgba(192, 132, 252, 0.01)', label: 'Up', unit: ' KB/s' }
+    ], { isLight, autoMax: true });
+
+    // 4. Disk I/O Activity Waveform
+    const latestRead = pts[pts.length - 1].disk_read || 0;
+    const latestWrite = pts[pts.length - 1].disk_write || 0;
+    const valDiskREl = document.getElementById('chartValDiskRead');
+    const valDiskWEl = document.getElementById('chartValDiskWrite');
+    if (valDiskREl) valDiskREl.textContent = `R: ${formatRateKb(latestRead)}`;
+    if (valDiskWEl) valDiskWEl.textContent = `W: ${formatRateKb(latestWrite)}`;
+
+    drawWaveformChart('canvasDisk', 'trackerDisk', pts, [
+        { key: 'disk_write', stroke: '#fbbf24', fillStart: 'rgba(251, 191, 36, 0.3)', fillEnd: 'rgba(251, 191, 36, 0.01)', label: 'Write', unit: ' KB/s' },
+        { key: 'disk_read', stroke: '#38bdf8', fillStart: 'rgba(56, 189, 248, 0.2)', fillEnd: 'rgba(56, 189, 248, 0.01)', label: 'Read', unit: ' KB/s' }
+    ], { isLight, autoMax: true });
+}
+
+function formatRateKb(kbs) {
+    if (kbs >= 1024) {
+        return (kbs / 1024.0).toFixed(1) + ' MB/s';
+    }
+    return Math.round(kbs) + ' KB/s';
+}
+
+function drawWaveformChart(canvasId, trackerId, points, series, opts = {}) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !points || points.length === 0) return;
+    if (points.length === 1) {
+        points = [points[0], points[0]];
+    }
+
+    const container = canvas.parentElement;
+    const rect = container.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+
+    const ctx = canvas.getContext('2d');
+    ctx.resetTransform();
+    ctx.scale(dpr, dpr);
+
+    const w = rect.width;
+    const h = rect.height;
+    const padTop = 8;
+    const padBottom = 8;
+    const plotH = h - padTop - padBottom;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Calculate Max Y
+    let maxY = opts.maxY || 100;
+    if (opts.autoMax) {
+        let maxVal = 10;
+        series.forEach(s => {
+            points.forEach(p => {
+                const v = p[s.key] || 0;
+                if (v > maxVal) maxVal = v;
+            });
+        });
+        maxY = maxVal * 1.15; // 15% headroom
+    }
+
+    // Gridlines (3 lines)
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = opts.isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.05)';
+    for (let i = 1; i <= 3; i++) {
+        const y = padTop + (plotH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+    }
+
+    // Render each series
+    series.forEach(s => {
+        const coords = points.map((p, idx) => {
+            const x = (idx / (points.length - 1)) * w;
+            const val = Math.min(maxY, Math.max(0, p[s.key] || 0));
+            const y = padTop + plotH - (val / maxY) * plotH;
+            return { x, y, val, time: p.t };
+        });
+
+        // 1. Fill Path with Gradient
+        const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+        grad.addColorStop(0, s.fillStart);
+        grad.addColorStop(1, s.fillEnd || 'rgba(0,0,0,0)');
+
+        ctx.beginPath();
+        ctx.moveTo(coords[0].x, padTop + plotH);
+        ctx.lineTo(coords[0].x, coords[0].y);
+
+        for (let i = 0; i < coords.length - 1; i++) {
+            const cpX = (coords[i].x + coords[i + 1].x) / 2;
+            const cpY = (coords[i].y + coords[i + 1].y) / 2;
+            ctx.quadraticCurveTo(coords[i].x, coords[i].y, cpX, cpY);
+        }
+        ctx.lineTo(coords[coords.length - 1].x, coords[coords.length - 1].y);
+        ctx.lineTo(coords[coords.length - 1].x, padTop + plotH);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // 2. Stroke Line with Glow
+        ctx.save();
+        ctx.shadowColor = s.stroke;
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = s.stroke;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(coords[0].x, coords[0].y);
+        for (let i = 0; i < coords.length - 1; i++) {
+            const cpX = (coords[i].x + coords[i + 1].x) / 2;
+            const cpY = (coords[i].y + coords[i + 1].y) / 2;
+            ctx.quadraticCurveTo(coords[i].x, coords[i].y, cpX, cpY);
+        }
+        ctx.lineTo(coords[coords.length - 1].x, coords[coords.length - 1].y);
+        ctx.stroke();
+        ctx.restore();
+    });
+
+    setupChartCrosshair(container, trackerId, points, series, maxY);
+}
+
+function setupChartCrosshair(container, trackerId, points, series, maxY) {
+    const tracker = document.getElementById(trackerId);
+    if (!tracker || container._hasCrosshairSetup) return;
+    container._hasCrosshairSetup = true;
+
+    container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        const mouseX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        const idx = Math.min(points.length - 1, Math.max(0, Math.round((mouseX / rect.width) * (points.length - 1))));
+        const p = points[idx];
+        if (!p) return;
+
+        tracker.style.display = 'block';
+        tracker.style.left = `${(idx / (points.length - 1)) * 100}%`;
+
+        let tipText = `${p.t}`;
+        series.forEach(s => {
+            const v = p[s.key] !== undefined ? p[s.key] : 0;
+            tipText += ` · ${s.label}: ${typeof v === 'number' ? (v > 100 ? Math.round(v) : v.toFixed(1)) : v}${s.unit}`;
+        });
+        tracker.setAttribute('data-tip', tipText);
+    });
+
+    container.addEventListener('mouseleave', () => {
+        tracker.style.display = 'none';
+    });
+}
+
+function renderContainerMatrix(containers) {
+    const grid = document.getElementById('containerMatrixGrid');
+    const countBadge = document.getElementById('containerMatrixCountBadge');
+    if (!grid) return;
+
+    if (!containers || !containers.length) {
+        grid.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">No active container metrics detected.</div>';
+        if (countBadge) countBadge.textContent = '0 Active';
+        return;
+    }
+
+    if (countBadge) countBadge.textContent = `${containers.length} Active`;
+
+    let html = '';
+    containers.forEach(c => {
+        const cpuPct = Math.min(100, Math.max(0, c.cpu || 0));
+        const memPct = Math.min(100, Math.max(0, c.mem_pct || 0));
+        
+        let cpuColor = '#38bdf8';
+        if (cpuPct > 50) cpuColor = '#ef4444';
+        else if (cpuPct > 20) cpuColor = '#fbbf24';
+        else if (cpuPct > 5) cpuColor = '#22d3ee';
+
+        let memColor = '#34d399';
+        if (memPct > 60) memColor = '#ef4444';
+        else if (memPct > 25) memColor = '#fbbf24';
+
+        html += `
+            <div class="container-row-tile">
+                <div style="font-size:14px;text-align:center">🐳</div>
+                <div style="min-width:0">
+                    <div style="font-size:11.5px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(c.display_name)}">
+                        ${escapeHtml(c.display_name)}
+                    </div>
+                    <div style="font-size:10px;color:var(--text-muted);font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                        ${escapeHtml(c.name)}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:10px;font-family:monospace;line-height:1.3;margin-bottom:3px;display:flex;justify-content:space-between;gap:6px">
+                        <span><span style="color:var(--text-secondary)">CPU:</span> <strong style="color:${cpuColor}">${c.cpu.toFixed(1)}%</strong></span>
+                        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.mem_str || ''}"><span style="color:var(--text-secondary)">RAM:</span> <strong style="color:${memColor}">${c.mem_str || (c.mem_pct + '%')}</strong></span>
+                    </div>
+                    <div class="c-mini-bar-track" style="display:flex;gap:2px">
+                        <div class="c-mini-bar-fill" style="width:${Math.max(2, cpuPct)}%;background:${cpuColor}" title="CPU: ${c.cpu}%"></div>
+                        <div class="c-mini-bar-fill" style="width:${Math.max(2, memPct)}%;background:${memColor};opacity:0.85" title="RAM: ${c.mem_pct}%"></div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:600">Running</span>
+                </div>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+}
+
+window.addEventListener('resize', () => {
+    if (telemetryActiveTab === 'waveforms') {
+        renderAllWaveforms();
+    }
+});
+
 // ── Live Stats Telemetry Poller ──────────────────────────────────
 async function fetchStats() {
     try {
@@ -11616,6 +12393,7 @@ async function fetchStats() {
         const data = await res.json();
         statsCache = data;
         applyWidgetVisibility();
+        fetchTelemetryHistory();
 
         // Dynamic Hardware & Host Server Title
         if (data.hardware) {

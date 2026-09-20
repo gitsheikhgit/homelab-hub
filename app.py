@@ -11,6 +11,7 @@ import urllib.request
 import threading
 import subprocess
 import psutil
+from collections import deque
 from datetime import datetime
 from flask import Flask, render_template, jsonify, request, send_from_directory, Response
 
@@ -1133,6 +1134,121 @@ def _nodes_telemetry_loop():
         time.sleep(15)
 
 threading.Thread(target=_nodes_telemetry_loop, daemon=True).start()
+
+# ── Live Telemetry Waveforms & Rolling History Ring Buffer (Beszel-Style) ──
+telemetry_history = deque(maxlen=120)  # Stores up to 120 samples (10-30 minutes of telemetry)
+cached_container_telemetry = []
+
+_last_wf_net = {"time": time.time(), "sent": 0, "recv": 0}
+_last_wf_disk = {"time": time.time(), "read": 0, "write": 0}
+
+try:
+    _n0 = psutil.net_io_counters()
+    _last_wf_net["sent"] = _n0.bytes_sent
+    _last_wf_net["recv"] = _n0.bytes_recv
+    _d0 = psutil.disk_io_counters()
+    if _d0:
+        _last_wf_disk["read"] = _d0.read_bytes
+        _last_wf_disk["write"] = _d0.write_bytes
+except Exception:
+    pass
+
+def _telemetry_waveforms_collector():
+    global telemetry_history, cached_container_telemetry, _last_wf_net, _last_wf_disk
+    time.sleep(1)
+    docker_tick = 0
+    while True:
+        try:
+            now = time.time()
+            cpu = psutil.cpu_percent(interval=None)
+            mem = psutil.virtual_memory().percent
+            
+            # Net Throughput Delta
+            net = psutil.net_io_counters()
+            dt_net = max(0.2, now - _last_wf_net["time"])
+            net_down_kbs = round(max(0.0, (net.bytes_recv - _last_wf_net["recv"]) / dt_net) / 1024.0, 1)
+            net_up_kbs = round(max(0.0, (net.bytes_sent - _last_wf_net["sent"]) / dt_net) / 1024.0, 1)
+            _last_wf_net["time"] = now
+            _last_wf_net["recv"] = net.bytes_recv
+            _last_wf_net["sent"] = net.bytes_sent
+
+            # Disk I/O Delta
+            disk = psutil.disk_io_counters()
+            dt_disk = max(0.2, now - _last_wf_disk["time"])
+            disk_read_kbs = 0.0
+            disk_write_kbs = 0.0
+            if disk:
+                disk_read_kbs = round(max(0.0, (disk.read_bytes - _last_wf_disk["read"]) / dt_disk) / 1024.0, 1)
+                disk_write_kbs = round(max(0.0, (disk.write_bytes - _last_wf_disk["write"]) / dt_disk) / 1024.0, 1)
+                _last_wf_disk["time"] = now
+                _last_wf_disk["read"] = disk.read_bytes
+                _last_wf_disk["write"] = disk.write_bytes
+
+            telemetry_history.append({
+                "t": datetime.now().strftime("%H:%M:%S"),
+                "ts": int(now),
+                "cpu": cpu,
+                "mem": mem,
+                "net_down": net_down_kbs,
+                "net_up": net_up_kbs,
+                "disk_read": disk_read_kbs,
+                "disk_write": disk_write_kbs
+            })
+
+            # Sample Docker container stats every 10s (every 2nd loop)
+            docker_tick += 1
+            if docker_tick >= 2:
+                docker_tick = 0
+                try:
+                    cmd = ['docker', 'stats', '--no-stream', '--format', '{{.Name}}|{{.CPUPerc}}|{{.MemUsage}}|{{.MemPerc}}']
+                    d_out = subprocess.check_output(cmd, timeout=6).decode('utf-8', errors='ignore')
+                    c_list = []
+                    for line in d_out.strip().splitlines():
+                        parts = line.split('|')
+                        if len(parts) >= 4:
+                            c_name = parts[0].strip()
+                            try:
+                                cpu_val = round(float(parts[1].replace('%', '').strip() or 0), 2)
+                            except Exception:
+                                cpu_val = 0.0
+                            mem_str = parts[2].strip()
+                            try:
+                                mem_val = round(float(parts[3].replace('%', '').strip() or 0), 2)
+                            except Exception:
+                                mem_val = 0.0
+                            
+                            c_clean = re.sub(r'[-_](?:app|main|server|core|web)?[-_]?\d+$', '', c_name)
+                            words = [w.capitalize() for w in re.split(r'[-_]', c_clean) if w]
+                            disp = " ".join(words) if words else c_name
+                            
+                            c_list.append({
+                                "name": c_name,
+                                "display_name": disp,
+                                "cpu": cpu_val,
+                                "mem_str": mem_str,
+                                "mem_pct": mem_val
+                            })
+                    c_list.sort(key=lambda x: (x["cpu"], x["mem_pct"]), reverse=True)
+                    cached_container_telemetry = c_list
+                except Exception:
+                    pass
+
+        except Exception:
+            pass
+        time.sleep(5)
+
+threading.Thread(target=_telemetry_waveforms_collector, daemon=True).start()
+
+@app.route("/api/telemetry/history")
+def api_telemetry_history():
+    return jsonify({
+        "status": "success",
+        "count": len(telemetry_history),
+        "history": list(telemetry_history),
+        "containers": cached_container_telemetry,
+        "timestamp": int(time.time()),
+        "server_time": datetime.now().strftime("%H:%M:%S")
+    })
 
 @app.route("/api/processes")
 def api_processes():
