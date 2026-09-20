@@ -552,35 +552,222 @@
             font-weight: 600 !important;
         }
 
-        /* ── Wallpapers & Wizard App Rows ── */
-        :root[data-active-theme="light"] .wallpaper-thumb {
+        /* ── Wallpapers & Wizard Controls & App Rows ── */
+        :root[data-active-theme="light"] .wizard-dock-btn {
+            background: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-dock-btn > div > div:first-child {
+            color: #0f172a !important;
+            font-weight: 700 !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-dock-btn > div > div:last-child {
+            color: #64748b !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-dock-btn:hover {
             background: #f8fafc !important;
-            border: 1px solid #cbd5e1 !important;
+            border-color: #94a3b8 !important;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-dock-btn.active {
+            background: #eff6ff !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25), 0 2px 8px rgba(37, 99, 235, 0.12) !important;
+            color: #1d4ed8 !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-dock-btn.active > div > div:first-child {
+            color: #1d4ed8 !important;
+            font-weight: 700 !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-dock-btn.active > div > div:last-child {
+            color: #2563eb !important;
+            font-weight: 500 !important;
+        }
+
+        :root[data-active-theme="light"] .wallpaper-thumb {
+            background: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
             color: #1e293b !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        :root[data-active-theme="light"] .wallpaper-thumb:hover {
+            background: #f8fafc !important;
+            border-color: #94a3b8 !important;
         }
 
         :root[data-active-theme="light"] .wallpaper-thumb.active {
             border-color: #2563eb !important;
-            background: rgba(37, 99, 235, 0.08) !important;
-            color: #2563eb !important;
+            background: #eff6ff !important;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+            color: #1d4ed8 !important;
+            font-weight: 700 !important;
         }
 
-        :root[data-active-theme="light"] .wizard-app-row {
-            background: #f8fafc !important;
-            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        :root[data-active-theme="light"] .wallpaper-thumb span {
+            color: inherit !important;
+            font-weight: inherit !important;
         }
 
-        :root[data-active-theme="light"] .wiz-app-name-input,
-        :root[data-active-theme="light"] .wiz-app-sub-input {
+        /* Initial Setup Modal Comprehensive Light Mode Polish */
+        :root[data-active-theme="light"] #initialSetupModal .drawer-head {
+            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%) !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-head > div:first-child > div:first-child {
+            background: #dbeafe !important;
+            border: 1.5px solid #bfdbfe !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-head span[style*="background:rgba(59,130,246,0.25)"] {
+            background: #dbeafe !important;
+            color: #1d4ed8 !important;
+            border: 1px solid #bfdbfe !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-head .btn-ctrl {
             background: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-head .btn-ctrl:hover {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
             color: #0f172a !important;
         }
 
-        :root[data-active-theme="light"] .wiz-app-cat-select {
+        :root[data-active-theme="light"] #initialSetupModal .drawer-body > div {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-body > div > div:first-child {
+            color: #0f172a !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .modal-form-input {
+            background: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            font-weight: 500 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .modal-form-input:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal label {
+            color: #334155 !important;
+            font-weight: 600 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal button[onclick*="wizCustomWallpaperInput"] {
+            background: #eff6ff !important;
+            border: 1.5px solid #bfdbfe !important;
+            color: #1d4ed8 !important;
+            font-weight: 600 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal button[onclick*="wizCustomWallpaperInput"]:hover {
+            background: #dbeafe !important;
+            border-color: #93c5fd !important;
+            color: #1e40af !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal #btnWizRescan {
+            background: #eff6ff !important;
+            border: 1.5px solid #bfdbfe !important;
+            color: #1d4ed8 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal #btnWizRescan:hover {
+            background: #dbeafe !important;
+            border-color: #93c5fd !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal #wizDockerContent .btn-ctrl {
             background: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
-            color: #2563eb !important;
+            color: #334155 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal #wizDockerContent .btn-ctrl:hover {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-foot {
+            background: #f8fafc !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-foot > div:first-child {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-foot label {
+            color: #1e293b !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-foot button.btn-ctrl:not(#btnWizFinishWithCards) {
+            background: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal .drawer-foot button.btn-ctrl:not(#btnWizFinishWithCards):hover {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+        }
+
+        :root[data-active-theme="light"] #initialSetupModal #btnWizFinishWithCards {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+            color: #ffffff !important;
+            border: 1px solid #1d4ed8 !important;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+        }
+
+        :root[data-active-theme="light"] .wizard-app-row {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        :root[data-active-theme="light"] .wiz-app-name-input {
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            font-weight: 600 !important;
+        }
+
+        :root[data-active-theme="light"] .wiz-app-sub-input {
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+
+        :root[data-active-theme="light"] .wiz-app-cat-select {
+            background: #eff6ff !important;
+            border: 1px solid #bfdbfe !important;
+            color: #1d4ed8 !important;
+            font-weight: 600 !important;
         }
 
         /* ── Real Dashboard Light Mode Precision Overrides ── */
@@ -3358,25 +3545,48 @@
         .wizard-dock-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
-            padding: 10px 12px;
+            border-radius: 9px;
+            padding: 10px 14px;
             color: #e2e8f0;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.2s ease;
+            gap: 12px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
+            user-select: none;
+        }
+        .wizard-dock-btn > div {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .wizard-dock-btn > div > div:first-child {
+            font-weight: 600;
+            font-size: 13px;
+            color: #f1f5f9;
+        }
+        .wizard-dock-btn > div > div:last-child {
+            font-size: 11px;
+            color: var(--text-muted);
         }
         .wizard-dock-btn:hover {
-            background: rgba(59, 130, 246, 0.12);
-            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(59, 130, 246, 0.14);
+            border-color: rgba(59, 130, 246, 0.45);
+            transform: translateY(-1px);
         }
         .wizard-dock-btn.active {
-            background: rgba(59, 130, 246, 0.22);
+            background: rgba(59, 130, 246, 0.24);
             border-color: var(--accent-blue);
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
             color: #fff;
+        }
+        .wizard-dock-btn.active > div > div:first-child {
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .wizard-dock-btn.active > div > div:last-child {
+            color: #93c5fd;
         }
         .wizard-app-row {
             display: grid;
