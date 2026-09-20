@@ -12,20 +12,15 @@ import time
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-AIO_CHILD_CONTAINERS = {
-    "nextcloud-aio-apache",
-    "nextcloud-aio-nextcloud",
-    "nextcloud-aio-imaginary",
-    "nextcloud-aio-fulltextsearch",
-    "nextcloud-aio-clamav",
-    "nextcloud-aio-redis",
-    "nextcloud-aio-database",
-    "nextcloud-aio-whiteboard",
-    "nextcloud-aio-notify-push",
-    "nextcloud-aio-eurooffice",
-    "nextcloud-aio-watchtower",
-    "nextcloud-aio-borgbackup"
-}
+def is_aio_managed_container(name):
+    """
+    Dynamically identifies if a container is an automated child worker of Nextcloud AIO.
+    Nextcloud AIO child containers (database, redis, apache, etc.) are managed strictly
+    by the Nextcloud AIO mastercontainer portal and must not be recreated externally.
+    """
+    if not name:
+        return False
+    return name.startswith("nextcloud-aio-") and name != "nextcloud-aio-mastercontainer"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(BASE_DIR, "docker_updates_cache.json")
@@ -88,7 +83,7 @@ def get_all_container_configs():
             compose_dir = labels.get('com.docker.compose.project.working_dir', '')
             compose_service = labels.get('com.docker.compose.service', '')
             
-            is_aio = name in AIO_CHILD_CONTAINERS
+            is_aio = is_aio_managed_container(name)
             
             containers.append({
                 "id": cid[:12],

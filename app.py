@@ -2334,13 +2334,13 @@ def docker_restart_unhealthy():
         dps = subprocess.check_output(cmd).decode("utf-8", errors="ignore")
         restarted = []
         errors = []
-        ignored = {"nextcloud-aio-borgbackup", "nextcloud-aio-watchtower", "busy_lederberg"}
         for line in dps.splitlines():
             if "|" in line:
                 name, stat = line.split("|", 1)
                 name = name.strip()
                 stat = stat.strip()
-                if name in ignored:
+                # Skip one-off/ephemeral batch jobs that naturally exit (backups, periodic watchtowers)
+                if name.startswith("nextcloud-aio-borgbackup") or name.startswith("nextcloud-aio-watchtower"):
                     continue
                 if "unhealthy" in stat.lower() or not ("Up" in stat):
                     try:
