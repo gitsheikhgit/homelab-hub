@@ -43,6 +43,12 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True
 
+# Prime psutil CPU counters so the first per-core call returns active non-zero data
+try:
+    psutil.cpu_percent(interval=None, percpu=True)
+except Exception:
+    pass
+
 @app.after_request
 def add_no_cache_headers(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
@@ -1221,6 +1227,44 @@ def api_processes():
                 "efficiency_rating": "Active Intel RAPL Silicon Telemetry"
             },
             "processes": top_procs
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/system/cpu-cores")
+def api_cpu_cores():
+    try:
+        cores_pct = psutil.cpu_percent(interval=None, percpu=True)
+        overall_cpu = round(sum(cores_pct) / len(cores_pct), 1) if cores_pct else 0.0
+        
+        freq = psutil.cpu_freq()
+        freq_ghz = round(freq.current / 1000.0, 2) if freq and freq.current else None
+        
+        mem = psutil.virtual_memory()
+        swap = psutil.swap_memory()
+        
+        return jsonify({
+            "status": "success",
+            "cpu": {
+                "overall": overall_cpu,
+                "cores": [round(c, 1) for c in cores_pct],
+                "count": len(cores_pct),
+                "freq_ghz": freq_ghz,
+                "temp": get_cpu_temp()
+            },
+            "ram": {
+                "percent": round(mem.percent, 1),
+                "used_gb": round(mem.used / (1024**3), 2),
+                "free_gb": round(mem.available / (1024**3), 2),
+                "cached_gb": round(getattr(mem, 'cached', 0) / (1024**3), 2),
+                "total_gb": round(mem.total / (1024**3), 2)
+            },
+            "swap": {
+                "percent": round(swap.percent, 1),
+                "used_gb": round(swap.used / (1024**3), 2),
+                "free_gb": round(swap.free / (1024**3), 2),
+                "total_gb": round(swap.total / (1024**3), 2)
+            }
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

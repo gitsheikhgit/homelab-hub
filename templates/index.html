@@ -2462,6 +2462,131 @@
             justify-content: flex-end;
         }
 
+        /* ── Host View Segmented Toggle & Real-Time Cores Matrix ── */
+        .host-view-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.08));
+            border-radius: 8px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        :root[data-active-theme="light"] .host-view-toggle {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .host-toggle-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .host-toggle-btn.active {
+            background: rgba(59, 130, 246, 0.22);
+            color: var(--accent-blue);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        :root[data-active-theme="light"] .host-toggle-btn.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .cores-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 480px) {
+            .cores-matrix-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 6px;
+            }
+        }
+
+        .core-slider-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .core-label {
+            font-size: 10px;
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 22px;
+            flex-shrink: 0;
+        }
+
+        .core-slider-track {
+            flex: 1;
+            min-width: 0;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        :root[data-active-theme="light"] .core-slider-track {
+            background: #e2e8f0;
+        }
+
+        .core-slider-fill {
+            height: 100%;
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.35s ease;
+        }
+
+        /* Subtle, theme-matching load states (NO rainbow colors!) */
+        .core-load-low {
+            background: var(--accent-cyan, #06b6d4);
+        }
+
+        .core-load-med {
+            background: var(--accent-amber, #f59e0b);
+        }
+
+        .core-load-high {
+            background: #ef4444;
+        }
+
+        .ram-fill {
+            background: var(--accent-blue, #3b82f6);
+        }
+
+        .swap-fill {
+            background: #a855f7;
+        }
+
+        .core-pct-val {
+            font-size: 10px;
+            font-family: monospace;
+            font-weight: 700;
+            min-width: 36px;
+            text-align: right;
+            flex-shrink: 0;
+            color: var(--text-primary);
+        }
+
         /* ── Responsive Breakpoints (Mobile & Tablet Optimized) ───── */
         @media (max-width: 1080px) {
             .main-command-grid {
@@ -2677,7 +2802,11 @@
             }
 
             /* 4-Metric System Cards (Host Overview, Power, Tailscale, Speedtest, Primary Fleet) */
-            .card-body:not(.metrics-3) {
+            .card-body.host-body-hidden {
+                display: none !important;
+            }
+
+            .card-body:not(.metrics-3):not(.host-body-hidden) {
                 display: grid !important;
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
                 gap: 6px !important;
@@ -4781,6 +4910,10 @@
                             </div>
                         </div>
                         <div class="card-head-right">
+                            <div class="host-view-toggle" onclick="event.stopPropagation()">
+                                <button type="button" class="host-toggle-btn active" id="btnHostViewOverview" onclick="toggleHostCardView('overview', event)" title="Compact 4-metric overview">⚡ Overview</button>
+                                <button type="button" class="host-toggle-btn" id="btnHostViewCores" onclick="toggleHostCardView('cores', event)" title="Real-time multi-core and memory distribution">📊 Cores &amp; RAM</button>
+                            </div>
                             <span style="font-size:11px;color:var(--accent-blue);font-weight:600;white-space:nowrap">Inspect ↗</span>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_host_overview')" title="Card Options">⋮</button>
@@ -4795,11 +4928,60 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
+
+                    <!-- 1. Default Compact 4-Metric Body -->
+                    <div class="card-body" id="hostOverviewCompactBody">
                         <div class="metric-cell"><div class="metric-val" id="hostCpu">--%</div><div class="metric-lbl">CPU Load</div></div>
                         <div class="metric-cell"><div class="metric-val" id="hostRam">--G</div><div class="metric-lbl">RAM Used</div></div>
                         <div class="metric-cell"><div class="metric-val" id="hostTemp">--°C</div><div class="metric-lbl">Temp</div></div>
                         <div class="metric-cell"><div class="metric-val" id="hostUptime">--</div><div class="metric-lbl">Uptime</div></div>
+                    </div>
+
+                    <!-- 2. Real-Time Per-Core & Dynamic RAM Body (Option C) -->
+                    <div id="hostOverviewCoresBody" style="display:none;padding:10px 12px 12px;box-sizing:border-box" onclick="event.stopPropagation()">
+                        <!-- Live CPU Cores Grid Header -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                            <div style="font-size:11px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:6px">
+                                <span>⚡</span> CPU Core Load <span id="hostCoresCountBadge" style="font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:4px;background:rgba(59,130,246,0.15);color:var(--accent-blue)">-- Cores</span>
+                            </div>
+                            <div style="font-size:10.5px;font-family:monospace;color:var(--text-secondary)" id="hostCpuFreqSummary">-- GHz · --% Total</div>
+                        </div>
+
+                        <div id="hostCpuCoresGrid" class="cores-matrix-grid">
+                            <!-- Populated dynamically based on detected cores -->
+                        </div>
+
+                        <!-- Divider -->
+                        <div style="height:1px;background:var(--border-glass, rgba(255,255,255,0.06));margin:10px 0 8px"></div>
+
+                        <!-- Dynamic RAM & Swap Telemetry -->
+                        <div style="display:flex;flex-direction:column;gap:7px">
+                            <!-- RAM Bar -->
+                            <div class="memory-telemetry-row">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-size:10.5px">
+                                    <span style="font-weight:600;color:var(--text-primary)">🧠 Physical RAM</span>
+                                    <span style="font-family:monospace;color:var(--text-secondary)" id="hostRamDetails">-- / -- GB (<span id="hostRamPct" style="font-weight:700;color:var(--accent-blue)">--%</span>)</span>
+                                </div>
+                                <div class="core-slider-track">
+                                    <div class="core-slider-fill ram-fill" id="hostRamSliderFill" style="width:0%"></div>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--text-muted);margin-top:2px">
+                                    <span>Cached: <span id="hostRamCached">-- GB</span></span>
+                                    <span>Free: <span id="hostRamFree">-- GB</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Swap Bar -->
+                            <div class="memory-telemetry-row" id="hostSwapRow">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-size:10.5px">
+                                    <span style="font-weight:600;color:var(--text-primary)">🔄 Swap Memory</span>
+                                    <span style="font-family:monospace;color:var(--text-secondary)" id="hostSwapDetails">-- / -- GB (<span id="hostSwapPct" style="font-weight:700;color:#a855f7">--%</span>)</span>
+                                </div>
+                                <div class="core-slider-track">
+                                    <div class="core-slider-fill swap-fill" id="hostSwapSliderFill" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -10947,6 +11129,145 @@ async function syncExternalFeeds() {
     }
 }
 
+// ── Real-Time Multi-Core & Dynamic RAM Telemetry (Option C) ──────────
+let _hostCardActiveView = 'overview';
+let _coresPollerTimer = null;
+let _cachedCoreCount = 0;
+
+function toggleHostCardView(view, ev) {
+    if (ev) ev.stopPropagation();
+    _hostCardActiveView = view;
+
+    const btnOverview = document.getElementById('btnHostViewOverview');
+    const btnCores = document.getElementById('btnHostViewCores');
+    const compactBody = document.getElementById('hostOverviewCompactBody');
+    const coresBody = document.getElementById('hostOverviewCoresBody');
+
+    if (view === 'cores') {
+        if (btnOverview) btnOverview.classList.remove('active');
+        if (btnCores) btnCores.classList.add('active');
+        if (compactBody) {
+            compactBody.classList.add('host-body-hidden');
+            compactBody.style.display = 'none';
+        }
+        if (coresBody) {
+            coresBody.style.display = 'block';
+        }
+        startCoresLivePoller();
+    } else {
+        if (btnOverview) btnOverview.classList.add('active');
+        if (btnCores) btnCores.classList.remove('active');
+        if (compactBody) {
+            compactBody.classList.remove('host-body-hidden');
+            compactBody.style.display = '';
+        }
+        if (coresBody) coresBody.style.display = 'none';
+        stopCoresLivePoller();
+    }
+}
+
+function startCoresLivePoller() {
+    stopCoresLivePoller();
+    fetchCoresTelemetry();
+    _coresPollerTimer = setInterval(fetchCoresTelemetry, 1800);
+}
+
+function stopCoresLivePoller() {
+    if (_coresPollerTimer) {
+        clearInterval(_coresPollerTimer);
+        _coresPollerTimer = null;
+    }
+}
+
+async function fetchCoresTelemetry() {
+    if (_hostCardActiveView !== 'cores') return;
+    try {
+        const res = await fetch('/api/system/cpu-cores');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.status === 'success') {
+            renderCoresTelemetry(data);
+        }
+    } catch (e) {
+        console.error('Failed to fetch cores telemetry:', e);
+    }
+}
+
+function renderCoresTelemetry(data) {
+    const cpu = data.cpu || {};
+    const ram = data.ram || {};
+    const swap = data.swap || {};
+    const cores = cpu.cores || [];
+
+    // Header summary
+    const countBadge = document.getElementById('hostCoresCountBadge');
+    const freqSummary = document.getElementById('hostCpuFreqSummary');
+    if (countBadge) countBadge.textContent = `${cores.length} Cores`;
+    if (freqSummary) {
+        const ghz = cpu.freq_ghz ? `${cpu.freq_ghz.toFixed(2)} GHz · ` : '';
+        const temp = cpu.temp ? ` · ${cpu.temp}°C` : '';
+        freqSummary.textContent = `${ghz}${cpu.overall || 0}% Total${temp}`;
+    }
+
+    // Cores Grid
+    const grid = document.getElementById('hostCpuCoresGrid');
+    if (grid) {
+        // Build rows if count changed or grid is empty
+        if (_cachedCoreCount !== cores.length || grid.children.length !== cores.length) {
+            _cachedCoreCount = cores.length;
+            grid.innerHTML = cores.map((_, i) => `
+                <div class="core-slider-item" id="coreItem_${i}">
+                    <div class="core-label">C${i}</div>
+                    <div class="core-slider-track">
+                        <div class="core-slider-fill" id="coreFill_${i}" style="width:0%"></div>
+                    </div>
+                    <div class="core-pct-val" id="coreVal_${i}">0%</div>
+                </div>
+            `).join('');
+        }
+
+        // Smoothly update widths, load classes, and percentages
+        cores.forEach((pct, i) => {
+            const fill = document.getElementById(`coreFill_${i}`);
+            const val = document.getElementById(`coreVal_${i}`);
+            if (fill && val) {
+                fill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+                val.textContent = `${pct.toFixed(0)}%`;
+                
+                // Color class based on load
+                fill.className = `core-slider-fill ${pct >= 75 ? 'core-load-high' : pct >= 45 ? 'core-load-med' : 'core-load-low'}`;
+            }
+        });
+    }
+
+    // RAM Telemetry
+    const ramFill = document.getElementById('hostRamSliderFill');
+    const ramDetails = document.getElementById('hostRamDetails');
+    const ramPct = document.getElementById('hostRamPct');
+    const ramCached = document.getElementById('hostRamCached');
+    const ramFree = document.getElementById('hostRamFree');
+
+    if (ramFill) ramFill.style.width = `${Math.min(100, Math.max(0, ram.percent || 0))}%`;
+    if (ramPct) ramPct.textContent = `${(ram.percent || 0).toFixed(1)}%`;
+    if (ramDetails) ramDetails.innerHTML = `${(ram.used_gb || 0).toFixed(1)} / ${(ram.total_gb || 0).toFixed(1)} GB (<span style="font-weight:700;color:var(--accent-blue)">${(ram.percent || 0).toFixed(1)}%</span>)`;
+    if (ramCached) ramCached.textContent = `${(ram.cached_gb || 0).toFixed(1)} GB`;
+    if (ramFree) ramFree.textContent = `${(ram.free_gb || 0).toFixed(1)} GB`;
+
+    // Swap Telemetry
+    const swapRow = document.getElementById('hostSwapRow');
+    const swapFill = document.getElementById('hostSwapSliderFill');
+    const swapDetails = document.getElementById('hostSwapDetails');
+    if (swapRow) {
+        if (!swap.total_gb || swap.total_gb === 0) {
+            swapRow.style.display = 'none';
+        } else {
+            swapRow.style.display = 'block';
+            if (swapFill) swapFill.style.width = `${Math.min(100, Math.max(0, swap.percent || 0))}%`;
+            if (swapDetails) swapDetails.innerHTML = `${(swap.used_gb || 0).toFixed(1)} / ${(swap.total_gb || 0).toFixed(1)} GB (<span style="font-weight:700;color:#a855f7">${(swap.percent || 0).toFixed(1)}%</span>)`;
+        }
+    }
+}
+
 // ── Live Stats Telemetry Poller ──────────────────────────────────
 async function fetchStats() {
     try {
@@ -14431,6 +14752,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlInspect = new URLSearchParams(window.location.search).get('inspect');
     if (urlInspect) {
         setTimeout(() => openDateInspector(urlInspect), 350);
+    }
+
+    const urlView = new URLSearchParams(window.location.search).get('view');
+    if (urlView === 'cores') {
+        setTimeout(() => toggleHostCardView('cores'), 250);
+    }
+
+    const urlScroll = new URLSearchParams(window.location.search).get('scroll');
+    if (urlScroll) {
+        setTimeout(() => {
+            const el = document.getElementById(urlScroll);
+            if (el) el.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }, 400);
     }
 });
 
