@@ -16191,13 +16191,12 @@ async function submitScanModalCards() {
 }
 
 function checkInitialSetup() {
+    if (dashboardSettings && dashboardSettings.initial_setup_completed === true) return;
     const isCompleted = localStorage.getItem('initial_setup_completed');
-    if (isCompleted === 'true') return;
-    if (dashboardSettings && dashboardSettings.initial_setup_completed === false) {
-        setTimeout(() => {
-            openInitialSetupModal();
-        }, 700);
-    }
+    if (isCompleted === 'true' && (!dashboardSettings || dashboardSettings.initial_setup_completed !== false)) return;
+    setTimeout(() => {
+        openInitialSetupModal();
+    }, 700);
 }
 
 

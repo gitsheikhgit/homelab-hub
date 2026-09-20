@@ -84,38 +84,14 @@ DEFAULT_SETTINGS = {
 }
 
 def get_cards():
-    """Retrieve list of cards. On fresh installations with no cards.json, auto-detects real Docker applications on the host."""
+    """Retrieve list of cards. On fresh installations with no cards.json, returns an empty list so user sets up cleanly."""
     if os.path.exists(CARDS_FILE):
         try:
             with open(CARDS_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
-
-    # Fresh system with no cards.json: Attempt to auto-detect running Docker containers on this machine
-    detected_cards = []
-    try:
-        scan = detect_docker_applications()
-        if scan and scan.get("apps"):
-            for idx, a in enumerate(scan["apps"], start=1):
-                detected_cards.append({
-                    "id": "card_" + uuid.uuid4().hex[:8],
-                    "name": a.get("name", "App"),
-                    "subtitle": a.get("subtitle", "Docker Container"),
-                    "lan_url": a.get("lan_url", ""),
-                    "ts_url": a.get("ts_url", ""),
-                    "second_link_name": a.get("second_link_name", ""),
-                    "second_lan_url": a.get("second_lan_url", ""),
-                    "second_ts_url": a.get("second_ts_url", ""),
-                    "icon": a.get("icon", "/static/icons/portainer.png"),
-                    "category": a.get("category", "Apps"),
-                    "order": idx
-                })
-    except Exception:
-        pass
-
-    save_cards(detected_cards)
-    return detected_cards
+    return []
 
 def save_cards(cards):
     """Save cards list to cards.json."""
