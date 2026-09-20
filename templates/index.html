@@ -5328,7 +5328,7 @@
             <div class="mobile-brand-text">
                 <div class="mobile-brand-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                     <span>HOMELAB <span style="color:var(--accent-blue)">HUB</span></span>
-                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.0.9') }} · Click to view updates">{{ app_version | default('v1.0.9') }}</span>
+                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.1.0') }} · Click to view updates">{{ app_version | default('v1.1.0') }}</span>
                     <span class="hub-update-available-flag" id="headerUpdateFlag" style="display:none" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Click to view update details and release notes">
                         <span class="flag-pulse-dot"></span> <span id="headerUpdateVer">Update Available</span>
                     </span>
@@ -6463,7 +6463,7 @@
                         <span style="color:#eab308;font-size:12px">Settings ⚙️</span>
                     </button>
                     <button class="mobile-tool-btn" onclick="closeDrawer('mobileMenuDrawer'); openSettingsWithTab('updates');">
-                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.0.9') }}</span>)</span>
+                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.1.0') }}</span>)</span>
                         <span id="menuUpdateBadge" style="color:var(--accent-blue);font-size:12px">Check ↗</span>
                     </button>
                 </div>
@@ -7316,7 +7316,7 @@
                     <div style="font-size:16px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px">
                         <span id="telDetailModalTitle">Host Silicon &amp; Telemetry Diagnostics</span>
                         <span class="status-dot" style="width:7px;height:7px;background:#10b981;box-shadow:0 0 8px #10b981;display:inline-block"></span>
-                        <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:600">Live 2s Feed</span>
+                        <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:600">Live Real-Time Stream</span>
                     </div>
                     <div style="font-size:12px;color:var(--text-secondary)" id="telDetailModalSubtitle">
                         Full-spectrum real-time sensors • Per-core topology • Memory pools • Network &amp; disk I/O • Container allocation
@@ -7414,7 +7414,7 @@
             <div id="telModalTabWaveforms">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
                     <div style="font-size:12px;font-weight:600;color:var(--text-secondary)">
-                        Continuous High-Resolution Telemetry Graphs (2s Sampling)
+                        Continuous High-Resolution Telemetry Graphs (Real-Time 60 FPS Flow)
                     </div>
                     <!-- Time Range Selector -->
                     <div class="telemetry-range-group" id="telModalRangeSelector">
@@ -8309,7 +8309,7 @@
                         <div>
                             <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
                                 <span>🛰️</span> Homelab Hub
-                                <span id="hubCurrentVersionBadge" style="background:rgba(59,130,246,0.25);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700">{{ app_version | default('v1.0.9') }}</span>
+                                <span id="hubCurrentVersionBadge" style="background:rgba(59,130,246,0.25);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700">{{ app_version | default('v1.1.0') }}</span>
                             </div>
                             <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="hubUpdateStatusText">
                                 Automatic update sentinel active. Check for newer Docker releases anytime.
@@ -8323,7 +8323,7 @@
                     <div id="hubUpdateBanner" style="display:none;margin-top:14px;padding:12px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);border-radius:8px">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
                             <div>
-                                <div style="font-size:13px;font-weight:700;color:#6ee7b7">🚀 New Update Available: <span id="hubLatestVersionText">v1.0.1</span></div>
+                                <div style="font-size:13px;font-weight:700;color:#6ee7b7">🚀 New Update Available: <span id="hubLatestVersionText">--</span></div>
                                 <div style="font-size:11.5px;color:#cbd5e1;margin-top:2px">A new version was published on GitHub Container Registry (GHCR).</div>
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -12589,6 +12589,7 @@ function setTelemetryTimeRange(limit, btn) {
     renderAllWaveforms();
 }
 
+// ── Live Telemetry Real-Time Streaming Engine ──
 async function fetchTelemetryHistory() {
     try {
         const res = await fetch('/api/telemetry/history');
@@ -12598,7 +12599,7 @@ async function fetchTelemetryHistory() {
             telemetryCachedData = data;
             const sub = document.getElementById('telemetryLastSampleTime');
             if (sub && data.server_time) {
-                sub.textContent = `Continuous 5s sampling • Last sample: ${data.server_time} • ${data.count} points recorded`;
+                sub.textContent = `Live 1s real-time stream • Last sample: ${data.server_time} • ${data.count} points recorded`;
             }
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -12616,6 +12617,16 @@ async function fetchTelemetryHistory() {
                 renderAllWaveforms();
             } else {
                 renderContainerMatrix(data.containers || []);
+            }
+
+            // Sync with modal if open
+            const modal = document.getElementById('telemetryDetailModal');
+            if (modal && (modal.classList.contains('active') || modal.classList.contains('open'))) {
+                telModalCachedData = data;
+                renderTelemetryDetailGlance(data);
+                if (typeof telDetailActiveTab === 'undefined' || telDetailActiveTab === 'waveforms') {
+                    renderExpandedWaveforms(data.history || []);
+                }
             }
         }
     } catch (e) {
@@ -12701,8 +12712,12 @@ function drawWaveformChart(canvasId, trackerId, points, series, opts = {}) {
     if (rect.width <= 0 || rect.height <= 0) return;
 
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(rect.width * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
+    const targetW = Math.floor(rect.width * dpr);
+    const targetH = Math.floor(rect.height * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+    }
 
     const ctx = canvas.getContext('2d');
     ctx.resetTransform();
@@ -12749,6 +12764,8 @@ function drawWaveformChart(canvasId, trackerId, points, series, opts = {}) {
             return { x, y, val, time: p.t };
         });
 
+        const last = coords[coords.length - 1];
+
         // 1. Fill Path with Gradient
         const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
         grad.addColorStop(0, s.fillStart);
@@ -12763,8 +12780,8 @@ function drawWaveformChart(canvasId, trackerId, points, series, opts = {}) {
             const cpY = (coords[i].y + coords[i + 1].y) / 2;
             ctx.quadraticCurveTo(coords[i].x, coords[i].y, cpX, cpY);
         }
-        ctx.lineTo(coords[coords.length - 1].x, coords[coords.length - 1].y);
-        ctx.lineTo(coords[coords.length - 1].x, padTop + plotH);
+        ctx.lineTo(last.x, last.y);
+        ctx.lineTo(last.x, padTop + plotH);
         ctx.closePath();
         ctx.fillStyle = grad;
         ctx.fill();
@@ -12782,8 +12799,14 @@ function drawWaveformChart(canvasId, trackerId, points, series, opts = {}) {
             const cpY = (coords[i].y + coords[i + 1].y) / 2;
             ctx.quadraticCurveTo(coords[i].x, coords[i].y, cpX, cpY);
         }
-        ctx.lineTo(coords[coords.length - 1].x, coords[coords.length - 1].y);
+        ctx.lineTo(last.x, last.y);
         ctx.stroke();
+
+        // 3. Live Glowing Beacon Pulse at right edge
+        ctx.fillStyle = s.stroke;
+        ctx.beginPath();
+        ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
     });
 
@@ -12911,7 +12934,7 @@ function openTelemetryDetailModal() {
     }, 40);
 
     if (!telModalInterval) {
-        telModalInterval = setInterval(refreshTelemetryDetailData, 2000);
+        telModalInterval = setInterval(refreshTelemetryDetailData, 1000);
     }
 }
 
@@ -12968,8 +12991,13 @@ async function refreshTelemetryDetailData() {
         const data = await res.json();
         if (data.status === 'success') {
             telModalCachedData = data;
+            telemetryCachedData = data;
             renderTelemetryDetailGlance(data);
-            renderTelemetryDetailActiveTab();
+            if (typeof telDetailActiveTab === 'undefined' || telDetailActiveTab === 'waveforms') {
+                renderExpandedWaveforms(data.history || []);
+            } else {
+                renderTelemetryDetailActiveTab();
+            }
         }
     } catch (e) {
         console.warn('Error refreshing telemetry details:', e);
@@ -16917,7 +16945,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateClock, 1000);
     fetchStats();
     setInterval(fetchStats, 10000);
-    setInterval(fetchTelemetryHistory, 2000);
+    setInterval(fetchTelemetryHistory, 1000);
     fetchWeather();
     setInterval(fetchWeather, 300000);
 

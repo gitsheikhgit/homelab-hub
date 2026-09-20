@@ -17,7 +17,7 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-APP_VERSION = "1.0.9"
+APP_VERSION = "1.1.0"
 
 import task_manager
 from card_manager import (
@@ -1136,7 +1136,7 @@ def _nodes_telemetry_loop():
 threading.Thread(target=_nodes_telemetry_loop, daemon=True).start()
 
 # ── Live Telemetry Waveforms & Rolling History Ring Buffer (Beszel-Style) ──
-telemetry_history = deque(maxlen=300)  # Stores up to 300 samples (10 minutes @ 2s sampling)
+telemetry_history = deque(maxlen=600)  # Stores up to 600 samples (10 minutes @ 1s sampling)
 cached_container_telemetry = []
 
 _last_wf_net = {"time": time.time(), "sent": 0, "recv": 0}
@@ -1186,7 +1186,7 @@ def _telemetry_waveforms_collector():
 
             telemetry_history.append({
                 "t": datetime.now().strftime("%H:%M:%S"),
-                "ts": int(now),
+                "ts": round(now * 1000),
                 "cpu": cpu,
                 "mem": mem,
                 "net_down": net_down_kbs,
@@ -1195,9 +1195,9 @@ def _telemetry_waveforms_collector():
                 "disk_write": disk_write_kbs
             })
 
-            # Sample Docker container stats every 10s (every 5th loop @ 2s)
+            # Sample Docker container stats every 10s (every 10th loop @ 1s)
             docker_tick += 1
-            if docker_tick >= 5:
+            if docker_tick >= 10:
                 docker_tick = 0
                 try:
                     cmd = ['docker', 'stats', '--no-stream', '--format', '{{.Name}}|{{.CPUPerc}}|{{.MemUsage}}|{{.MemPerc}}']
@@ -1235,7 +1235,7 @@ def _telemetry_waveforms_collector():
 
         except Exception:
             pass
-        time.sleep(2)
+        time.sleep(1)
 
 threading.Thread(target=_telemetry_waveforms_collector, daemon=True).start()
 

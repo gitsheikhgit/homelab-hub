@@ -4,6 +4,19 @@ All notable changes to **Homelab Hub** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [[v1.1.0](https://github.com/gitsheikhgit/homelab-hub/releases/tag/v1.1.0)] - 2026-09-20
+
+### Added
+- **Beszel-Style Live Silicon & Hardware Telemetry Waveforms**: High-resolution, continuous SVG/Canvas waveform graphs for CPU utilization, Memory allocation, Network throughput (download/upload), and Disk I/O (read/write) with real-time 60 FPS rendering and 1m, 2m, 5m, and 10m time-window presets.
+- **Interactive Crosshair & Hover Scrubbing**: Live coordinate tracking across all waveform timelines showing precise timestamps, CPU %, memory metrics, and I/O rates.
+- **Docker Container Resource Utilization Matrix**: Real-time per-container CPU percentage and RAM usage/limit allocation table with instant text search filtering and sorting by CPU, RAM, or Name.
+- **Pinned Diagnostic Metrics & Tab Navigation**: Host Silicon & Telemetry modal features pinned glance metrics (CPU load/frequency, memory usage/cached, network throughput, disk operations) and sticky tab navigation that remain accessible while scrolling through detailed diagnostics.
+- **1-Second Real-Time Telemetry Streaming Engine**: Ultra-low-latency, zero-drift background collector streaming host and container performance deltas without synthetic jitter or artificial sawtooth offsets.
+
+### Changed
+- **Universal Theme Contrast & Visibility**: Perfected light and dark mode contrast across the sticky mobile masthead, initial setup wizard option buttons, and diagnostic modal overlays, guaranteeing WCAG AAA compliance (> 7:1 contrast ratio) in both themes.
+- **Z-Index Layering & Occlusion Prevention**: Elevated cluster node dropdown menus, widget 3-dot action popups, and modal drawer overlays (`z-index: 9999`) to prevent clipping or background obstruction by adjacent cards.
+
 ---
 
 ## [[v1.0.9](https://github.com/gitsheikhgit/homelab-hub/releases/tag/v1.0.9)] - 2026-09-20

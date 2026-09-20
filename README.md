@@ -47,13 +47,23 @@ Most server dashboards either offer a simple bookmarks list or heavy enterprise 
 
 <div align="center">
 
+### 📊 Real-Time Silicon & Telemetry Waveforms (Beszel-Style Diagnostics)
+![Telemetry Waveforms](https://raw.githubusercontent.com/gitsheikhgit/homelab-hub/main/static/screenshots/telemetry_waveforms_dark.png?v=4)
+
+<br>
+
+### 🐳 Real-Time Docker Container Allocation Matrix
+![Telemetry Containers](https://raw.githubusercontent.com/gitsheikhgit/homelab-hub/main/static/screenshots/telemetry_containers_dark.png?v=4)
+
+<br>
+
 ### 🌙 Dark Mode (Glassmorphic Midnight)
-![Homelab Hub Dark Mode](https://raw.githubusercontent.com/gitsheikhgit/homelab-hub/main/static/screenshots/real_homelab_dark.png?v=3)
+![Homelab Hub Dark Mode](https://raw.githubusercontent.com/gitsheikhgit/homelab-hub/main/static/screenshots/real_homelab_dark.png?v=4)
 
 <br>
 
 ### ☀️ Light Mode (High-Contrast Slate)
-![Homelab Hub Light Mode](https://raw.githubusercontent.com/gitsheikhgit/homelab-hub/main/static/screenshots/real_homelab_light.png?v=3)
+![Homelab Hub Light Mode](https://raw.githubusercontent.com/gitsheikhgit/homelab-hub/main/static/screenshots/real_homelab_light.png?v=4)
 
 </div>
 
@@ -65,6 +75,7 @@ Homelab Hub adheres to [Semantic Versioning](https://semver.org/). Full version 
 
 | Version | Release Date | Key Focus & Highlights | Full Notes |
 | :--- | :--- | :--- | :---: |
+| **v1.1.0** | 2026-09-20 | **Beszel-Style Silicon Waveforms & Live Telemetry Matrix**: High-resolution 1s real-time streaming graphs (CPU, RAM, Net, Disk I/O), per-core topology, live Docker container resource allocation table, full dark/light theme contrast parity. | [Details ↗](CHANGELOG.md#v110---2026-09-20) |
 | **v1.0.9** | 2026-09-20 | **Mobile Viewport Overhaul & Automated History**: Zero-overflow card constraints, responsive drive arrays, automated timeline logging, universal speedtest engine. | [Details ↗](CHANGELOG.md#v109---2026-09-20) |
 | **v1.0.8** | 2026-09-19 | **Proxmox Hypervisor Overhaul**: 1-click LXC/VM power controls, multi-node telemetry, Docker LAN reachability fix. | [Details ↗](CHANGELOG.md#v108---2026-09-19) |
 | **v1.0.7** | 2026-09-19 | **Clean Onboarding & In-Container Docker CLI**: Zero-config container discovery on fresh installs. | [Details ↗](CHANGELOG.md#v107---2026-09-19) |
