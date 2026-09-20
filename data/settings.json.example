@@ -28,6 +28,7 @@
     "media_row": true
   },
   "cluster_nodes": [],
+  "service_cards": [],
   "proxmox_nodes": [],
   "proxmox_tokens": [],
   "widgets_layout": {

@@ -1083,11 +1083,60 @@
             cursor: not-allowed;
         }
 
+        #clusterNodesContainer {
+            position: relative;
+            z-index: 60;
+        }
+
+        #clusterNodesContainer.menu-active,
+        #clusterNodesContainer:has(.widget-menu-dropdown.show) {
+            z-index: 2500 !important;
+        }
+
+        .top-telemetry-bar {
+            overflow: visible;
+        }
+
+        .node-pill,
+        .draggable-node-pill {
+            overflow: visible !important;
+            position: relative;
+        }
+
+        .node-pill.menu-active,
+        .node-pill:has(.widget-menu-dropdown.show),
+        .draggable-node-pill.menu-active,
+        .draggable-node-pill:has(.widget-menu-dropdown.show) {
+            z-index: 2501 !important;
+            position: relative;
+        }
+
+        .node-metrics {
+            overflow: visible;
+        }
+
+        #serviceCardsContainer {
+            position: relative;
+            z-index: 50;
+        }
+
+        #serviceCardsContainer.menu-active,
+        #serviceCardsContainer:has(.widget-menu-dropdown.show) {
+            z-index: 2000 !important;
+        }
+
         .svc-card-wrap {
             position: relative;
             height: 100%;
             display: flex;
             flex-direction: column;
+            overflow: visible !important;
+        }
+
+        .svc-card-wrap.menu-active,
+        .svc-card-wrap:has(.widget-menu-dropdown.show) {
+            z-index: 2001 !important;
+            position: relative;
         }
 
         .svc-card-wrap .card-widget {
@@ -1098,6 +1147,8 @@
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
+            overflow: visible !important;
+            position: relative;
         }
 
         .svc-card-wrap .card-head {
@@ -1110,7 +1161,8 @@
             align-items: center !important;
             justify-content: space-between !important;
             gap: 8px !important;
-            overflow: hidden !important;
+            overflow: visible !important;
+            position: relative;
         }
 
         .svc-card-wrap .card-title-group {
@@ -3532,18 +3584,20 @@
             position: absolute;
             top: 100%;
             right: 0;
+            margin-top: 4px;
             background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
-            z-index: 1001;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+            z-index: 9999 !important;
             min-width: 175px;
             padding: 4px 0;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .widget-menu-dropdown.show {
-            display: block;
+            display: block !important;
         }
 
         .widget-menu-item {
@@ -7697,7 +7751,7 @@ const SERVICE_CARD_PRESETS = {
         metrics: [
             { val: ':38274', lbl: 'Port' },
             { val: 'Active', lbl: 'Status' },
-            { val: 'Noble', lbl: 'Stack' },
+            { val: 'Media', lbl: 'Stack' },
             { val: 'Ready', lbl: 'Health', color: 'var(--accent-green)' }
         ]
     },
@@ -7918,13 +7972,8 @@ function renderServiceCards() {
 
         // Build header right section based on link_mode
         let headerRight = '';
-        let wrapTag = 'div';
-        let wrapAttrs = `class="card-widget svc-card" data-svc-id="${escapeHtml(card.id)}"`;
 
         if (card.link_mode === 'single') {
-            const url = (currentNetworkMode === 'ts' && card.ts_url) ? card.ts_url : (card.lan_url || '');
-            wrapTag = 'a';
-            wrapAttrs = `class="card-widget svc-card" data-svc-id="${escapeHtml(card.id)}" href="${escapeHtml(url)}" target="_blank" data-lan-url="${escapeHtml(card.lan_url || '')}" data-ts-url="${escapeHtml(card.ts_url || '')}"`;
             const statusColor = card.status_color || 'var(--accent-green)';
             headerRight = `<div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="status-dot"></span><span style="font-size:11px;color:${statusColor};font-weight:600">${escapeHtml(card.status_label || 'Online ↗')}</span></div>`;
         } else if (card.link_mode === 'dual') {
@@ -7937,11 +7986,9 @@ function renderServiceCards() {
                 links.map((lnk, li) => {
                     const url = (currentNetworkMode === 'ts' && lnk.ts_url) ? lnk.ts_url : (lnk.lan_url || '');
                     const st = btnStyles[li] || btnStyles[0];
-                    return `<button class="btn-ctrl svc-dual-btn" onclick="event.stopPropagation();window.open('${escapeHtml(url)}','_blank')" style="${st}" title="Open ${escapeHtml(lnk.label || '')}">${escapeHtml(lnk.label || '')} ↗</button>`;
+                    return `<button type="button" class="btn-ctrl svc-dual-btn" onclick="event.stopPropagation();window.open('${escapeHtml(url)}','_blank')" style="${st}" title="Open ${escapeHtml(lnk.label || '')}">${escapeHtml(lnk.label || '')} ↗</button>`;
                 }).join('') + `</div>`;
         } else if (card.link_mode === 'action') {
-            const action = card.action || '';
-            wrapAttrs = `class="card-widget svc-card" data-svc-id="${escapeHtml(card.id)}" onclick="${escapeHtml(action)}" title="Click to open"`;
             headerRight = `<span style="font-size:11px;color:var(--accent-blue);font-weight:600;flex-shrink:0">Open ↗</span>`;
             if (card.id === 'svc_docker') {
                 headerRight = `<div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span id="dockerUpdatePill" style="display:none;font-size:10px;font-weight:700;background:rgba(245,158,11,0.22);color:var(--accent-amber);padding:2px 7px;border-radius:10px;border:1px solid rgba(245,158,11,0.45)">✨ <span id="dockerCardUpdateCount">0</span></span><span style="font-size:11px;color:var(--accent-blue);font-weight:600">Open ↗</span></div>`;
@@ -7949,8 +7996,8 @@ function renderServiceCards() {
         }
 
         return `
-        <div class="svc-card-wrap" draggable="true" data-svc-id="${escapeHtml(card.id)}">
-            <${wrapTag} ${wrapAttrs}>
+        <div class="svc-card-wrap draggable-svc-card" draggable="true" data-svc-id="${escapeHtml(card.id)}">
+            <div class="card-widget svc-card" data-svc-id="${escapeHtml(card.id)}" onclick="handleSvcCardClick(event, '${escapeHtml(card.id)}')">
                 <div class="card-head">
                     <div class="card-title-group">
                         <div class="card-logo" style="background:${iconBg}">
@@ -7963,13 +8010,13 @@ function renderServiceCards() {
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
                         ${headerRight}
-                        <div class="widget-menu-wrap" onclick="event.stopPropagation();event.preventDefault()">
-                            <button type="button" class="node-menu-btn" onclick="toggleSvcCardMenu(event,'${escapeHtml(card.id)}')" title="Card options">⋮</button>
+                        <div class="widget-menu-wrap" onclick="event.stopPropagation()">
+                            <button type="button" class="node-menu-btn" onclick="toggleSvcCardMenu(event, '${escapeHtml(card.id)}')" title="Card options">⋮</button>
                             <div class="widget-menu-dropdown" id="svcmenu_${escapeHtml(card.id)}">
                                 <button type="button" class="widget-menu-item" onclick="openEditSvcCardModal('${escapeHtml(card.id)}')"><span>✏️</span> Edit Card</button>
                                 <button type="button" class="widget-menu-item" onclick="openAddSvcCardModal()" ${cards.length >= MAX_SERVICE_CARDS ? 'disabled style="opacity:0.4"' : ''}><span>➕</span> Add Card ${cards.length >= MAX_SERVICE_CARDS ? '(Max 4)' : ''}</button>
-                                <button type="button" class="widget-menu-item" onclick="moveSvcCardStep('${escapeHtml(card.id)}',-1)" ${idx === 0 ? 'disabled style="opacity:0.4"' : ''}><span>⬅️</span> Move Left</button>
-                                <button type="button" class="widget-menu-item" onclick="moveSvcCardStep('${escapeHtml(card.id)}',1)" ${idx === cards.length-1 ? 'disabled style="opacity:0.4"' : ''}><span>➡️</span> Move Right</button>
+                                <button type="button" class="widget-menu-item" onclick="moveSvcCardStep('${escapeHtml(card.id)}', -1)" ${idx === 0 ? 'disabled style="opacity:0.4"' : ''}><span>⬅️</span> Move Left</button>
+                                <button type="button" class="widget-menu-item" onclick="moveSvcCardStep('${escapeHtml(card.id)}', 1)" ${idx === cards.length-1 ? 'disabled style="opacity:0.4"' : ''}><span>➡️</span> Move Right</button>
                                 <button type="button" class="widget-menu-item danger-text" onclick="deleteSvcCard('${escapeHtml(card.id)}')"><span>🗑️</span> Remove Card</button>
                             </div>
                         </div>
@@ -7978,25 +8025,53 @@ function renderServiceCards() {
                 <div class="card-body">
                     ${metricsHtml}
                 </div>
-            </${wrapTag}>
+            </div>
         </div>`;
     }).join('');
 
     setupSvcCardsDragAndDrop();
 }
 
-function toggleSvcCardMenu(e, cardId) {
-    e.stopPropagation();
-    const menu = document.getElementById('svcmenu_' + cardId);
-    if (!menu) return;
-    const isOpen = menu.classList.contains('show');
-    document.querySelectorAll('.svc-card-dropdown.show').forEach(m => m.classList.remove('show'));
-    if (!isOpen) menu.classList.add('show');
+function handleSvcCardClick(e, cardId) {
+    if (isSvcDragJustFinished) return;
+    if (e.target.closest('.widget-menu-wrap') || e.target.closest('button') || e.target.closest('.btn-ctrl') || e.target.closest('a')) {
+        return;
+    }
+    const cards = (dashboardSettings && dashboardSettings.service_cards) ? dashboardSettings.service_cards : [];
+    const card = cards.find(c => c.id === cardId);
+    if (!card) return;
+    if (card.link_mode === 'single') {
+        const url = (currentNetworkMode === 'ts' && card.ts_url) ? card.ts_url : (card.lan_url || '');
+        if (url) window.open(url, '_blank');
+    } else if (card.link_mode === 'action') {
+        if (card.action === 'openDockerDrawer()') {
+            openDockerDrawer();
+        } else if (card.action) {
+            try {
+                const fn = new Function(card.action);
+                fn();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
 }
 
-document.addEventListener('click', () => {
-    document.querySelectorAll('.svc-card-dropdown.show').forEach(m => m.classList.remove('show'));
-});
+function toggleSvcCardMenu(e, cardId) {
+    e.stopPropagation();
+    e.preventDefault();
+    const menu = document.getElementById('svcmenu_' + cardId);
+    if (!menu) return;
+    const isShown = menu.classList.contains('show');
+    closeAllWidgetMenus();
+    if (!isShown) {
+        menu.classList.add('show');
+        const wrap = menu.closest('.svc-card-wrap');
+        if (wrap) wrap.classList.add('menu-active');
+        const container = document.getElementById('serviceCardsContainer');
+        if (container) container.classList.add('menu-active');
+    }
+}
 
 function moveSvcCardStep(cardId, dir) {
     const cards = dashboardSettings.service_cards || [];
@@ -8346,28 +8421,28 @@ const HYPERVISOR_PRESETS = {
         m3_val: 'Valid'
     },
     proxmox: {
-        name: 'Prox PVE',
+        name: 'Proxmox VE',
         type: 'proxmox',
         icon: '/static/icons/proxmox.png',
         url: 'https://192.168.1.100:8006',
         ip: '192.168.1.100',
         m1_lbl: 'CPU',
-        m1_val: '4.7%',
+        m1_val: '--%',
         m2_lbl: 'RAM',
-        m2_val: '8.56G',
+        m2_val: '-- GB',
         m3_lbl: 'VMs',
-        m3_val: '8/13'
+        m3_val: '--/--'
     },
     pbs: {
-        name: 'Prox Backup Server',
+        name: 'Proxmox Backup Server',
         type: 'pbs',
         icon: '/static/icons/pbs.png',
         url: 'https://192.168.1.101:8007',
         ip: '192.168.1.101',
         m1_lbl: 'Used',
-        m1_val: '155 GB',
+        m1_val: '-- GB',
         m2_lbl: 'Dedup',
-        m2_val: '3.85x',
+        m2_val: '--x',
         m3_lbl: 'Health',
         m3_val: '100% OK'
     },
@@ -8526,23 +8601,22 @@ function handleNodePillClick(e, url) {
 
 function toggleNodeMenu(e, nodeId) {
     e.stopPropagation();
+    e.preventDefault();
     const menu = document.getElementById('nodemenu_' + nodeId);
     const isShown = menu && menu.classList.contains('show');
-    closeAllNodeMenus();
+    closeAllWidgetMenus();
     if (menu && !isShown) {
         menu.classList.add('show');
+        const pill = menu.closest('.draggable-node-pill') || menu.closest('.node-pill');
+        if (pill) pill.classList.add('menu-active');
+        const container = document.getElementById('clusterNodesContainer');
+        if (container) container.classList.add('menu-active');
     }
 }
 
 function closeAllNodeMenus() {
-    document.querySelectorAll('.node-metrics .widget-menu-dropdown.show').forEach(el => el.classList.remove('show'));
+    closeAllWidgetMenus();
 }
-
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.widget-menu-wrap')) {
-        closeAllNodeMenus();
-    }
-});
 
 function setupClusterNodesDragAndDrop() {
     const pills = document.querySelectorAll('.draggable-node-pill');
@@ -8982,6 +9056,11 @@ function toggleWidgetMenu(widgetId) {
 
 function closeAllWidgetMenus() {
     document.querySelectorAll('.widget-menu-dropdown.show').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.draggable-node-pill.menu-active, .node-pill.menu-active, .svc-card-wrap.menu-active').forEach(p => p.classList.remove('menu-active'));
+    const c1 = document.getElementById('clusterNodesContainer');
+    if (c1) c1.classList.remove('menu-active');
+    const c2 = document.getElementById('serviceCardsContainer');
+    if (c2) c2.classList.remove('menu-active');
 }
 
 document.addEventListener('click', (e) => {

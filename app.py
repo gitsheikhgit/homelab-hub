@@ -2392,7 +2392,7 @@ def docker_restart_stack():
                     "nextcloud-aio-apache", "nextcloud-aio-whiteboard", "nextcloud-aio-notify-push",
                     "nextcloud-aio-eurooffice", "nextcloud-aio-mastercontainer"
                 ],
-                "media": ["noble_zakir-main_app-1", "navidrome"],
+                "media": ["musicgrabber", "navidrome"],
                 "productivity": ["papra", "docuseal"]
             }
             target_containers = stacks_map.get(stack, [])

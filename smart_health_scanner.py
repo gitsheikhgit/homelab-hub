@@ -1,12 +1,37 @@
 #!/usr/bin/env python3
 import subprocess, json, time, os, re
 
-drives_config = [
-    ("/dev/sda", "System OS SSD", "/"),
-    ("/dev/sdb", "Backup Storage", "/mnt/backup_hdd"),
-    ("/dev/sdc", "Storage SSD", "/mnt/storage"),
-    ("/dev/sdd", "WDDATA Drive", "/mnt/WDDATA")
-]
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+settings_file = os.path.join(BASE_DIR, "data", "settings.json")
+drives_config = []
+
+if os.path.exists(settings_file):
+    try:
+        with open(settings_file, "r") as sf:
+            s_data = json.load(sf)
+            for d in s_data.get("monitored_drives", []):
+                dev = d.get("dev")
+                name = d.get("name") or "Storage Drive"
+                mount = d.get("mount") or "/"
+                if dev:
+                    drives_config.append((dev, name, mount))
+    except Exception:
+        pass
+
+if not drives_config:
+    drives_config.append(("/dev/sda", "System OS SSD", "/"))
+    try:
+        with open("/proc/mounts", "r") as mf:
+            for line in mf:
+                parts = line.strip().split()
+                if len(parts) >= 2 and parts[0].startswith("/dev/sd"):
+                    base_dev = re.sub(r'\d+$', '', parts[0])
+                    mount_pt = parts[1]
+                    if not mount_pt.startswith("/boot") and not mount_pt.startswith("/var"):
+                        if not any(d[0] == base_dev for d in drives_config):
+                            drives_config.append((base_dev, f"Disk {os.path.basename(base_dev)}", mount_pt))
+    except Exception:
+        pass
 
 results = {
     "last_scan_time": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
@@ -23,7 +48,7 @@ for dev, friendly_name, mount_point in drives_config:
         "name": friendly_name,
         "mount": mount_point,
         "health": "PASSED",
-        "model": "SPCC Solid State Disk" if dev in ("/dev/sdc", "/dev/sdd") else ("Western Digital Blue" if dev == "/dev/sdb" else "Kingston SSDNow"),
+        "model": "Solid State Disk / Hard Drive",
         "serial": "Unknown",
         "temp": 35,
         "hours": 0,

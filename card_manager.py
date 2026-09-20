@@ -59,6 +59,7 @@ DEFAULT_SETTINGS = {
         "media_row": True
     },
     "cluster_nodes": [],
+    "service_cards": [],
     "proxmox_nodes": [],
     "proxmox_tokens": [],
     "widgets_layout": {
@@ -234,6 +235,8 @@ def get_settings():
                         res[key] = merged
                 if "cluster_nodes" not in loaded or not isinstance(loaded["cluster_nodes"], list):
                     res["cluster_nodes"] = list(DEFAULT_SETTINGS["cluster_nodes"])
+                if "service_cards" not in loaded or not isinstance(loaded["service_cards"], list):
+                    res["service_cards"] = list(DEFAULT_SETTINGS["service_cards"])
                 if "monitored_drives" not in loaded or not isinstance(loaded["monitored_drives"], list):
                     res["monitored_drives"] = list(DEFAULT_SETTINGS["monitored_drives"])
                 if "quick_icon_size_px" not in loaded:
