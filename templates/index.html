@@ -2439,89 +2439,310 @@
             border-color: var(--border-highlight);
         }
 
-        /* ── Responsive Breakpoints ──────────────────────────────── */
+        .card-head-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .card-title-text-wrap {
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .card-head-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        /* ── Responsive Breakpoints (Mobile & Tablet Optimized) ───── */
         @media (max-width: 1080px) {
             .main-command-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr) !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .col-stack {
+                min-width: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-height: auto !important;
+                padding-bottom: 20px !important;
             }
         }
 
         @media (max-width: 900px) {
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+                width: 100% !important;
+            }
+
             .dashboard-wrap {
-                padding: 10px 14px calc(110px + env(safe-area-inset-bottom, 20px)) !important;
-                gap: 14px !important;
+                padding: 10px 12px calc(90px + env(safe-area-inset-bottom, 20px)) !important;
+                gap: 12px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                overflow-x: hidden !important;
+                box-sizing: border-box !important;
+            }
+
+            .main-command-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .col-stack,
+            .draggable-widget-block,
+            .col-cards-container,
+            .card-widget,
+            .dynamic-card {
+                min-width: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .top-telemetry-bar {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                grid-template-columns: 1fr !important;
+                gap: 8px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .node-pill {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: stretch !important;
-                gap: 10px !important;
-                padding: 12px 14px !important;
+                gap: 8px !important;
+                padding: 10px 12px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .node-pill-left {
                 width: 100% !important;
+                min-width: 0 !important;
                 justify-content: flex-start !important;
             }
 
             .node-metrics {
                 width: 100% !important;
+                min-width: 0 !important;
                 justify-content: flex-start !important;
                 flex-wrap: wrap !important;
                 gap: 6px !important;
             }
 
             .search-launch-bar {
-                padding: 12px 14px !important;
-                gap: 10px !important;
+                padding: 10px 12px !important;
+                gap: 8px !important;
                 flex-direction: column !important;
                 align-items: stretch !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .search-box-wrap {
                 width: 100% !important;
-                min-width: 100% !important;
+                min-width: 0 !important;
             }
 
             .quick-bookmarks {
                 width: 100% !important;
-                padding-bottom: 4px !important;
+                padding-bottom: 2px !important;
             }
 
             .clock-widget {
                 display: none !important;
             }
 
+            .section-header {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
             .media-stack-grid {
                 grid-template-columns: 1fr !important;
-                gap: 12px !important;
+                gap: 10px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .card-head {
+                display: flex !important;
                 flex-wrap: wrap !important;
+                align-items: center !important;
+                justify-content: space-between !important;
                 gap: 8px !important;
-                padding: 12px 14px !important;
+                padding: 10px 12px !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
-            .card-body {
+            .card-head-left,
+            .card-title-group {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+                max-width: 100% !important;
+            }
+
+            .card-title-text-wrap {
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+                overflow: hidden !important;
+            }
+
+            .card-title {
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+            }
+
+            .card-subtitle {
+                font-size: 10px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+            }
+
+            .card-head-right {
+                display: flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                flex-shrink: 0 !important;
+                flex-wrap: wrap !important;
+                justify-content: flex-end !important;
+                margin-left: auto !important;
+            }
+
+            /* Dynamic Application Cards Body (3 Metrics: Status, Category, Port) */
+            .dynamic-card .card-body,
+            .card-body.metrics-3 {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 6px !important;
+                padding: 8px 10px 10px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .dynamic-card .card-body .metric-cell,
+            .card-body.metrics-3 .metric-cell {
+                flex: 1 1 0 !important;
+                min-width: 0 !important;
+                padding: 6px 4px !important;
+                box-sizing: border-box !important;
+            }
+
+            .dynamic-card .card-body .metric-val,
+            .card-body.metrics-3 .metric-val {
+                font-size: 12px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+            }
+
+            .dynamic-card .card-body .metric-lbl,
+            .card-body.metrics-3 .metric-lbl {
+                font-size: 8.5px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            /* 4-Metric System Cards (Host Overview, Power, Tailscale, Speedtest, Primary Fleet) */
+            .card-body:not(.metrics-3) {
                 display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px !important;
-                padding: 10px 14px !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 6px !important;
+                padding: 8px 10px 10px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
-            .metric-cell {
+            .card-body:not(.metrics-3) .metric-cell {
+                min-width: 0 !important;
+                padding: 6px 6px !important;
+                box-sizing: border-box !important;
+            }
+
+            .card-body:not(.metrics-3) .metric-val {
+                font-size: 13px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+            }
+
+            .card-body:not(.metrics-3) .metric-lbl {
+                font-size: 9px !important;
+            }
+
+            /* Calendar Card Header & Grid on Mobile */
+            .cal-header {
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+                padding: 10px 12px !important;
+            }
+
+            .cal-header > div {
+                flex-wrap: wrap !important;
+                gap: 4px !important;
+            }
+
+            .cal-grid {
+                gap: 2px !important;
                 padding: 8px 6px !important;
             }
 
-            .metric-val {
-                font-size: 14px !important;
+            /* Category Views Override minmax(420px, 1fr) */
+            .cat-view-services #dynamicCardsGrid,
+            .cat-view-proxmox .main-command-grid,
+            .cat-view-docker .main-command-grid,
+            .cat-view-storage .main-command-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+                width: 100% !important;
+            }
+
+            /* Mobile Bottom Dock */
+            .mobile-bottom-nav {
+                padding: 4px 2px calc(4px + env(safe-area-inset-bottom, 8px)) !important;
+                gap: 2px !important;
+            }
+
+            .mobile-nav-item {
+                padding: 4px 1px !important;
+            }
+
+            .mobile-nav-item .nav-icon-wrap {
+                width: 28px !important;
+                height: 22px !important;
+            }
+
+            .mobile-nav-item span {
+                font-size: 9.5px !important;
+                letter-spacing: 0 !important;
             }
 
             .drawer-overlay {
@@ -2738,8 +2959,14 @@
             align-items: center;
             gap: 8px;
             overflow-x: auto;
-            scrollbar-width: thin;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
             padding-bottom: 2px;
+        }
+
+        .category-filter-bar::-webkit-scrollbar {
+            display: none;
         }
 
         .cat-pill {
@@ -4142,7 +4369,7 @@
             <div class="mobile-brand-text">
                 <div class="mobile-brand-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                     <span>HOMELAB <span style="color:var(--accent-blue)">HUB</span></span>
-                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.0.5') }} · Click to view updates">{{ app_version | default('v1.0.5') }}</span>
+                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.0.9') }} · Click to view updates">{{ app_version | default('v1.0.9') }}</span>
                     <span class="hub-update-available-flag" id="headerUpdateFlag" style="display:none" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Click to view update details and release notes">
                         <span class="flag-pulse-dot"></span> <span id="headerUpdateVer">Update Available</span>
                     </span>
@@ -4276,13 +4503,13 @@
         <!-- Column 1: Services & Applications (Left - Customizable & Draggable) -->
         <div class="col-stack" id="dashboardCol1" data-col-id="col1">
             <div class="draggable-widget-block" id="cards_apps" data-widget-id="cards_apps">
-                <div class="section-header" style="display:flex;align-items:center;justify-content:space-between">
+                <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
                     <div style="display:flex;align-items:center;gap:6px">
                         <span class="widget-drag-handle" title="Drag to reorder card stack or place into another column">⠿</span>
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
                         <span>Services & Applications</span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:6px">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                         <span style="font-size:10.5px;color:var(--text-muted);font-weight:400" title="Drag cards by the ⠿ handle to reorder">⠿ Apps</span>
                         <button class="btn-ctrl" onclick="openDockerScanModal()" style="font-size:11px;padding:3px 8px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;font-weight:600;display:flex;align-items:center;gap:4px" title="Auto-Detect Docker Applications & Ports"><span>⚡</span> Auto-Detect</button>
                         <button class="btn-ctrl" onclick="openAddCardModal()" style="font-size:11px;padding:3px 8px;background:var(--accent-blue);font-weight:600" title="Add Application Card">➕ Add</button>
@@ -4613,7 +4840,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body metrics-3">
                         <div class="metric-cell"><div class="metric-val" id="portainerDockerRunning" style="color:var(--accent-green)">--</div><div class="metric-lbl">Running</div></div>
                         <div class="metric-cell"><div class="metric-val" id="portainerDockerStopped">--</div><div class="metric-lbl">Stopped</div></div>
                         <div class="metric-cell"><div class="metric-val" id="portainerDockerTotal">--</div><div class="metric-lbl">Total</div></div>
@@ -4808,7 +5035,7 @@
         </div>
 
         <!-- 2-Column Responsive Operational Layout -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));gap:16px;align-items:start">
+        <div class="agenda-hub-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(320px, 100%), 1fr));gap:16px;align-items:start">
             <!-- Left Column: Interactive Calendar & Selected Day Inspector -->
             <div style="display:flex;flex-direction:column;gap:16px">
                 <!-- Interactive Month Calendar Card -->
@@ -5047,7 +5274,7 @@
                         <span style="color:#eab308;font-size:12px">Settings ⚙️</span>
                     </button>
                     <button class="mobile-tool-btn" onclick="closeDrawer('mobileMenuDrawer'); openSettingsWithTab('updates');">
-                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.0.5') }}</span>)</span>
+                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.0.9') }}</span>)</span>
                         <span id="menuUpdateBadge" style="color:var(--accent-blue);font-size:12px">Check ↗</span>
                     </button>
                 </div>
@@ -6509,7 +6736,7 @@
                         <div>
                             <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
                                 <span>🛰️</span> Homelab Hub
-                                <span id="hubCurrentVersionBadge" style="background:rgba(59,130,246,0.25);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700">{{ app_version | default('v1.0.5') }}</span>
+                                <span id="hubCurrentVersionBadge" style="background:rgba(59,130,246,0.25);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700">{{ app_version | default('v1.0.9') }}</span>
                             </div>
                             <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="hubUpdateStatusText">
                                 Automatic update sentinel active. Check for newer Docker releases anytime.
@@ -9195,19 +9422,19 @@ function renderCards() {
         return `
             <div class="card-widget dynamic-card" data-card-id="${escapeHtml(card.id)}" onclick="handleCardClick(event, '${escapeHtml(primaryUrl)}')">
                 <div class="card-head">
-                    <div style="display:flex;align-items:center;gap:6px">
+                    <div class="card-head-left">
                         <div class="card-drag-handle" title="Click and drag to place anywhere in the column">⠿</div>
                         <div class="card-title-group">
                             <div class="card-logo" style="background:rgba(255,255,255,0.06)">
                                 <img src="${escapeHtml(iconSrc)}" class="card-logo-img" alt="${escapeHtml(card.name)}" onerror="this.src='/static/icons/portainer.png'">
                             </div>
-                            <div>
+                            <div class="card-title-text-wrap">
                                 <div class="card-title">${escapeHtml(card.name)}</div>
                                 <div class="card-subtitle">${escapeHtml(card.subtitle || '')}</div>
                             </div>
                         </div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:6px">
+                    <div class="card-head-right">
                         ${secActiveUrl ? `<button class="btn-ctrl second-link-badge" onclick="event.preventDefault(); event.stopPropagation(); window.open('${escapeHtml(secActiveUrl)}','_blank')" title="Open ${escapeHtml(secName)} (${escapeHtml(secActiveUrl)})">⚙️ ${escapeHtml(secName)}</button>` : ''}
                         ${tsUrl ? `<button class="btn-ctrl ts-badge" onclick="event.preventDefault(); event.stopPropagation(); window.open('${escapeHtml(tsUrl)}','_blank')" title="Direct Tailscale Remote Link">🔒 TS</button>` : ''}
                         
@@ -9235,7 +9462,7 @@ function renderCards() {
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body metrics-3">
                     <div class="metric-cell"><div class="metric-val" style="color:var(--accent-green)">Online</div><div class="metric-lbl">Status</div></div>
                     <div class="metric-cell"><div class="metric-val" style="color:var(--accent-blue)">${escapeHtml(card.category || 'App')}</div><div class="metric-lbl">Category</div></div>
                     <div class="metric-cell"><div class="metric-val">${escapeHtml(portStr)}</div><div class="metric-lbl">Port</div></div>

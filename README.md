@@ -61,6 +61,13 @@ Most server dashboards either offer a simple bookmarks list or heavy enterprise 
 
 ## 📝 Release History & Changelog
 
+### [v1.0.9] - 2026-09-20
+- **Complete Mobile Viewport & Card Optimization**: Solved horizontal overflow and cut-off card boundaries on smartphones (iPhone / Android) by adding `min-width: 0` constraints, auto-wrapping headers (`.card-head-left`, `.card-head-right`), and adaptive metric cells.
+- **Unified 3-Metric Single-Row App Layout**: Dynamic application cards (`Status`, `Category`, `Port`) and Portainer stacks (`Running`, `Stopped`, `Total`) now fit into a clean single row on mobile with 33.3% flex distribution without awkward second-line line wrapping or edge clipping.
+- **Dynamic Proxmox UI Visibility**: The `🖥️ Proxmox` filter tab, `VMs / PVE` dock button, and `Proxmox Cluster & VMs` card are now completely dynamic and automatically hide on fresh installations or non-hypervisor systems unless Proxmox VE or cluster nodes are actively present.
+- **Universal Multi-Tier Speedtest Engine**: Benchmark engine functions natively across all Linux distributions, Docker containers, VMs, and architectures (x86_64, ARM, Raspberry Pi) without freezing or requiring pre-installed CLI binaries.
+- **Complete Cross-System Sanitization**: Cleaned historical IPs, personal cards, and starting energy ledger metrics from defaults so any fresh setup starts with a true zero baseline.
+
 ### [v1.0.8] - 2026-09-19
 - **Proxmox Hypervisor VMs & Containers Overhaul**: Fixed live telemetry caching and populated real-time status, vCPU, RAM, CPU %, and LAN IPs for all 13 cluster guests across nodes `pve` and `pve2`.
 - **Proxmox Power Controls & Instant Refresh**: Added direct 1-click power management (Start, Stop, Reboot) with auto-detection for LXC vs QEMU, live search filtering, guest category tabs, and on-demand `/api/proxmox/refresh`.
