@@ -4155,6 +4155,123 @@
             transition: width 0.3s ease;
         }
 
+        /* ── Full-Size Telemetry & Diagnostics Modal Styles ── */
+        .tel-modal-tab-btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .tel-modal-tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tel-modal-tab-btn.active {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        :root[data-active-theme="light"] .tel-modal-tab-btn.active {
+            color: #1d4ed8;
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+
+        .tel-widescreen-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 860px) {
+            .tel-widescreen-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tel-core-tile {
+            background: rgba(10, 15, 26, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        :root[data-active-theme="light"] .tel-core-tile {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .tel-proc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11.5px;
+        }
+
+        .tel-proc-table th {
+            text-align: left;
+            padding: 7px 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .tel-proc-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        :root[data-active-theme="light"] .tel-proc-table td {
+            border-bottom-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .tel-proc-table tr:hover td {
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        .mem-pool-track {
+            height: 22px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mem-pool-segment {
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
         /* ── Appearance & System Settings Modal Tabs & Toggles ── */
         .modal-tabs-nav {
             display: flex;
@@ -5590,17 +5707,17 @@
 
             <!-- 2b. Live System & Container Telemetry Waveforms (Beszel Style) -->
             <div class="draggable-widget-block" id="widget_telemetry_graphs" data-widget-id="widget_telemetry_graphs">
-                <div class="card-widget telemetry-waveforms-card">
+                <div class="card-widget telemetry-waveforms-card" onclick="handleWidgetCardClick(event, openTelemetryDetailModal)" title="Click to view full system telemetry and hardware diagnostics">
                     <div class="card-head">
                         <div class="card-head-left">
                             <div class="card-title-group">
                                 <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                                <div class="card-logo" style="background:rgba(59,130,246,0.18)">
+                                <div class="card-logo" style="background:rgba(59,130,246,0.18);cursor:pointer" onclick="openTelemetryDetailModal()" title="Open System Diagnostics Modal">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                                     </svg>
                                 </div>
-                                <div class="card-title-text-wrap">
+                                <div class="card-title-text-wrap" onclick="openTelemetryDetailModal()" style="cursor:pointer" title="Click to open Full System Diagnostics">
                                     <div style="display:flex;align-items:center;gap:6px">
                                         <div class="card-title">Live Telemetry Waveforms</div>
                                         <span class="status-dot" style="width:7px;height:7px;background:#10b981;box-shadow:0 0 8px #10b981;display:inline-block"></span>
@@ -5610,6 +5727,7 @@
                             </div>
                         </div>
                         <div class="card-head-right">
+                            <button type="button" class="btn-ctrl" onclick="openTelemetryDetailModal()" style="font-size:11px;padding:3px 8px;font-weight:600;display:flex;align-items:center;gap:3px" title="Full System Diagnostics &amp; Detailed Telemetry">Inspect ↗</button>
                             <!-- View Switcher Tabs -->
                             <div class="telemetry-tab-group">
                                 <button type="button" class="telemetry-tab-btn active" id="btnTelTabWaveforms" onclick="switchTelemetryTab('waveforms')">📈 Charts</button>
@@ -5619,6 +5737,7 @@
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_telemetry_graphs')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_telemetry_graphs">
+                                    <button class="widget-menu-item" onclick="openTelemetryDetailModal()">📊 Full System Diagnostics Modal</button>
                                     <button class="widget-menu-item" onclick="moveWidgetUp('widget_telemetry_graphs')">⬆️ Move Up</button>
                                     <button class="widget-menu-item" onclick="moveWidgetDown('widget_telemetry_graphs')">⬇️ Move Down</button>
                                     <button class="widget-menu-item" onclick="moveWidgetToCol('widget_telemetry_graphs', 'col1')">⬅️ Move to Left Col</button>
@@ -5716,6 +5835,11 @@
                                         <div class="chart-tooltip-tracker" id="trackerDisk"></div>
                                     </div>
                                 </div>
+                            </div>
+                            <div style="display:flex;justify-content:center;margin-top:8px">
+                                <button type="button" class="btn-ctrl" onclick="openTelemetryDetailModal()" style="width:100%;font-size:11px;padding:6px 12px;background:rgba(59,130,246,0.12);color:var(--accent-blue);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:7px">
+                                    <span>Expand Full System Diagnostics, Per-Core Topology &amp; Pools</span> ↗
+                                </button>
                             </div>
                         </div>
 
@@ -7175,6 +7299,379 @@
                 </div>
                 <div id="modalAgendaList"></div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Full-Size Live Telemetry & System Diagnostics Modal ─────────────── -->
+<div class="drawer-overlay" id="telemetryDetailModal" onclick="if(event.target===this)closeTelemetryDetailModal()">
+    <div class="drawer-card" style="max-width:1120px;width:96%;max-height:88vh;display:flex;flex-direction:column">
+        <!-- Header -->
+        <div class="drawer-head" style="padding:14px 20px;flex-shrink:0">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(59,130,246,0.18);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--accent-blue)">
+                    📈
+                </div>
+                <div>
+                    <div style="font-size:16px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px">
+                        <span id="telDetailModalTitle">Host Silicon &amp; Telemetry Diagnostics</span>
+                        <span class="status-dot" style="width:7px;height:7px;background:#10b981;box-shadow:0 0 8px #10b981;display:inline-block"></span>
+                        <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:600">Live 2s Feed</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-secondary)" id="telDetailModalSubtitle">
+                        Full-spectrum real-time sensors • Per-core topology • Memory pools • Network &amp; disk I/O • Container allocation
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <button type="button" class="btn-ctrl" onclick="refreshTelemetryDetailData()" style="background:rgba(59,130,246,0.22);color:#93c5fd;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px">
+                    ⟳ Live Feed
+                </button>
+                <button type="button" class="btn-ctrl" onclick="closeTelemetryDetailModal()" style="font-size:12px">✕ Close</button>
+            </div>
+        </div>
+
+        <!-- Pinned Top Overview & Sub-Navigation Tabs (Fixed, never scrolls off) -->
+        <div style="padding:14px 20px 0 20px;flex-shrink:0;background:inherit">
+            <!-- Top Glance Metric Cards (4 cards) -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:12px">
+                <!-- CPU Overview Tile -->
+                <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase">🧠 CPU Silicon</span>
+                        <span id="telModalCpuModelBadge" style="font-size:10.5px;color:var(--text-muted);font-family:monospace">4C / 4T</span>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin:2px 0">
+                        <span style="font-size:22px;font-weight:800;color:var(--accent-blue)" id="telModalCpuPct">--%</span>
+                        <span style="font-size:12px;color:var(--text-muted)" id="telModalCpuFreq">-- MHz</span>
+                    </div>
+                    <div style="font-size:10.5px;color:var(--text-secondary)" id="telModalCpuLoadAvg">Load: --, --, --</div>
+                </div>
+
+                <!-- Memory Overview Tile -->
+                <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase">💾 Memory (RAM)</span>
+                        <span id="telModalMemPercentBadge" style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:600">--% Used</span>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin:2px 0">
+                        <span style="font-size:22px;font-weight:800;color:var(--accent-green)" id="telModalMemUsed">-- GB</span>
+                        <span style="font-size:12px;color:var(--text-muted)" id="telModalMemTotal">/ -- GB</span>
+                    </div>
+                    <div style="font-size:10.5px;color:var(--text-secondary)" id="telModalMemCached">Cached: -- GB · Free: -- MB</div>
+                </div>
+
+                <!-- Network Overview Tile -->
+                <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase">🌐 Network I/O</span>
+                        <span style="font-size:10.5px;color:var(--text-muted)" id="telModalNetPeak">Peak: -- MB/s</span>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:12px;margin:2px 0">
+                        <span style="font-size:19px;font-weight:800;color:#38bdf8" id="telModalNetDown">↓ -- MB/s</span>
+                        <span style="font-size:19px;font-weight:800;color:#c084fc" id="telModalNetUp">↑ -- MB/s</span>
+                    </div>
+                    <div style="font-size:10.5px;color:var(--text-secondary)" id="telModalNetTotals">Total: ↓ -- GB · ↑ -- GB</div>
+                </div>
+
+                <!-- Disk I/O Overview Tile -->
+                <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase">💽 Disk Operations</span>
+                        <span style="font-size:10.5px;color:var(--text-muted)" id="telModalDiskOpsCount">-- ops</span>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:12px;margin:2px 0">
+                        <span style="font-size:19px;font-weight:800;color:var(--accent-amber)" id="telModalDiskRead">R: -- KB/s</span>
+                        <span style="font-size:19px;font-weight:800;color:#f97316" id="telModalDiskWrite">W: -- MB/s</span>
+                    </div>
+                    <div style="font-size:10.5px;color:var(--text-secondary)" id="telModalDiskTotals">Lifetime: R: -- GB · W: -- GB</div>
+                </div>
+            </div>
+
+            <!-- Modal Sub-Navigation Tabs (Pinned - Always Visible!) -->
+            <div style="display:flex;gap:6px;border-bottom:1px solid var(--border-glass);padding-bottom:10px;overflow-x:auto">
+                <button type="button" class="tel-modal-tab-btn active" id="tabBtnTelWaveforms" onclick="switchTelemetryDetailTab('waveforms')">
+                    📊 Waveforms &amp; Trends
+                </button>
+                <button type="button" class="tel-modal-tab-btn" id="tabBtnTelCpu" onclick="switchTelemetryDetailTab('cpu')">
+                    🧠 CPU &amp; Cores Topology
+                </button>
+                <button type="button" class="tel-modal-tab-btn" id="tabBtnTelMem" onclick="switchTelemetryDetailTab('mem')">
+                    💾 Memory &amp; Swap Pools
+                </button>
+                <button type="button" class="tel-modal-tab-btn" id="tabBtnTelNet" onclick="switchTelemetryDetailTab('net')">
+                    🌐 Network &amp; Disk I/O
+                </button>
+                <button type="button" class="tel-modal-tab-btn" id="tabBtnTelContainers" onclick="switchTelemetryDetailTab('containers')">
+                    🐳 Containers Matrix (<span id="telModalContainerBadgeCount">--</span>)
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Tab Panes Body -->
+        <div class="drawer-body" style="padding:16px 20px 20px;overflow-y:auto;flex:1">
+            <!-- TAB 1: EXPANDED WAVEFORMS -->
+            <div id="telModalTabWaveforms">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                    <div style="font-size:12px;font-weight:600;color:var(--text-secondary)">
+                        Continuous High-Resolution Telemetry Graphs (2s Sampling)
+                    </div>
+                    <!-- Time Range Selector -->
+                    <div class="telemetry-range-group" id="telModalRangeSelector">
+                        <button type="button" class="telemetry-range-pill" onclick="setTelModalTimeRange(30, this)">1m</button>
+                        <button type="button" class="telemetry-range-pill active" onclick="setTelModalTimeRange(60, this)">2m</button>
+                        <button type="button" class="telemetry-range-pill" onclick="setTelModalTimeRange(150, this)">5m</button>
+                        <button type="button" class="telemetry-range-pill" onclick="setTelModalTimeRange(300, this)">10m</button>
+                    </div>
+                </div>
+
+                <div class="tel-widescreen-grid">
+                    <!-- Expanded CPU Chart -->
+                    <div class="telemetry-chart-tile" style="padding:12px">
+                        <div class="chart-tile-header">
+                            <div class="chart-tile-title">
+                                <span class="chart-tile-indicator" style="background:#3b82f6"></span>
+                                <span>CPU Utilization Timeline</span>
+                            </div>
+                            <div class="chart-tile-val-wrap">
+                                <span class="chart-tile-val" id="telModalCpuVal">--%</span>
+                                <span class="chart-tile-sub" id="telModalCpuPeak">Peak --%</span>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-container" style="height:140px">
+                            <canvas id="telModalCpuCanvas" class="waveform-canvas"></canvas>
+                            <div class="chart-tooltip-tracker" id="telModalCpuTracker"></div>
+                        </div>
+                    </div>
+
+                    <!-- Expanded Memory Chart -->
+                    <div class="telemetry-chart-tile" style="padding:12px">
+                        <div class="chart-tile-header">
+                            <div class="chart-tile-title">
+                                <span class="chart-tile-indicator" style="background:#10b981"></span>
+                                <span>Memory (RAM) Allocation</span>
+                            </div>
+                            <div class="chart-tile-val-wrap">
+                                <span class="chart-tile-val" id="telModalMemVal">--%</span>
+                                <span class="chart-tile-sub" id="telModalMemGb">-- / -- GB</span>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-container" style="height:140px">
+                            <canvas id="telModalMemCanvas" class="waveform-canvas"></canvas>
+                            <div class="chart-tooltip-tracker" id="telModalMemTracker"></div>
+                        </div>
+                    </div>
+
+                    <!-- Expanded Network Throughput Chart -->
+                    <div class="telemetry-chart-tile" style="padding:12px">
+                        <div class="chart-tile-header">
+                            <div class="chart-tile-title">
+                                <span class="chart-tile-indicator" style="background:#06b6d4"></span>
+                                <span>Network Throughput (In/Out)</span>
+                            </div>
+                            <div class="chart-tile-val-wrap">
+                                <span class="chart-tile-val" id="telModalNetVal" style="color:#06b6d4">↓ -- KB/s</span>
+                                <span class="chart-tile-sub" id="telModalNetUpVal" style="color:#c084fc;background:rgba(192,132,252,0.15)">↑ -- KB/s</span>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-container" style="height:140px">
+                            <canvas id="telModalNetCanvas" class="waveform-canvas"></canvas>
+                            <div class="chart-tooltip-tracker" id="telModalNetTracker"></div>
+                        </div>
+                    </div>
+
+                    <!-- Expanded Disk I/O Chart -->
+                    <div class="telemetry-chart-tile" style="padding:12px">
+                        <div class="chart-tile-header">
+                            <div class="chart-tile-title">
+                                <span class="chart-tile-indicator" style="background:#f59e0b"></span>
+                                <span>Disk Read / Write I/O</span>
+                            </div>
+                            <div class="chart-tile-val-wrap">
+                                <span class="chart-tile-val" id="telModalDiskVal" style="color:#f59e0b">R: -- KB/s</span>
+                                <span class="chart-tile-sub" id="telModalDiskWriteVal" style="color:#f97316;background:rgba(249,115,22,0.15)">W: -- KB/s</span>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-container" style="height:140px">
+                            <canvas id="telModalDiskCanvas" class="waveform-canvas"></canvas>
+                            <div class="chart-tooltip-tracker" id="telModalDiskTracker"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: CPU & CORES TOPOLOGY -->
+            <div id="telModalTabCpu" style="display:none">
+                <!-- Hardware Model & Frequency Banner -->
+                <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:var(--text-primary)" id="telCpuBannerModel">Loading CPU Model...</div>
+                        <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px" id="telCpuBannerDetails">-- Cores · -- Threads · Frequency: -- MHz (Base: -- / Turbo: --)</div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <div style="text-align:right">
+                            <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase">Load Averages</div>
+                            <div style="font-size:13px;font-weight:700;color:var(--text-primary);font-family:monospace" id="telCpuBannerLoad">1m: -- · 5m: -- · 15m: --</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Per-Core Load Tiles -->
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px">Individual Core Topology &amp; Utilization</div>
+                <div id="telCpuCoresGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:18px">
+                    <!-- Filled dynamically -->
+                </div>
+
+                <!-- Top CPU-Consuming Processes Table -->
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+                    <span>Top Active Host Processes (By CPU Utilization)</span>
+                    <span style="font-size:11px;color:var(--text-muted)">Live sample</span>
+                </div>
+                <div style="background:rgba(0,0,0,0.25);border:1px solid var(--border-glass);border-radius:8px;overflow:hidden">
+                    <table class="tel-proc-table">
+                        <thead>
+                            <tr>
+                                <th style="width:80px">PID</th>
+                                <th>Process Name</th>
+                                <th style="text-align:right;width:100px">CPU Load</th>
+                                <th style="text-align:right;width:120px">Memory (RSS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telCpuTopProcsBody">
+                            <tr><td colspan="4" style="text-align:center;padding:12px;color:var(--text-muted)">Loading process matrix...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: MEMORY & SWAP POOLS -->
+            <div id="telModalTabMem" style="display:none">
+                <!-- Proportional Segmented Memory Bar -->
+                <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:10px;padding:14px;margin-bottom:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                        <span style="font-weight:700;color:var(--text-primary)">Physical Memory Pool Breakdown</span>
+                        <span style="color:var(--text-secondary)" id="telMemBarTotal">Total: -- GB</span>
+                    </div>
+
+                    <div class="mem-pool-track" id="telMemSegmentedBar">
+                        <div class="mem-pool-segment" id="telMemSegUsed" style="width:50%;background:#3b82f6" title="Used">Used</div>
+                        <div class="mem-pool-segment" id="telMemSegCached" style="width:30%;background:#a855f7" title="Cached">Cached</div>
+                        <div class="mem-pool-segment" id="telMemSegBuffers" style="width:5%;background:#f59e0b" title="Buffers">Buffers</div>
+                        <div class="mem-pool-segment" id="telMemSegFree" style="width:15%;background:#10b981" title="Free">Free</div>
+                    </div>
+
+                    <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:11px;margin-top:6px">
+                        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#3b82f6"></span> <strong>Used:</strong> <span id="telLegendUsed">-- GB</span></span>
+                        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#a855f7"></span> <strong>Cached:</strong> <span id="telLegendCached">-- GB</span></span>
+                        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#f59e0b"></span> <strong>Buffers:</strong> <span id="telLegendBuffers">-- MB</span></span>
+                        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#10b981"></span> <strong>Free:</strong> <span id="telLegendFree">-- MB</span></span>
+                        <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#06b6d4"></span> <strong>Available:</strong> <span id="telLegendAvail">-- GB</span></span>
+                    </div>
+                </div>
+
+                <!-- Swap Memory Pool & Activity -->
+                <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:10px;padding:14px;margin-bottom:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:8px">
+                        <span style="font-weight:700;color:var(--text-primary)">Virtual Swap Allocation &amp; Paging</span>
+                        <span style="color:var(--text-secondary)" id="telSwapTotals">-- / -- GB (--%)</span>
+                    </div>
+                    <div class="c-mini-bar-track" style="height:10px">
+                        <div class="c-mini-bar-fill" id="telSwapBarFill" style="width:0%;background:#eab308"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-secondary);margin-top:6px">
+                        <span id="telSwapFree">Free Swap: -- GB</span>
+                        <span id="telSwapPaging">Paging: Sin -- MB · Sout -- MB</span>
+                    </div>
+                </div>
+
+                <!-- Top Memory-Consuming Processes Table -->
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+                    <span>Top Active Host Processes (By Memory Allocation)</span>
+                    <span style="font-size:11px;color:var(--text-muted)">Live sample</span>
+                </div>
+                <div style="background:rgba(0,0,0,0.25);border:1px solid var(--border-glass);border-radius:8px;overflow:hidden">
+                    <table class="tel-proc-table">
+                        <thead>
+                            <tr>
+                                <th style="width:80px">PID</th>
+                                <th>Process Name</th>
+                                <th style="text-align:right;width:100px">Memory %</th>
+                                <th style="text-align:right;width:120px">Resident RAM</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telMemTopProcsBody">
+                            <tr><td colspan="4" style="text-align:center;padding:12px;color:var(--text-muted)">Loading process matrix...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: NETWORK & DISK I/O -->
+            <div id="telModalTabNet" style="display:none">
+                <!-- Network Interfaces Matrix -->
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px">Active Network Adapters &amp; Interfaces</div>
+                <div style="background:rgba(0,0,0,0.25);border:1px solid var(--border-glass);border-radius:8px;overflow:hidden;margin-bottom:18px">
+                    <table class="tel-proc-table">
+                        <thead>
+                            <tr>
+                                <th>Interface</th>
+                                <th style="text-align:right">Total Received</th>
+                                <th style="text-align:right">Total Transmitted</th>
+                                <th style="text-align:right">Packets In</th>
+                                <th style="text-align:right">Packets Out</th>
+                                <th style="text-align:right">Drops / Errs</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telNetAdaptersBody">
+                            <tr><td colspan="6" style="text-align:center;padding:12px;color:var(--text-muted)">Loading network interfaces...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Detailed Disk I/O Metrics -->
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px">Disk I/O Ledger &amp; Operations</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px" id="telDiskMetricsGrid">
+                    <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+                        <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase">Lifetime Data Read</div>
+                        <div style="font-size:18px;font-weight:700;color:var(--accent-amber);margin-top:3px" id="telDiskReadTotal">-- GB</div>
+                        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px" id="telDiskReadCount">-- read ops</div>
+                    </div>
+                    <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+                        <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase">Lifetime Data Written</div>
+                        <div style="font-size:18px;font-weight:700;color:#f97316;margin-top:3px" id="telDiskWriteTotal">-- GB</div>
+                        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px" id="telDiskWriteCount">-- write ops</div>
+                    </div>
+                    <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+                        <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase">Total Operations</div>
+                        <div style="font-size:18px;font-weight:700;color:var(--accent-cyan);margin-top:3px" id="telDiskTotalOps">--</div>
+                        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">Combined I/O count</div>
+                    </div>
+                    <div class="metric-cell" style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+                        <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase">Total I/O Wait Time</div>
+                        <div style="font-size:18px;font-weight:700;color:#a855f7;margin-top:3px" id="telDiskWaitTime">-- s</div>
+                        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">Cumulative kernel time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: CONTAINERS MATRIX -->
+            <div id="telModalTabContainers" style="display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <input type="text" id="telModalContainerSearch" placeholder="🔍 Search containers..." oninput="filterModalContainers()" style="background:rgba(0,0,0,0.35);border:1px solid var(--border-glass);color:var(--text-primary);padding:6px 12px;border-radius:6px;font-size:12px;width:220px;outline:none">
+                    </div>
+                    <div style="display:flex;gap:6px">
+                        <button type="button" class="btn-ctrl active" id="btnSortTelContCpu" onclick="setModalContainerSort('cpu')" style="font-size:11px;padding:3px 8px">Sort by CPU</button>
+                        <button type="button" class="btn-ctrl" id="btnSortTelContMem" onclick="setModalContainerSort('mem')" style="font-size:11px;padding:3px 8px">Sort by RAM</button>
+                        <button type="button" class="btn-ctrl" id="btnSortTelContName" onclick="setModalContainerSort('name')" style="font-size:11px;padding:3px 8px">Sort by Name</button>
+                    </div>
+                </div>
+
+                <div id="telModalContainerGrid" class="containers-matrix-grid">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -12379,9 +12876,567 @@ function renderContainerMatrix(containers) {
     grid.innerHTML = html;
 }
 
+// ── Full-Size Live Telemetry & System Diagnostics Modal Engine ──────────
+let telDetailActiveTab = 'waveforms';
+let telModalPointsLimit = 60; // default 15m in modal
+let telModalInterval = null;
+let telModalCachedData = null;
+let telModalContainerSort = 'cpu';
+let telModalContainerFilter = '';
+
+function openTelemetryDetailModal() {
+    closeAllWidgetMenus();
+    openDrawer('telemetryDetailModal');
+    
+    // Set active server name in title if available
+    try {
+        const sName = document.getElementById('brandServerName') ? document.getElementById('brandServerName').textContent.trim() : '';
+        const titleEl = document.getElementById('telDetailModalTitle');
+        if (titleEl && sName && sName !== 'HOMELAB') {
+            titleEl.textContent = `${sName} · Silicon & Telemetry Diagnostics`;
+        }
+    } catch(e) {}
+
+    // INSTANT RENDER: Draw immediately from in-memory cache with 0ms latency
+    if (telemetryCachedData && telemetryCachedData.history && telemetryCachedData.history.length) {
+        telModalCachedData = telemetryCachedData;
+        renderTelemetryDetailGlance(telemetryCachedData);
+        setTimeout(() => {
+            renderTelemetryDetailActiveTab();
+        }, 10);
+    }
+
+    setTimeout(() => {
+        refreshTelemetryDetailData();
+    }, 40);
+
+    if (!telModalInterval) {
+        telModalInterval = setInterval(refreshTelemetryDetailData, 2000);
+    }
+}
+
+function closeTelemetryDetailModal() {
+    closeDrawer('telemetryDetailModal');
+    if (telModalInterval) {
+        clearInterval(telModalInterval);
+        telModalInterval = null;
+    }
+}
+
+function switchTelemetryDetailTab(tab) {
+    telDetailActiveTab = tab;
+    const tabMap = {
+        'waveforms': { btn: 'tabBtnTelWaveforms', pane: 'telModalTabWaveforms' },
+        'cpu': { btn: 'tabBtnTelCpu', pane: 'telModalTabCpu' },
+        'mem': { btn: 'tabBtnTelMem', pane: 'telModalTabMem' },
+        'net': { btn: 'tabBtnTelNet', pane: 'telModalTabNet' },
+        'containers': { btn: 'tabBtnTelContainers', pane: 'telModalTabContainers' }
+    };
+
+    Object.keys(tabMap).forEach(k => {
+        const b = document.getElementById(tabMap[k].btn);
+        const p = document.getElementById(tabMap[k].pane);
+        if (b) {
+            if (k === tab) b.classList.add('active');
+            else b.classList.remove('active');
+        }
+        if (p) {
+            p.style.display = (k === tab) ? 'block' : 'none';
+        }
+    });
+
+    if (telModalCachedData) {
+        setTimeout(() => {
+            renderTelemetryDetailActiveTab();
+        }, 40);
+    }
+}
+
+function setTelModalTimeRange(limit, btn) {
+    telModalPointsLimit = limit;
+    document.querySelectorAll('#telModalRangeSelector .telemetry-range-pill').forEach(el => el.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (telModalCachedData) {
+        renderExpandedWaveforms(telModalCachedData.history || []);
+    }
+}
+
+async function refreshTelemetryDetailData() {
+    try {
+        const res = await fetch('/api/telemetry/history');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status === 'success') {
+            telModalCachedData = data;
+            renderTelemetryDetailGlance(data);
+            renderTelemetryDetailActiveTab();
+        }
+    } catch (e) {
+        console.warn('Error refreshing telemetry details:', e);
+    }
+}
+
+function renderTelemetryDetailGlance(data) {
+    const history = data.history || [];
+    const last = history[history.length - 1] || {};
+    const details = data.details || {};
+    const cpu = details.cpu || {};
+    const mem = details.memory || {};
+    const disk = details.disk_io || {};
+    const nics = details.nics || [];
+
+    // 1. CPU Glance
+    const cpuPctEl = document.getElementById('telModalCpuPct');
+    if (cpuPctEl) cpuPctEl.textContent = `${last.cpu !== undefined ? last.cpu.toFixed(1) : (mem.percent ? '--' : '0.0')}%`;
+    const cpuFreqEl = document.getElementById('telModalCpuFreq');
+    if (cpuFreqEl && cpu.freq_current_mhz) {
+        cpuFreqEl.textContent = `${Math.round(cpu.freq_current_mhz)} MHz`;
+    }
+    const cpuBadgeEl = document.getElementById('telModalCpuModelBadge');
+    if (cpuBadgeEl) {
+        cpuBadgeEl.textContent = `${cpu.count_physical || 4}C / ${cpu.count_logical || 4}T`;
+    }
+    const cpuLoadEl = document.getElementById('telModalCpuLoadAvg');
+    if (cpuLoadEl && cpu.load_avg) {
+        cpuLoadEl.textContent = `Load: ${cpu.load_avg.join(', ')}`;
+    }
+
+    // 2. Memory Glance
+    const memUsedEl = document.getElementById('telModalMemUsed');
+    const memTotalEl = document.getElementById('telModalMemTotal');
+    const memBadgeEl = document.getElementById('telModalMemPercentBadge');
+    const memCachedEl = document.getElementById('telModalMemCached');
+    if (memUsedEl && mem.used_bytes) {
+        const usedGb = (mem.used_bytes / (1024 ** 3)).toFixed(1);
+        const totalGb = (mem.total_bytes / (1024 ** 3)).toFixed(1);
+        memUsedEl.textContent = `${usedGb} GB`;
+        if (memTotalEl) memTotalEl.textContent = `/ ${totalGb} GB`;
+        if (memBadgeEl) memBadgeEl.textContent = `${mem.percent ? mem.percent.toFixed(1) : '--'}% Used`;
+        const cachedGb = mem.cached_bytes ? (mem.cached_bytes / (1024 ** 3)).toFixed(1) : '0';
+        const freeMb = mem.free_bytes ? Math.round(mem.free_bytes / (1024 ** 2)) : '0';
+        if (memCachedEl) memCachedEl.textContent = `Cached: ${cachedGb} GB · Free: ${freeMb} MB`;
+    }
+
+    // 3. Network Glance
+    const netDownEl = document.getElementById('telModalNetDown');
+    const netUpEl = document.getElementById('telModalNetUp');
+    const netTotalsEl = document.getElementById('telModalNetTotals');
+    const netPeakEl = document.getElementById('telModalNetPeak');
+    if (netDownEl) {
+        const dKbs = last.net_down || 0;
+        const uKbs = last.net_up || 0;
+        netDownEl.textContent = dKbs > 1024 ? `↓ ${(dKbs/1024).toFixed(1)} MB/s` : `↓ ${dKbs.toFixed(1)} KB/s`;
+        if (netUpEl) netUpEl.textContent = uKbs > 1024 ? `↑ ${(uKbs/1024).toFixed(1)} MB/s` : `↑ ${uKbs.toFixed(1)} KB/s`;
+        
+        let peakNet = 0;
+        history.forEach(p => {
+            if ((p.net_down || 0) > peakNet) peakNet = p.net_down;
+        });
+        if (netPeakEl) netPeakEl.textContent = `Peak: ${peakNet > 1024 ? (peakNet/1024).toFixed(1) + ' MB/s' : peakNet.toFixed(1) + ' KB/s'}`;
+
+        let totRecv = 0, totSent = 0;
+        nics.forEach(n => { totRecv += (n.bytes_recv || 0); totSent += (n.bytes_sent || 0); });
+        if (netTotalsEl) {
+            netTotalsEl.textContent = `Total: ↓ ${(totRecv / (1024**3)).toFixed(1)} GB · ↑ ${(totSent / (1024**3)).toFixed(1)} GB`;
+        }
+    }
+
+    // 4. Disk Glance
+    const diskReadEl = document.getElementById('telModalDiskRead');
+    const diskWriteEl = document.getElementById('telModalDiskWrite');
+    const diskTotalsEl = document.getElementById('telModalDiskTotals');
+    const diskOpsEl = document.getElementById('telModalDiskOpsCount');
+    if (diskReadEl) {
+        const rKbs = last.disk_read || 0;
+        const wKbs = last.disk_write || 0;
+        diskReadEl.textContent = rKbs > 1024 ? `R: ${(rKbs/1024).toFixed(1)} MB/s` : `R: ${Math.round(rKbs)} KB/s`;
+        if (diskWriteEl) diskWriteEl.textContent = wKbs > 1024 ? `W: ${(wKbs/1024).toFixed(1)} MB/s` : `W: ${Math.round(wKbs)} KB/s`;
+        if (diskOpsEl && disk.read_count !== undefined) {
+            const totOps = (disk.read_count || 0) + (disk.write_count || 0);
+            diskOpsEl.textContent = `${(totOps / 1e6).toFixed(1)}M ops`;
+        }
+        if (diskTotalsEl && disk.read_bytes) {
+            const rGb = (disk.read_bytes / (1024**3)).toFixed(1);
+            const wGb = (disk.write_bytes / (1024**3)).toFixed(1);
+            diskTotalsEl.textContent = `Lifetime: R: ${rGb} GB · W: ${wGb} GB`;
+        }
+    }
+
+    // Containers count badge
+    const cBadge = document.getElementById('telModalContainerBadgeCount');
+    if (cBadge && data.containers) {
+        cBadge.textContent = data.containers.length;
+    }
+}
+
+function renderTelemetryDetailActiveTab() {
+    if (!telModalCachedData) return;
+    const data = telModalCachedData;
+    const history = data.history || [];
+    const details = data.details || {};
+
+    if (telDetailActiveTab === 'waveforms') {
+        renderExpandedWaveforms(history);
+    } else if (telDetailActiveTab === 'cpu') {
+        renderExpandedCpuTab(details.cpu || {}, details.top_processes || {});
+    } else if (telDetailActiveTab === 'mem') {
+        renderExpandedMemTab(details.memory || {}, details.swap || {}, details.top_processes || {});
+    } else if (telDetailActiveTab === 'net') {
+        renderExpandedNetTab(details.nics || [], details.disk_io || {});
+    } else if (telDetailActiveTab === 'containers') {
+        renderModalContainerMatrix(data.containers || []);
+    }
+}
+
+function renderExpandedWaveforms(rawHistory) {
+    if (!rawHistory || !rawHistory.length) return;
+    const pts = rawHistory.slice(-telModalPointsLimit);
+    const last = pts[pts.length - 1] || {};
+    const isLight = document.documentElement.getAttribute('data-active-theme') === 'light';
+
+    // 1. CPU Waveform
+    const peakCpu = Math.max(...pts.map(p => p.cpu || 0));
+    const cpuValEl = document.getElementById('telModalCpuVal');
+    const cpuPeakEl = document.getElementById('telModalCpuPeak');
+    if (cpuValEl) cpuValEl.textContent = `${(last.cpu || 0).toFixed(1)}%`;
+    if (cpuPeakEl) cpuPeakEl.textContent = `Peak ${(peakCpu || 0).toFixed(1)}%`;
+
+    drawWaveformChart('telModalCpuCanvas', 'telModalCpuTracker', pts, [
+        { key: 'cpu', stroke: '#38bdf8', fillStart: 'rgba(56, 189, 248, 0.35)', fillEnd: 'rgba(56, 189, 248, 0.01)', label: 'CPU', unit: '%' }
+    ], { maxY: 100, isLight });
+
+    // 2. Memory Waveform
+    const memValEl = document.getElementById('telModalMemVal');
+    const memGbEl = document.getElementById('telModalMemGb');
+    if (memValEl) memValEl.textContent = `${(last.mem || 0).toFixed(1)}%`;
+    if (memGbEl && telModalCachedData && telModalCachedData.details && telModalCachedData.details.memory) {
+        const m = telModalCachedData.details.memory;
+        memGbEl.textContent = `${(m.used_bytes / (1024**3)).toFixed(1)} / ${(m.total_bytes / (1024**3)).toFixed(1)} GB`;
+    }
+
+    drawWaveformChart('telModalMemCanvas', 'telModalMemTracker', pts, [
+        { key: 'mem', stroke: '#34d399', fillStart: 'rgba(52, 211, 153, 0.35)', fillEnd: 'rgba(52, 211, 153, 0.01)', label: 'RAM', unit: '%' }
+    ], { maxY: 100, isLight });
+
+    // 3. Network Throughput Waveform
+    const netValEl = document.getElementById('telModalNetVal');
+    const netUpValEl = document.getElementById('telModalNetUpVal');
+    const dVal = last.net_down || 0;
+    const uVal = last.net_up || 0;
+    if (netValEl) netValEl.textContent = `↓ ${formatRateKb(dVal)}`;
+    if (netUpValEl) netUpValEl.textContent = `↑ ${formatRateKb(uVal)}`;
+
+    drawWaveformChart('telModalNetCanvas', 'telModalNetTracker', pts, [
+        { key: 'net_down', stroke: '#22d3ee', fillStart: 'rgba(34, 211, 238, 0.3)', fillEnd: 'rgba(34, 211, 238, 0.01)', label: 'Inbound', unit: ' KB/s' },
+        { key: 'net_up', stroke: '#c084fc', fillStart: 'rgba(192, 132, 252, 0.25)', fillEnd: 'rgba(192, 132, 252, 0.01)', label: 'Outbound', unit: ' KB/s' }
+    ], { isLight, autoMax: true });
+
+    // 4. Disk I/O Activity Waveform
+    const diskValEl = document.getElementById('telModalDiskVal');
+    const diskWriteValEl = document.getElementById('telModalDiskWriteVal');
+    const rVal = last.disk_read || 0;
+    const wVal = last.disk_write || 0;
+    if (diskValEl) diskValEl.textContent = `R: ${formatRateKb(rVal)}`;
+    if (diskWriteValEl) diskWriteValEl.textContent = `W: ${formatRateKb(wVal)}`;
+
+    drawWaveformChart('telModalDiskCanvas', 'telModalDiskTracker', pts, [
+        { key: 'disk_write', stroke: '#fbbf24', fillStart: 'rgba(251, 191, 36, 0.3)', fillEnd: 'rgba(251, 191, 36, 0.01)', label: 'Write', unit: ' KB/s' },
+        { key: 'disk_read', stroke: '#38bdf8', fillStart: 'rgba(56, 189, 248, 0.2)', fillEnd: 'rgba(56, 189, 248, 0.01)', label: 'Read', unit: ' KB/s' }
+    ], { isLight, autoMax: true });
+}
+
+function renderExpandedCpuTab(cpu, procs) {
+    const modelEl = document.getElementById('telCpuBannerModel');
+    if (modelEl) modelEl.textContent = cpu.model || 'Intel Core Processor';
+    
+    const detailsEl = document.getElementById('telCpuBannerDetails');
+    if (detailsEl) {
+        detailsEl.textContent = `${cpu.count_physical || 4} Physical Cores · ${cpu.count_logical || 4} Threads · Current Freq: ${cpu.freq_current_mhz ? Math.round(cpu.freq_current_mhz) + ' MHz' : '--'} (Min: ${cpu.freq_min_mhz || '--'} / Max: ${cpu.freq_max_mhz || '--'} MHz)`;
+    }
+
+    const loadEl = document.getElementById('telCpuBannerLoad');
+    if (loadEl && cpu.load_avg) {
+        loadEl.textContent = `1m: ${cpu.load_avg[0]} · 5m: ${cpu.load_avg[1]} · 15m: ${cpu.load_avg[2]}`;
+    }
+
+    // Per-core tiles
+    const grid = document.getElementById('telCpuCoresGrid');
+    if (grid && cpu.cores) {
+        let html = '';
+        cpu.cores.forEach((pct, idx) => {
+            let col = '#10b981';
+            if (pct > 80) col = '#ef4444';
+            else if (pct > 50) col = '#f59e0b';
+            else if (pct > 25) col = '#38bdf8';
+
+            html += `
+                <div class="tel-core-tile">
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px">
+                        <span style="font-weight:700;color:var(--text-primary)">Core ${idx}</span>
+                        <strong style="color:${col}">${pct.toFixed(1)}%</strong>
+                    </div>
+                    <div class="c-mini-bar-track" style="height:7px">
+                        <div class="c-mini-bar-fill" style="width:${Math.max(2, pct)}%;background:${col}"></div>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    // Top CPU processes
+    const pBody = document.getElementById('telCpuTopProcsBody');
+    if (pBody) {
+        const list = (procs && procs.by_cpu) ? procs.by_cpu : [];
+        if (!list.length) {
+            pBody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:12px;color:var(--text-muted)">No active process metrics available.</td></tr>';
+        } else {
+            let rows = '';
+            list.forEach(p => {
+                rows += `
+                    <tr>
+                        <td style="font-family:monospace;color:var(--text-secondary)">${p.pid}</td>
+                        <td style="font-weight:600;color:var(--text-primary)">${escapeHtml(p.name)}</td>
+                        <td style="text-align:right;font-weight:700;color:var(--accent-blue)">${p.cpu.toFixed(1)}%</td>
+                        <td style="text-align:right;font-family:monospace;color:var(--text-secondary)">${p.mem_mb} MB</td>
+                    </tr>
+                `;
+            });
+            pBody.innerHTML = rows;
+        }
+    }
+}
+
+function renderExpandedMemTab(mem, swap, procs) {
+    const totGb = (mem.total_bytes / (1024**3)).toFixed(1);
+    const usedGb = (mem.used_bytes / (1024**3)).toFixed(1);
+    const cachedGb = mem.cached_bytes ? (mem.cached_bytes / (1024**3)).toFixed(1) : '0';
+    const buffersMb = mem.buffers_bytes ? Math.round(mem.buffers_bytes / (1024**2)) : '0';
+    const freeMb = mem.free_bytes ? Math.round(mem.free_bytes / (1024**2)) : '0';
+    const availGb = mem.available_bytes ? (mem.available_bytes / (1024**3)).toFixed(1) : '0';
+
+    const totalEl = document.getElementById('telMemBarTotal');
+    if (totalEl) totalEl.textContent = `Total: ${totGb} GB`;
+
+    const uPct = Math.min(100, (mem.used_bytes / mem.total_bytes) * 100);
+    const cPct = Math.min(100 - uPct, ((mem.cached_bytes || 0) / mem.total_bytes) * 100);
+    const bPct = Math.min(100 - uPct - cPct, ((mem.buffers_bytes || 0) / mem.total_bytes) * 100);
+    const fPct = Math.max(0, 100 - uPct - cPct - bPct);
+
+    const sU = document.getElementById('telMemSegUsed');
+    const sC = document.getElementById('telMemSegCached');
+    const sB = document.getElementById('telMemSegBuffers');
+    const sF = document.getElementById('telMemSegFree');
+    if (sU) { sU.style.width = `${uPct}%`; sU.textContent = uPct > 10 ? `Used (${Math.round(uPct)}%)` : ''; }
+    if (sC) { sC.style.width = `${cPct}%`; sC.textContent = cPct > 10 ? `Cached (${Math.round(cPct)}%)` : ''; }
+    if (sB) { sB.style.width = `${bPct}%`; sB.textContent = bPct > 8 ? `Buf` : ''; }
+    if (sF) { sF.style.width = `${fPct}%`; sF.textContent = fPct > 10 ? `Free (${Math.round(fPct)}%)` : ''; }
+
+    const lU = document.getElementById('telLegendUsed');
+    const lC = document.getElementById('telLegendCached');
+    const lB = document.getElementById('telLegendBuffers');
+    const lF = document.getElementById('telLegendFree');
+    const lA = document.getElementById('telLegendAvail');
+    if (lU) lU.textContent = `${usedGb} GB`;
+    if (lC) lC.textContent = `${cachedGb} GB`;
+    if (lB) lB.textContent = `${buffersMb} MB`;
+    if (lF) lF.textContent = `${freeMb} MB`;
+    if (lA) lA.textContent = `${availGb} GB`;
+
+    // Swap
+    if (swap && swap.total_bytes) {
+        const swpTotGb = (swap.total_bytes / (1024**3)).toFixed(1);
+        const swpUsedGb = (swap.used_bytes / (1024**3)).toFixed(1);
+        const swpFreeGb = (swap.free_bytes / (1024**3)).toFixed(1);
+        const swpPct = swap.percent || 0;
+
+        const swpTotEl = document.getElementById('telSwapTotals');
+        if (swpTotEl) swpTotEl.textContent = `${swpUsedGb} / ${swpTotGb} GB (${swpPct.toFixed(1)}%)`;
+        const swpBar = document.getElementById('telSwapBarFill');
+        if (swpBar) {
+            swpBar.style.width = `${Math.max(2, swpPct)}%`;
+            swpBar.style.background = swpPct > 75 ? '#ef4444' : (swpPct > 40 ? '#eab308' : '#38bdf8');
+        }
+        const swpFreeEl = document.getElementById('telSwapFree');
+        if (swpFreeEl) swpFreeEl.textContent = `Free Swap: ${swpFreeGb} GB`;
+        const swpPageEl = document.getElementById('telSwapPaging');
+        if (swpPageEl) {
+            const sinMb = swap.sin_bytes ? Math.round(swap.sin_bytes / (1024**2)) : 0;
+            const soutMb = swap.sout_bytes ? Math.round(swap.sout_bytes / (1024**2)) : 0;
+            swpPageEl.textContent = `Paging: Sin ${sinMb} MB · Sout ${soutMb} MB`;
+        }
+    }
+
+    // Top RAM processes
+    const pBody = document.getElementById('telMemTopProcsBody');
+    if (pBody) {
+        const list = (procs && procs.by_mem) ? procs.by_mem : [];
+        if (!list.length) {
+            pBody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:12px;color:var(--text-muted)">No active process metrics available.</td></tr>';
+        } else {
+            let rows = '';
+            list.forEach(p => {
+                rows += `
+                    <tr>
+                        <td style="font-family:monospace;color:var(--text-secondary)">${p.pid}</td>
+                        <td style="font-weight:600;color:var(--text-primary)">${escapeHtml(p.name)}</td>
+                        <td style="text-align:right;font-weight:700;color:#10b981">${p.mem_pct.toFixed(1)}%</td>
+                        <td style="text-align:right;font-family:monospace;color:var(--text-secondary)">${p.mem_mb} MB</td>
+                    </tr>
+                `;
+            });
+            pBody.innerHTML = rows;
+        }
+    }
+}
+
+function renderExpandedNetTab(nics, disk) {
+    const nBody = document.getElementById('telNetAdaptersBody');
+    if (nBody) {
+        if (!nics || !nics.length) {
+            nBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:12px;color:var(--text-muted)">No network adapters detected.</td></tr>';
+        } else {
+            let rows = '';
+            nics.forEach(n => {
+                const rGb = (n.bytes_recv / (1024**3)).toFixed(2);
+                const sGb = (n.bytes_sent / (1024**3)).toFixed(2);
+                const drops = (n.dropin || 0) + (n.dropout || 0) + (n.errin || 0) + (n.errout || 0);
+                rows += `
+                    <tr>
+                        <td style="font-weight:700;color:var(--text-primary);font-family:monospace">${escapeHtml(n.name)}</td>
+                        <td style="text-align:right;color:#38bdf8;font-weight:600">↓ ${rGb} GB</td>
+                        <td style="text-align:right;color:#c084fc;font-weight:600">↑ ${sGb} GB</td>
+                        <td style="text-align:right;font-family:monospace;color:var(--text-secondary)">${(n.packets_recv || 0).toLocaleString()}</td>
+                        <td style="text-align:right;font-family:monospace;color:var(--text-secondary)">${(n.packets_sent || 0).toLocaleString()}</td>
+                        <td style="text-align:right;font-family:monospace;color:${drops > 0 ? '#ef4444' : '#10b981'}">${drops}</td>
+                    </tr>
+                `;
+            });
+            nBody.innerHTML = rows;
+        }
+    }
+
+    if (disk) {
+        const rTot = document.getElementById('telDiskReadTotal');
+        const rCnt = document.getElementById('telDiskReadCount');
+        const wTot = document.getElementById('telDiskWriteTotal');
+        const wCnt = document.getElementById('telDiskWriteCount');
+        const totOps = document.getElementById('telDiskTotalOps');
+        const wTime = document.getElementById('telDiskWaitTime');
+
+        if (rTot && disk.read_bytes) rTot.textContent = `${(disk.read_bytes / (1024**3)).toFixed(1)} GB`;
+        if (rCnt && disk.read_count) rCnt.textContent = `${(disk.read_count).toLocaleString()} read ops`;
+        if (wTot && disk.write_bytes) wTot.textContent = `${(disk.write_bytes / (1024**3)).toFixed(1)} GB`;
+        if (wCnt && disk.write_count) wCnt.textContent = `${(disk.write_count).toLocaleString()} write ops`;
+        if (totOps && disk.read_count !== undefined) {
+            totOps.textContent = ((disk.read_count + disk.write_count)).toLocaleString();
+        }
+        if (wTime && disk.read_time_ms) {
+            const totSec = Math.round((disk.read_time_ms + (disk.write_time_ms || 0)) / 1000);
+            wTime.textContent = `${totSec.toLocaleString()} s`;
+        }
+    }
+}
+
+function filterModalContainers() {
+    const input = document.getElementById('telModalContainerSearch');
+    telModalContainerFilter = input ? input.value.trim().toLowerCase() : '';
+    if (telModalCachedData) {
+        renderModalContainerMatrix(telModalCachedData.containers || []);
+    }
+}
+
+function setModalContainerSort(sortKey) {
+    telModalContainerSort = sortKey;
+    ['btnSortTelContCpu', 'btnSortTelContMem', 'btnSortTelContName'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.remove('active');
+    });
+    if (sortKey === 'cpu') document.getElementById('btnSortTelContCpu')?.classList.add('active');
+    else if (sortKey === 'mem') document.getElementById('btnSortTelContMem')?.classList.add('active');
+    else if (sortKey === 'name') document.getElementById('btnSortTelContName')?.classList.add('active');
+
+    if (telModalCachedData) {
+        renderModalContainerMatrix(telModalCachedData.containers || []);
+    }
+}
+
+function renderModalContainerMatrix(containers) {
+    const grid = document.getElementById('telModalContainerGrid');
+    if (!grid) return;
+
+    if (!containers || !containers.length) {
+        grid.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No active Docker containers detected.</div>';
+        return;
+    }
+
+    let list = [...containers];
+    if (telModalContainerFilter) {
+        list = list.filter(c => 
+            (c.display_name && c.display_name.toLowerCase().includes(telModalContainerFilter)) ||
+            (c.name && c.name.toLowerCase().includes(telModalContainerFilter))
+        );
+    }
+
+    if (telModalContainerSort === 'cpu') {
+        list.sort((a, b) => (b.cpu || 0) - (a.cpu || 0));
+    } else if (telModalContainerSort === 'mem') {
+        list.sort((a, b) => (b.mem_pct || 0) - (a.mem_pct || 0));
+    } else if (telModalContainerSort === 'name') {
+        list.sort((a, b) => (a.display_name || a.name || '').localeCompare(b.display_name || b.name || ''));
+    }
+
+    let html = '';
+    list.forEach(c => {
+        const cpuPct = Math.min(100, Math.max(0, c.cpu || 0));
+        const memPct = Math.min(100, Math.max(0, c.mem_pct || 0));
+
+        let cpuColor = '#38bdf8';
+        if (cpuPct > 50) cpuColor = '#ef4444';
+        else if (cpuPct > 20) cpuColor = '#fbbf24';
+        else if (cpuPct > 5) cpuColor = '#22d3ee';
+
+        let memColor = '#34d399';
+        if (memPct > 60) memColor = '#ef4444';
+        else if (memPct > 25) memColor = '#fbbf24';
+
+        html += `
+            <div class="container-row-tile">
+                <div style="font-size:14px;text-align:center">🐳</div>
+                <div style="min-width:0">
+                    <div style="font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(c.display_name)}">
+                        ${escapeHtml(c.display_name)}
+                    </div>
+                    <div style="font-size:10px;color:var(--text-muted);font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                        ${escapeHtml(c.name)}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:10.5px;font-family:monospace;line-height:1.3;margin-bottom:3px;display:flex;justify-content:space-between;gap:8px">
+                        <span><span style="color:var(--text-secondary)">CPU:</span> <strong style="color:${cpuColor}">${c.cpu.toFixed(1)}%</strong></span>
+                        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.mem_str || ''}"><span style="color:var(--text-secondary)">RAM:</span> <strong style="color:${memColor}">${c.mem_str || (c.mem_pct + '%')}</strong></span>
+                    </div>
+                    <div class="c-mini-bar-track" style="display:flex;gap:2px">
+                        <div class="c-mini-bar-fill" style="width:${Math.max(2, cpuPct)}%;background:${cpuColor}" title="CPU: ${c.cpu}%"></div>
+                        <div class="c-mini-bar-fill" style="width:${Math.max(2, memPct)}%;background:${memColor};opacity:0.85" title="RAM: ${c.mem_pct}%"></div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,0.15);color:#10b981;font-weight:600">Running</span>
+                </div>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+}
+
 window.addEventListener('resize', () => {
     if (telemetryActiveTab === 'waveforms') {
         renderAllWaveforms();
+    }
+    if (document.getElementById('telemetryDetailModal')?.classList.contains('open') && telDetailActiveTab === 'waveforms') {
+        if (telModalCachedData) renderExpandedWaveforms(telModalCachedData.history || []);
     }
 });
 
@@ -15862,6 +16917,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateClock, 1000);
     fetchStats();
     setInterval(fetchStats, 10000);
+    setInterval(fetchTelemetryHistory, 2000);
     fetchWeather();
     setInterval(fetchWeather, 300000);
 

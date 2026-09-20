@@ -1136,7 +1136,7 @@ def _nodes_telemetry_loop():
 threading.Thread(target=_nodes_telemetry_loop, daemon=True).start()
 
 # ── Live Telemetry Waveforms & Rolling History Ring Buffer (Beszel-Style) ──
-telemetry_history = deque(maxlen=120)  # Stores up to 120 samples (10-30 minutes of telemetry)
+telemetry_history = deque(maxlen=300)  # Stores up to 300 samples (10 minutes @ 2s sampling)
 cached_container_telemetry = []
 
 _last_wf_net = {"time": time.time(), "sent": 0, "recv": 0}
@@ -1195,9 +1195,9 @@ def _telemetry_waveforms_collector():
                 "disk_write": disk_write_kbs
             })
 
-            # Sample Docker container stats every 10s (every 2nd loop)
+            # Sample Docker container stats every 10s (every 5th loop @ 2s)
             docker_tick += 1
-            if docker_tick >= 2:
+            if docker_tick >= 5:
                 docker_tick = 0
                 try:
                     cmd = ['docker', 'stats', '--no-stream', '--format', '{{.Name}}|{{.CPUPerc}}|{{.MemUsage}}|{{.MemPerc}}']
@@ -1235,17 +1235,123 @@ def _telemetry_waveforms_collector():
 
         except Exception:
             pass
-        time.sleep(5)
+        time.sleep(2)
 
 threading.Thread(target=_telemetry_waveforms_collector, daemon=True).start()
 
+def get_detailed_telemetry():
+    try:
+        cores = psutil.cpu_percent(interval=None, percpu=True)
+        freq = psutil.cpu_freq()
+        load_avg = os.getloadavg() if hasattr(os, 'getloadavg') else (0.0, 0.0, 0.0)
+        cpu_count_logical = psutil.cpu_count(logical=True) or len(cores)
+        cpu_count_physical = psutil.cpu_count(logical=False) or cpu_count_logical
+        
+        vm = psutil.virtual_memory()
+        sm = psutil.swap_memory()
+        
+        disk_io = psutil.disk_io_counters()
+        disk_stats = {
+            "read_count": disk_io.read_count if disk_io else 0,
+            "write_count": disk_io.write_count if disk_io else 0,
+            "read_bytes": disk_io.read_bytes if disk_io else 0,
+            "write_bytes": disk_io.write_bytes if disk_io else 0,
+            "read_time_ms": disk_io.read_time if disk_io else 0,
+            "write_time_ms": disk_io.write_time if disk_io else 0,
+        }
+        
+        nics_raw = psutil.net_io_counters(pernic=True)
+        nics = []
+        for nic_name, nic_io in nics_raw.items():
+            if nic_name.startswith('veth'):
+                continue
+            nics.append({
+                "name": nic_name,
+                "bytes_recv": nic_io.bytes_recv,
+                "bytes_sent": nic_io.bytes_sent,
+                "packets_recv": nic_io.packets_recv,
+                "packets_sent": nic_io.packets_sent,
+                "dropin": nic_io.dropin,
+                "dropout": nic_io.dropout,
+                "errin": nic_io.errin,
+                "errout": nic_io.errout
+            })
+        nics.sort(key=lambda x: x["bytes_recv"] + x["bytes_sent"], reverse=True)
+
+        procs_all = []
+        try:
+            for p in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent', 'memory_info']):
+                try:
+                    info = p.info
+                    mem_mb = round((info['memory_info'].rss if info.get('memory_info') else 0) / (1024 * 1024), 1)
+                    procs_all.append({
+                        "pid": info['pid'],
+                        "name": info['name'] or 'unknown',
+                        "cpu": round(info['cpu_percent'] or 0.0, 1),
+                        "mem_pct": round(info['memory_percent'] or 0.0, 1),
+                        "mem_mb": mem_mb
+                    })
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+            top_cpu = sorted(procs_all, key=lambda x: x['cpu'], reverse=True)[:5]
+            top_mem = sorted(procs_all, key=lambda x: x['mem_pct'], reverse=True)[:5]
+        except Exception:
+            top_cpu, top_mem = [], []
+
+        hw = {}
+        try:
+            hw = get_system_hardware_info()
+        except Exception:
+            pass
+
+        return {
+            "cpu": {
+                "model": hw.get("cpu_model", "Intel Core Processor"),
+                "cores": cores,
+                "count_logical": cpu_count_logical,
+                "count_physical": cpu_count_physical,
+                "freq_current_mhz": round(freq.current, 1) if freq else None,
+                "freq_min_mhz": round(freq.min, 1) if freq else None,
+                "freq_max_mhz": round(freq.max, 1) if freq else None,
+                "load_avg": [round(x, 2) for x in load_avg]
+            },
+            "memory": {
+                "total_bytes": vm.total,
+                "available_bytes": vm.available,
+                "used_bytes": vm.used,
+                "free_bytes": vm.free,
+                "cached_bytes": getattr(vm, 'cached', 0),
+                "buffers_bytes": getattr(vm, 'buffers', 0),
+                "shared_bytes": getattr(vm, 'shared', 0),
+                "percent": vm.percent
+            },
+            "swap": {
+                "total_bytes": sm.total,
+                "used_bytes": sm.used,
+                "free_bytes": sm.free,
+                "percent": sm.percent,
+                "sin_bytes": sm.sin,
+                "sout_bytes": sm.sout
+            },
+            "disk_io": disk_stats,
+            "nics": nics[:8],
+            "top_processes": {
+                "by_cpu": top_cpu,
+                "by_mem": top_mem
+            }
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.route("/api/telemetry/history")
 def api_telemetry_history():
+    details = get_detailed_telemetry()
     return jsonify({
         "status": "success",
         "count": len(telemetry_history),
         "history": list(telemetry_history),
         "containers": cached_container_telemetry,
+        "details": details,
         "timestamp": int(time.time()),
         "server_time": datetime.now().strftime("%H:%M:%S")
     })
