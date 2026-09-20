@@ -59,63 +59,18 @@ Most server dashboards either offer a simple bookmarks list or heavy enterprise 
 
 ---
 
-## 📝 Release History & Changelog
+## 📜 Release History & Changelog
 
-### [v1.0.9] - 2026-09-20
-- **Complete Mobile Viewport & Card Optimization**: Solved horizontal overflow and cut-off card boundaries on smartphones (iPhone / Android) by adding `min-width: 0` constraints, auto-wrapping headers (`.card-head-left`, `.card-head-right`), and adaptive metric cells.
-- **Unified 3-Metric Single-Row App Layout**: Dynamic application cards (`Status`, `Category`, `Port`) and Portainer stacks (`Running`, `Stopped`, `Total`) now fit into a clean single row on mobile with 33.3% flex distribution without awkward second-line line wrapping or edge clipping.
-- **Dynamic Proxmox UI Visibility**: The `🖥️ Proxmox` filter tab, `VMs / PVE` dock button, and `Proxmox Cluster & VMs` card are now completely dynamic and automatically hide on fresh installations or non-hypervisor systems unless Proxmox VE or cluster nodes are actively present.
-- **Universal Multi-Tier Speedtest Engine**: Benchmark engine functions natively across all Linux distributions, Docker containers, VMs, and architectures (x86_64, ARM, Raspberry Pi) without freezing or requiring pre-installed CLI binaries.
-- **Complete Cross-System Sanitization**: Cleaned historical IPs, personal cards, and starting energy ledger metrics from defaults so any fresh setup starts with a true zero baseline.
+Homelab Hub adheres to [Semantic Versioning](https://semver.org/). Full version notes, commit diffs, and historical upgrades are maintained in [CHANGELOG.md](CHANGELOG.md) and tagged across all GitHub releases.
 
-### [v1.0.8] - 2026-09-19
-- **Proxmox Hypervisor VMs & Containers Overhaul**: Fixed live telemetry caching and populated real-time status, vCPU, RAM, CPU %, and LAN IPs for all 13 cluster guests across nodes `pve` and `pve2`.
-- **Proxmox Power Controls & Instant Refresh**: Added direct 1-click power management (Start, Stop, Reboot) with auto-detection for LXC vs QEMU, live search filtering, guest category tabs, and on-demand `/api/proxmox/refresh`.
-- **Docker Detection & Reachable Host IP**: Fixed container URL resolution to bind to the client's reachable host/LAN IP (`192.168.0.8`) instead of internal Docker bridge IPs (`172.16.x.x`–`172.31.x.x`).
-- **Setup Wizard Clean Replacement**: Added `[✓] Clean Setup: Replace existing cards` checkbox to wizard footer so fresh setups cleanly replace old cards instead of creating duplicates.
-- **Dynamic Initial Monogram Fallbacks**: Added glowing initials badges for any apps without custom icons so that empty or broken icons are never displayed under the search bar.
-- **Dynamic System Tasks**: Integrated `task_manager.py` with `/api/system/tasks` to dynamically manage host maintenance and systemd timers.
-- **Bypass Cache on Manual Update Check**: Added `?force=1` on manual "Check for Updates" queries to bypass server-side caches and query GitHub directly.
+| Version | Release Date | Key Focus & Highlights | Full Notes |
+| :--- | :--- | :--- | :---: |
+| **v1.0.9** | 2026-09-20 | **Mobile Viewport Overhaul & Automated History**: Zero-overflow card constraints, responsive drive arrays, automated timeline logging, universal speedtest engine. | [Details ↗](CHANGELOG.md#v109---2026-09-20) |
+| **v1.0.8** | 2026-09-19 | **Proxmox Hypervisor Overhaul**: 1-click LXC/VM power controls, multi-node telemetry, Docker LAN reachability fix. | [Details ↗](CHANGELOG.md#v108---2026-09-19) |
+| **v1.0.7** | 2026-09-19 | **Clean Onboarding & In-Container Docker CLI**: Zero-config container discovery on fresh installs. | [Details ↗](CHANGELOG.md#v107---2026-09-19) |
+| **v1.0.0** | 2026-09-19 | **Initial Public Release**: Deep hardware telemetry, energy ledger, and app launcher. | [Details ↗](CHANGELOG.md#v100---2026-09-19) |
 
-### [v1.0.7] - 2026-09-19
-- **Docker Fleet CLI Inside Container**: Replaced `docker.io` with `docker-cli` in `Dockerfile` so the `/usr/bin/docker` client binary is fully available inside Docker container deployments to query `/var/run/docker.sock` and display running containers.
-- **Fresh Install Dynamic Discovery**: Removed hardcoded sample cards from `card_manager.py` (`DEFAULT_CARDS`). On fresh installations on any new system, Homelab Hub automatically scans the local Docker engine and auto-populates cards for the containers *actually running* on that specific host.
-- **Clean Initial Setup State**: When no containers or cards exist, the dashboard presents a clean onboarding prompt with one-click **⚡ Auto-Detect Docker Apps** and **➕ Add Card Manually** actions without displaying applications from other systems.
-- **Automated 1-Click Update & Restart**: Added `/api/system/apply-update` and UI button **⚡ Update & Restart Now** that downloads updates, restarts the service, and automatically reconnects the browser with zero manual terminal commands.
-- **Build Isolation & Sanitization**: Strengthened `.dockerignore` to prevent local configuration (`cards.json`, `settings.json`, `calendar_events.json`) from ever being copied into Docker images. Cleaned personal container names from fallback dictionaries.
-
-### [v1.0.6] - 2026-09-19
-- **Running Version Header Badge**: Prominently displayed the live version pill (`v1.0.6`) directly on the top dashboard header next to the brand title. Clicking it jumps directly to the updates panel.
-- **Automated Update Availability Flag**: Added automatic background update polling against GitHub releases. If a newer image/release is published, a glowing update badge (`Update Available: vX.Y.Z`) appears on the header and an amber alert indicator appears on the Settings button.
-- **Semver Precision & Cache Guard**: Upgraded `/api/system/update-check` with semver comparison and a 15-minute in-memory cache to prevent GitHub API rate limiting.
-- **Menu Drawer Version Entry**: Integrated version and update status into the navigation drawer menu.
-
-### [v1.0.5] - 2026-09-19
-- **Fixed Docker Fleet Counts**: Resolved duplicate element IDs that caused container count metrics (`Running`, `Stopped`, `Total`) to remain blank (`--`) on companion cards. Live telemetry poller now updates all dashboard fleet widgets in sync.
-- **Portainer Portal Direct Navigation**: Clicking the Portainer card now opens Portainer's own web UI portal directly (via configured LAN port `:9000` or Tailscale remote URL) rather than triggering the generic internal container drawer. The "Manage ↗" button remains available on the card header for opening the fleet drawer on demand.
-- **Privacy & Location Hardening**: Replaced all hardcoded local township fallbacks in `app.py` and `templates/index.html` with generic metropolitan defaults (`Toronto` / `Chicago`) to ensure zero personal location data is exposed in public repositories.
-- **Process Cleanup**: Terminated lingering headless testing containers from earlier image captures.
-
-### [v1.0.4] - 2026-09-19
-- **Calendar & Clock Visibility Overhaul**: Completely eliminated hardcoded dark background bands in Light Mode; replaced with soft slate themed surfaces (`#f8fafc`).
-- **High-Contrast Typography**: Converted digital time to bold dark slate (`#0f172a`, weight `800`) and date subtitles to deep slate (`#475569`).
-- **Energy Ledger Contrast**: Replaced low-contrast yellow text with warm amber pill badges (`#92400e` text on `#fef3c7` pill with `#fde68a` border) for maximum readability.
-- **Today Highlight**: Replaced washed-out cell styles with a solid royal blue pill (`#2563eb`), crisp white numerals (`#ffffff`), and a highlighted cost badge.
-- **Interactive Day Banner**: Redesigned selected date banner and empty agenda box for clean contrast in Light Mode.
-
-### [v1.0.3] - 2026-09-19
-- **GitHub Image Cache Busting**: Renamed screenshot assets to `real_homelab_dark.png` and `real_homelab_light.png` and added cache-busting version query parameters (`?v=3`) to force GitHub's Camo CDN proxy to immediately render fresh authentic captures instead of cached mockups.
-
-### [v1.0.2] - 2026-09-19
-- **Authentic Dashboard Captures**: Replaced all synthetic AI mockups with real browser captures taken directly from the live running server dashboard in both Dark and Light modes.
-- **Light Mode UI System**: Overhauled Hypervisor node pills, navigation dock (`.mobile-bottom-nav`), segmented network mode switch (LAN vs Tailscale), and service tags for high contrast and readability.
-- **Demo Masking Mode**: Implemented client-side `?demo=1` parameter to sanitize cluster node IPs and weather headers during public screenshot captures.
-
-### [v1.0.1] - 2026-09-19
-- **Initial Contrast Adjustments**: Improved light mode contrast for select cards and added the initial UI showcase gallery.
-
-### [v1.0.0] - 2026-09-19
-- **Initial Public Release**: Comprehensive server management and hardware telemetry dashboard for homelabs. Deep hardware sensing, Proxmox VE integration, Docker fleet controls, energy tracking ledger, and self-hosted application launchpad.
+👉 **[Read the Full CHANGELOG.md](CHANGELOG.md)** or browse all **[GitHub Releases & Tags](https://github.com/gitsheikhgit/homelab-hub/releases)**.
 
 ---
 

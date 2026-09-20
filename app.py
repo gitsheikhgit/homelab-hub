@@ -614,7 +614,7 @@ def update_energy_tracker(current_watts):
             data["yearly"][year_key]["kwh"] = data["yearly"][year_key].get("kwh", 0.0) + added_kwh
             try:
                 today_str = now_dt.strftime("%Y-%m-%d")
-                calendar_manager.record_daily_energy(today_str, added_kwh, current_watts, rate_kwh)
+                calendar_manager.record_daily_energy(today_str, added_kwh, current_watts, rate_kwh, dt_seconds=dt)
             except Exception:
                 pass
             
@@ -670,6 +670,16 @@ def _continuous_energy_poller():
         time.sleep(3)
 
 threading.Thread(target=_continuous_energy_poller, daemon=True).start()
+
+try:
+    calendar_manager.log_system_event(
+        title="🚀 Homelab Hub Telemetry Online",
+        desc="Hardware telemetry poller, background sensors, and daily energy tracking active.",
+        category="system",
+        tag="System"
+    )
+except Exception:
+    pass
         
 @app.route("/")
 def index():
@@ -1841,6 +1851,19 @@ def run_speedtest():
         server_id = request.args.get("server_id", None)
         result = execute_speedtest_multi_tier(server_id)
         speedtest_cache = result
+        try:
+            dl = result.get("download_mbps", 0)
+            ul = result.get("upload_mbps", 0)
+            ping = result.get("ping_ms", 0)
+            isp = result.get("isp", "Broadband")
+            calendar_manager.log_system_event(
+                title=f"⚡ WAN Benchmark: {dl:.1f}M DL / {ul:.1f}M UL",
+                desc=f"Download: {dl:.1f} Mbps, Upload: {ul:.1f} Mbps, Ping: {ping:.1f}ms via {isp}",
+                category="network",
+                tag="Speedtest"
+            )
+        except Exception:
+            pass
         return jsonify({"status": "success", "data": speedtest_cache})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -3001,6 +3024,9 @@ def get_calendar_day():
             "energy": {"kwh": 0.0, "cost": 0.0, "avg_watts": 0.0, "runtime_hours": 0.0, "rate_kwh": calendar_manager._get_electricity_rate()},
             "events": []
         })
+        
+        # Ensure daily energy ledger summary event is present
+        calendar_manager.ensure_daily_ledger_event(date_str, day_info)
         
         # Also grab any external events for this specific day
         try:

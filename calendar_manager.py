@@ -97,7 +97,31 @@ def _generate_initial_data():
         "last_sync": time.time()
     }
 
-def record_daily_energy(date_str, added_kwh, current_watts, rate_kwh):
+def ensure_daily_ledger_event(date_str, day_rec):
+    """Ensure a completed or in-progress energy ledger event is present in the day's timeline."""
+    eng = day_rec.get("energy", {})
+    kwh = eng.get("kwh", 0.0)
+    hours = eng.get("runtime_hours", 0.0)
+    cost = eng.get("cost", 0.0)
+    watts = eng.get("avg_watts", 0.0)
+    
+    if kwh > 0 or hours > 0:
+        events = day_rec.setdefault("events", [])
+        has_ledger = any(e.get("category") == "energy" or "Daily Energy" in e.get("title", "") for e in events)
+        if not has_ledger:
+            is_past = date_str < datetime.now().strftime("%Y-%m-%d")
+            events.append({
+                "id": f"evt_ledger_{date_str.replace('-', '')}",
+                "time": "11:59 PM" if is_past else "Live",
+                "title": f"⚡ Daily Energy Ledger {'Finalized' if is_past else 'Active'} ({kwh:.3f} kWh · ${cost:.2f})",
+                "desc": f"Recorded {kwh:.3f} kWh energy consumption (${cost:.2f}) across {hours:.1f} hrs active runtime with {watts:.1f}W average load.",
+                "category": "energy",
+                "tag": "Ledger",
+                "badge_color": "rgba(245,158,11,0.2);color:#fbbf24",
+                "source": "system"
+            })
+
+def record_daily_energy(date_str, added_kwh, current_watts, rate_kwh, dt_seconds=2.0):
     """Called continuously by update_energy_tracker in app.py"""
     data = load_calendar_data()
     days = data.setdefault("days", {})
@@ -118,37 +142,53 @@ def record_daily_energy(date_str, added_kwh, current_watts, rate_kwh):
     eng["cost"] = round(eng["kwh"] * rate_kwh, 3)
     eng["rate_kwh"] = rate_kwh
     
+    # Accumulate active runtime hours
+    if dt_seconds > 0:
+        eng["runtime_hours"] = round(eng.get("runtime_hours", 0.0) + (dt_seconds / 3600.0), 2)
+    
     # Smooth moving average watts
     prev_w = eng.get("avg_watts", current_watts)
     eng["avg_watts"] = round((prev_w * 0.95) + (current_watts * 0.05), 1)
     
+    ensure_daily_ledger_event(date_str, day_rec)
     save_calendar_data(data)
 
-def log_system_event(title, desc, category="system", tag="Homelab", badge_color=None):
-    """Log an operational event into today's calendar ledger"""
+def log_system_event(title, desc, category="system", tag="Homelab", badge_color=None, date_str=None, time_str=None):
+    """Log an operational event into the calendar ledger with deduplication"""
     now = datetime.now()
-    date_str = now.strftime("%Y-%m-%d")
-    time_str = now.strftime("%I:%M %p")
+    if not date_str:
+        date_str = now.strftime("%Y-%m-%d")
+    if not time_str:
+        time_str = now.strftime("%I:%M %p")
     
     if not badge_color:
         colors = {
-            "backup": "var(--accent-green)",
-            "docker": "var(--accent-blue)",
-            "storage": "var(--accent-cyan)",
-            "system": "var(--accent-proxmox)",
-            "user_note": "#a855f7"
+            "backup": "rgba(16,185,129,0.2);color:#6ee7b7",
+            "docker": "rgba(59,130,246,0.2);color:#93c5fd",
+            "storage": "rgba(249,115,22,0.2);color:#fdba74",
+            "system": "rgba(168,85,247,0.2);color:#d8b4fe",
+            "energy": "rgba(245,158,11,0.2);color:#fbbf24",
+            "network": "rgba(6,182,212,0.2);color:#67e8f9",
+            "user_note": "rgba(168,85,247,0.2);color:#d8b4fe"
         }
-        badge_color = colors.get(category, "var(--accent-blue)")
+        badge_color = colors.get(category, "rgba(59,130,246,0.2);color:#93c5fd")
         
     data = load_calendar_data()
     days = data.setdefault("days", {})
+    rate = _get_electricity_rate()
     day_rec = days.setdefault(date_str, {
-        "energy": {"kwh": 0.0, "cost": 0.0, "avg_watts": 17.5, "runtime_hours": 0.0, "rate_kwh": 0.23},
+        "energy": {"kwh": 0.0, "cost": 0.0, "avg_watts": 17.5, "runtime_hours": 0.0, "rate_kwh": rate},
         "events": []
     })
     
-    event_id = f"evt_{int(time.time())}_{len(day_rec.setdefault('events', []))}"
-    day_rec["events"].append({
+    # Deduplication: don't add if identical title already logged for this date
+    events = day_rec.setdefault("events", [])
+    for ev in events:
+        if ev.get("title") == title and ev.get("desc") == desc:
+            return ev.get("id")
+            
+    event_id = f"evt_{int(time.time())}_{len(events)}"
+    events.append({
         "id": event_id,
         "time": time_str,
         "title": title,
