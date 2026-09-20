@@ -2505,7 +2505,12 @@
             .draggable-widget-block,
             .col-cards-container,
             .card-widget,
-            .dynamic-card {
+            .dynamic-card,
+            #agendaViewHub,
+            .agenda-hub-card,
+            .agenda-hub-grid,
+            .drive-row,
+            .agenda-task-item {
                 min-width: 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -3743,11 +3748,19 @@
             display: none !important;
         }
         .cat-view-proxmox .main-command-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)) !important;
-            gap: 16px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
             width: 100% !important;
-            align-items: start !important;
+            max-width: 100% !important;
+            align-items: stretch !important;
+        }
+        @media (min-width: 901px) {
+            .cat-view-proxmox .main-command-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)) !important;
+                align-items: start !important;
+            }
         }
         .cat-view-proxmox #dashboardCol1,
         .cat-view-proxmox #dashboardCol2 {
@@ -3772,11 +3785,19 @@
             display: none !important;
         }
         .cat-view-docker .main-command-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)) !important;
-            gap: 16px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
             width: 100% !important;
-            align-items: start !important;
+            max-width: 100% !important;
+            align-items: stretch !important;
+        }
+        @media (min-width: 901px) {
+            .cat-view-docker .main-command-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)) !important;
+                align-items: start !important;
+            }
         }
         .cat-view-docker #dashboardCol1,
         .cat-view-docker #dashboardCol2 {
@@ -3801,11 +3822,19 @@
             display: none !important;
         }
         .cat-view-storage .main-command-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)) !important;
-            gap: 16px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
             width: 100% !important;
-            align-items: start !important;
+            max-width: 100% !important;
+            align-items: stretch !important;
+        }
+        @media (min-width: 901px) {
+            .cat-view-storage .main-command-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)) !important;
+                align-items: start !important;
+            }
         }
         .cat-view-storage #dashboardCol1,
         .cat-view-storage #dashboardCol2 {
@@ -3929,7 +3958,82 @@
             gap: 4px;
         }
 
-    
+        /* ── Agenda Hub Responsive & Mobile Rules ── */
+        @media (max-width: 768px) {
+            #agendaViewHub {
+                max-width: 100% !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .agenda-hub-card {
+                padding: 12px 14px !important;
+                border-radius: 12px !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .agenda-hub-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .agenda-task-item {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+                padding: 10px 12px !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .agenda-task-item > div:first-child {
+                align-self: flex-start !important;
+            }
+            .agenda-task-item > div:nth-child(2) {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            .agenda-task-item > button {
+                align-self: flex-end !important;
+                margin-top: 2px !important;
+            }
+            .agenda-hub-hero {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+            .agenda-hub-hero > div:first-child {
+                width: 100% !important;
+            }
+            .agenda-hub-hero > div:last-child {
+                width: 100% !important;
+                display: flex !important;
+                gap: 8px !important;
+            }
+            .agenda-hub-hero > div:last-child > button {
+                flex: 1 1 auto !important;
+                justify-content: center !important;
+            }
+        }
+
+        /* ── Light Mode Agenda Hub Rules ── */
+        :root[data-active-theme="light"] .agenda-hub-card {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+        }
+        :root[data-active-theme="light"] .agenda-task-item {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+        :root[data-active-theme="light"] .agenda-task-item:hover {
+            background: #f1f5f9 !important;
+        }
+        :root[data-active-theme="light"] #agendaViewHub strong,
+        :root[data-active-theme="light"] #agendaHubMonthTitle,
+        :root[data-active-theme="light"] #agendaHubDayTitle {
+            color: #0f172a !important;
+        }
 
         /* ══════════════════════════════════════════════════════════════
            LIGHT MODE OVERHAUL: Calendar, Clock & Daily Energy Ledger
@@ -4656,19 +4760,21 @@
             <div class="draggable-widget-block" id="widget_host_overview" data-widget-id="widget_host_overview">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, openPowerProcessModal)" title="Click to view full host telemetry and live processes">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/cockpit.png" class="card-logo-img" alt="Host Core"></div>
-                            <div>
-                                <div style="display:flex;align-items:center;gap:6px">
-                                    <div class="card-title" id="hostServerTitle">Host Server</div>
-                                    <button type="button" class="btn-ctrl" onclick="event.stopPropagation(); openServerNameModal()" title="Customize Server Display Name" style="padding:1px 5px;font-size:10px;background:rgba(255,255,255,0.06);opacity:0.75">✏️</button>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/cockpit.png" class="card-logo-img" alt="Host Core"></div>
+                                <div class="card-title-text-wrap">
+                                    <div style="display:flex;align-items:center;gap:6px">
+                                        <div class="card-title" id="hostServerTitle">Host Server</div>
+                                        <button type="button" class="btn-ctrl" onclick="event.stopPropagation(); openServerNameModal()" title="Customize Server Display Name" style="padding:1px 5px;font-size:10px;background:rgba(255,255,255,0.06);opacity:0.75">✏️</button>
+                                    </div>
+                                    <div class="card-subtitle" id="hostServerSubtitle">Detecting system telemetry...</div>
                                 </div>
-                                <div class="card-subtitle" id="hostServerSubtitle">Detecting system telemetry...</div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <span style="font-size:11px;color:var(--accent-blue);font-weight:600">Inspect ↗</span>
+                        <div class="card-head-right">
+                            <span style="font-size:11px;color:var(--accent-blue);font-weight:600;white-space:nowrap">Inspect ↗</span>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_host_overview')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_host_overview">
@@ -4695,16 +4801,18 @@
             <div class="draggable-widget-block" id="widget_host_power" data-widget-id="widget_host_power">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, openPowerProcessModal)" title="Click to view host power telemetry and live process matrix">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(16,185,129,0.18)"><img src="/static/icons/cockpit.png" class="card-logo-img" alt="Power"></div>
-                            <div>
-                                <div class="card-title" id="hostPowerTitle">System Power &amp; Energy</div>
-                                <div class="card-subtitle" id="hostPowerSubtitle">Host Energy &amp; System Telemetry</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(16,185,129,0.18)"><img src="/static/icons/cockpit.png" class="card-logo-img" alt="Power"></div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title" id="hostPowerTitle">System Power &amp; Energy</div>
+                                    <div class="card-subtitle" id="hostPowerSubtitle">Host Energy &amp; System Telemetry</div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <span style="font-size:11px;color:var(--accent-green);font-weight:600">Inspect ↗</span>
+                        <div class="card-head-right">
+                            <span style="font-size:11px;color:var(--accent-green);font-weight:600;white-space:nowrap">Inspect ↗</span>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_host_power')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_host_power">
@@ -4735,16 +4843,18 @@
             <div class="draggable-widget-block" id="widget_proxmox" data-widget-id="widget_proxmox" style="display:none">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, openVmDrawer)" title="Click to view all VMs and LXC containers">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(249,115,22,0.18)"><img src="/static/icons/proxmox.png" class="card-logo-img" alt="Proxmox"></div>
-                            <div>
-                                <div class="card-title">Proxmox Cluster & VMs</div>
-                                <div class="card-subtitle">Click to Open VM Power Manager</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(249,115,22,0.18)"><img src="/static/icons/proxmox.png" class="card-logo-img" alt="Proxmox"></div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title">Proxmox Cluster &amp; VMs</div>
+                                    <div class="card-subtitle">Click to Open VM Power Manager</div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <span style="font-size:11px;color:var(--accent-proxmox);font-weight:600">Open ↗</span>
+                        <div class="card-head-right">
+                            <span style="font-size:11px;color:var(--accent-proxmox);font-weight:600;white-space:nowrap">Open ↗</span>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_proxmox')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_proxmox">
@@ -4770,19 +4880,21 @@
             <div class="draggable-widget-block" id="widget_storage" data-widget-id="widget_storage">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, openDiskModal)">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(16,185,129,0.18)"><img src="/static/icons/cockpit.png" class="card-logo-img" alt="Storage"></div>
-                            <div>
-                                <div class="card-title">Storage Pools & Drives</div>
-                                <div class="card-subtitle">MergerFS HDD Array + NVMe SSDs</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(16,185,129,0.18)"><img src="/static/icons/cockpit.png" class="card-logo-img" alt="Storage"></div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title">Storage Pools &amp; Drives</div>
+                                    <div class="card-subtitle">MergerFS HDD Array + NVMe SSDs</div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation();openDriveConfigModal()" style="font-size:11px;padding:3px 9px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--accent-green);display:flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer" title="Add or Manage Monitored Disks & Partitions">
+                        <div class="card-head-right">
+                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation();openDriveConfigModal()" style="font-size:11px;padding:3px 8px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--accent-green);display:flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer;white-space:nowrap" title="Add or Manage Monitored Disks & Partitions">
                                 ➕ Add Drive
                             </button>
-                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation();openSsdCleanerModal()" style="font-size:11px;padding:3px 9px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:var(--accent-amber);display:flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer" title="Clean SSD Garbage & Reclaim Space">
+                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation();openSsdCleanerModal()" style="font-size:11px;padding:3px 8px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:var(--accent-amber);display:flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer;white-space:nowrap" title="Clean SSD Garbage & Reclaim Space">
                                 🧹 Clean SSD
                             </button>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
@@ -4812,19 +4924,21 @@
             <div class="draggable-widget-block" id="widget_portainer" data-widget-id="widget_portainer">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, handlePortainerCardClick)">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/portainer.png" class="card-logo-img" alt="Portainer"></div>
-                            <div>
-                                <div class="card-title" id="portainerWidgetTitle">Portainer CE &amp; Stacks</div>
-                                <div class="card-subtitle" id="portainerWidgetSubtitle">Docker Fleet &amp; Power Controls</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/portainer.png" class="card-logo-img" alt="Portainer"></div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title" id="portainerWidgetTitle">Portainer CE &amp; Stacks</div>
+                                    <div class="card-subtitle" id="portainerWidgetSubtitle">Docker Fleet &amp; Power Controls</div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <button type="button" class="btn-ctrl" id="btnPortainerWebUi" onclick="event.stopPropagation(); launchPortainerWebUi()" style="font-size:11px;padding:3px 9px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;display:inline-flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer" title="Open Portainer CE Web UI Console">
+                        <div class="card-head-right">
+                            <button type="button" class="btn-ctrl" id="btnPortainerWebUi" onclick="event.stopPropagation(); launchPortainerWebUi()" style="font-size:11px;padding:3px 8px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;display:inline-flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer;white-space:nowrap" title="Open Portainer CE Web UI Console">
                                 Web UI ↗
                             </button>
-                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation(); openDockerDrawer()" style="font-size:11px;padding:3px 9px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:var(--accent-blue);font-weight:600;border-radius:6px;cursor:pointer" title="Open Container Power & Fleet Manager Drawer">
+                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation(); openDockerDrawer()" style="font-size:11px;padding:3px 8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:var(--accent-blue);font-weight:600;border-radius:6px;cursor:pointer;white-space:nowrap" title="Open Container Power & Fleet Manager Drawer">
                                 Manage ↗
                             </button>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
@@ -4852,22 +4966,24 @@
             <div class="draggable-widget-block" id="widget_tailscale" data-widget-id="widget_tailscale">
                 <div class="card-widget" style="border-color:rgba(6,182,212,0.35);background:rgba(6,182,212,0.04)">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(6,182,212,0.22)"><img src="/static/icons/tailscale.png" class="card-logo-img" alt="Tailscale"></div>
-                            <div>
-                                <div class="card-title" style="display:flex;align-items:center;gap:6px">
-                                    Tailscale VPN & Mesh
-                                    <span style="font-size:9.5px;background:rgba(16,185,129,0.2);color:#6ee7b7;padding:1px 6px;border-radius:4px;font-weight:700">ACTIVE</span>
-                                </div>
-                                <div class="card-subtitle" style="display:flex;align-items:center;gap:4px">
-                                    <code id="tsHostDisplay" style="color:#67e8f9;font-family:monospace;font-size:11px">homelab.ts.net</code>
-                                    <button class="copy-mini-btn" onclick="copyToClipboard(document.getElementById('tsHostDisplay').innerText, this)" title="Copy MagicDNS FQDN">📋</button>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(6,182,212,0.22)"><img src="/static/icons/tailscale.png" class="card-logo-img" alt="Tailscale"></div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title" style="display:flex;align-items:center;gap:6px">
+                                        Tailscale VPN &amp; Mesh
+                                        <span style="font-size:9.5px;background:rgba(16,185,129,0.2);color:#6ee7b7;padding:1px 6px;border-radius:4px;font-weight:700">ACTIVE</span>
+                                    </div>
+                                    <div class="card-subtitle" style="display:flex;align-items:center;gap:4px">
+                                        <code id="tsHostDisplay" style="color:#67e8f9;font-family:monospace;font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">homelab.ts.net</code>
+                                        <button class="copy-mini-btn" onclick="copyToClipboard(document.getElementById('tsHostDisplay').innerText, this)" title="Copy MagicDNS FQDN">📋</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <button class="btn-ctrl" onclick="window.open('https://login.tailscale.com/admin/machines','_blank')" style="background:rgba(6,182,212,0.25);color:#67e8f9;font-size:11px;font-weight:600" title="Open Tailscale Admin Machines">Admin ↗</button>
+                        <div class="card-head-right">
+                            <button class="btn-ctrl" onclick="window.open('https://login.tailscale.com/admin/machines','_blank')" style="background:rgba(6,182,212,0.25);color:#67e8f9;font-size:11px;font-weight:600;white-space:nowrap" title="Open Tailscale Admin Machines">Admin ↗</button>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_tailscale')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_tailscale">
@@ -4896,31 +5012,35 @@
             <div class="draggable-widget-block" id="dockerCategoryCard" data-widget-id="dockerCategoryCard" style="display:none">
                 <div class="card-widget" style="padding:0;overflow:hidden">
                     <div class="card-head" style="background:rgba(59,130,246,0.08);border-bottom:1px solid rgba(59,130,246,0.2);padding:10px 14px">
-                        <div class="card-title-group">
-                            <div class="card-logo" style="background:rgba(59,130,246,0.2);color:var(--accent-blue);font-size:16px">🐳</div>
-                            <div>
-                                <div class="card-title">Docker Containers Fleet Hub</div>
-                                <div class="card-subtitle">Live Container Controls &amp; Image Updates</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <div class="card-logo" style="background:rgba(59,130,246,0.2);color:var(--accent-blue);font-size:16px">🐳</div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title">Docker Containers Fleet Hub</div>
+                                    <div class="card-subtitle">Live Container Controls &amp; Image Updates</div>
+                                </div>
                             </div>
                         </div>
-                        <button type="button" class="btn-ctrl" onclick="openDockerDrawer()" style="background:var(--accent-blue);font-size:11px;font-weight:600;padding:5px 12px">
-                            Open Full Manager ↗
-                        </button>
+                        <div class="card-head-right">
+                            <button type="button" class="btn-ctrl" onclick="openDockerDrawer()" style="background:var(--accent-blue);font-size:11px;font-weight:600;padding:5px 12px;white-space:nowrap">
+                                Open Full Manager ↗
+                            </button>
+                        </div>
                     </div>
-                    <div class="card-body" style="grid-template-columns:repeat(4,1fr);padding:12px;gap:8px">
+                    <div class="card-body" style="grid-template-columns:repeat(auto-fit, minmax(65px, 1fr));padding:10px 12px;gap:6px">
                         <div class="metric-cell"><div class="metric-val" id="catDockerRunning" style="color:var(--accent-green)">--</div><div class="metric-lbl">Running</div></div>
                         <div class="metric-cell"><div class="metric-val" id="catDockerStopped">--</div><div class="metric-lbl">Stopped</div></div>
                         <div class="metric-cell"><div class="metric-val" id="catDockerTotal">--</div><div class="metric-lbl">Total</div></div>
                         <div class="metric-cell"><div class="metric-val" id="catDockerUpdates" style="color:var(--accent-amber)">0</div><div class="metric-lbl">Updates</div></div>
                     </div>
-                    <div style="padding:10px 14px;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between">
-                        <button type="button" class="btn-ctrl" onclick="checkDockerUpdates(this)" style="background:rgba(59,130,246,0.18);border-color:rgba(59,130,246,0.4);color:#93c5fd;font-size:11.5px;padding:5px 12px;display:flex;align-items:center;gap:5px">
+                    <div style="padding:10px 12px;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+                        <button type="button" class="btn-ctrl" onclick="checkDockerUpdates(this)" style="background:rgba(59,130,246,0.18);border-color:rgba(59,130,246,0.4);color:#93c5fd;font-size:11px;padding:5px 10px;display:flex;align-items:center;gap:5px;flex:1 1 auto;justify-content:center;min-width:120px">
                             <span>🚀</span> Check Image Updates
                         </button>
-                        <button type="button" class="btn-ctrl" onclick="restartUnhealthyDocker()" style="background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.4);color:#fca5a5;font-size:11.5px;padding:5px 12px;display:flex;align-items:center;gap:5px">
+                        <button type="button" class="btn-ctrl" onclick="restartUnhealthyDocker()" style="background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.4);color:#fca5a5;font-size:11px;padding:5px 10px;display:flex;align-items:center;gap:5px;flex:1 1 auto;justify-content:center;min-width:110px">
                             <span>⚡</span> Restart Broken
                         </button>
-                        <button type="button" class="btn-ctrl" onclick="pruneDockerSpace(this)" style="font-size:11.5px;padding:5px 12px;color:var(--text-secondary);display:flex;align-items:center;gap:5px">
+                        <button type="button" class="btn-ctrl" onclick="pruneDockerSpace(this)" style="font-size:11px;padding:5px 10px;color:var(--text-secondary);display:flex;align-items:center;gap:5px;flex:1 1 auto;justify-content:center;min-width:100px">
                             <span>🧹</span> Prune Cache
                         </button>
                     </div>
@@ -4931,42 +5051,46 @@
             <div class="draggable-widget-block" id="storageCategoryCard" data-widget-id="storageCategoryCard" style="display:none">
                 <div class="card-widget" style="padding:0;overflow:hidden">
                     <div class="card-head" style="background:rgba(16,185,129,0.08);border-bottom:1px solid rgba(16,185,129,0.2);padding:10px 14px">
-                        <div class="card-title-group">
-                            <div class="card-logo" style="background:rgba(16,185,129,0.2);color:var(--accent-green);font-size:16px">💾</div>
-                            <div>
-                                <div class="card-title">Storage Ecosystem &amp; Cloud Vaults</div>
-                                <div class="card-subtitle">Fast Links to Network Storage &amp; Backups</div>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-ctrl" onclick="openDiskModal()" style="background:rgba(255,255,255,0.08);font-size:11px;font-weight:600;padding:5px 12px">
-                            Disks &amp; Mounts ↗
-                        </button>
-                    </div>
-                    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
-                        <!-- Disks & Storage Management -->
-                        <div class="node-pill" onclick="openDriveConfigModal()" style="padding:8px 12px;border-radius:10px;text-decoration:none;color:#fff;cursor:pointer">
-                            <div class="node-pill-left" style="min-width:auto;display:flex;align-items:center;gap:10px">
-                                <div class="node-icon" style="background:rgba(16,185,129,0.2)"><img src="/static/icons/synology.png" style="width:20px;height:20px;object-fit:contain" onerror="this.src='/static/icons/cockpit.png'"></div>
-                                <div>
-                                    <div class="node-name" style="font-size:12.5px">Storage Disks &amp; SMART Health</div>
-                                    <div class="node-ip" style="font-size:10px">Configure Monitored Drive Mounts</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <div class="card-logo" style="background:rgba(16,185,129,0.2);color:var(--accent-green);font-size:16px">💾</div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title">Storage Ecosystem &amp; Cloud Vaults</div>
+                                    <div class="card-subtitle">Fast Links to Network Storage &amp; Backups</div>
                                 </div>
                             </div>
-                            <div style="display:flex;align-items:center;gap:6px">
+                        </div>
+                        <div class="card-head-right">
+                            <button type="button" class="btn-ctrl" onclick="openDiskModal()" style="background:rgba(255,255,255,0.08);font-size:11px;font-weight:600;padding:5px 12px;white-space:nowrap">
+                                Disks &amp; Mounts ↗
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+                        <!-- Disks & Storage Management -->
+                        <div class="node-pill" onclick="openDriveConfigModal()" style="padding:8px 12px;border-radius:10px;text-decoration:none;color:#fff;cursor:pointer">
+                            <div class="node-pill-left" style="min-width:0;display:flex;align-items:center;gap:10px;flex:1">
+                                <div class="node-icon" style="background:rgba(16,185,129,0.2);flex-shrink:0"><img src="/static/icons/synology.png" style="width:20px;height:20px;object-fit:contain" onerror="this.src='/static/icons/cockpit.png'"></div>
+                                <div style="min-width:0;flex:1">
+                                    <div class="node-name" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Storage Disks &amp; SMART Health</div>
+                                    <div class="node-ip" style="font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Configure Monitored Drive Mounts</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
                                 <span class="status-dot"></span>
                                 <span style="font-size:11px;color:var(--accent-green);font-weight:600">Configure ⚙️</span>
                             </div>
                         </div>
                         <!-- SSD Cleaner -->
                         <div class="node-pill" onclick="openDrawer('ssdCleanerDrawer')" style="padding:8px 12px;border-radius:10px;text-decoration:none;color:#fff;cursor:pointer">
-                            <div class="node-pill-left" style="min-width:auto;display:flex;align-items:center;gap:10px">
-                                <div class="node-icon" style="background:rgba(59,130,246,0.2)"><img src="/static/icons/cockpit.png" style="width:20px;height:20px;object-fit:contain"></div>
-                                <div>
-                                    <div class="node-name" style="font-size:12.5px">SSD Garbage Collector</div>
-                                    <div class="node-ip" style="font-size:10px">Prune Docker &amp; System Logs</div>
+                            <div class="node-pill-left" style="min-width:0;display:flex;align-items:center;gap:10px;flex:1">
+                                <div class="node-icon" style="background:rgba(59,130,246,0.2);flex-shrink:0"><img src="/static/icons/cockpit.png" style="width:20px;height:20px;object-fit:contain"></div>
+                                <div style="min-width:0;flex:1">
+                                    <div class="node-name" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">SSD Garbage Collector</div>
+                                    <div class="node-ip" style="font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Prune Docker &amp; System Logs</div>
                                 </div>
                             </div>
-                            <div style="display:flex;align-items:center;gap:6px">
+                            <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
                                 <span style="font-size:11px;color:var(--accent-blue);font-weight:600">Open ↗</span>
                             </div>
                         </div>
@@ -4978,16 +5102,18 @@
             <div class="draggable-widget-block" id="widget_speedtest" data-widget-id="widget_speedtest">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, openSpeedtestModal)" title="Click to run live Ookla Speedtest">
                     <div class="card-head">
-                        <div class="card-title-group">
-                            <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                            <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/speedtest.png" class="card-logo-img" alt="Speedtest"></div>
-                            <div>
-                                <div class="card-title">Internet Speed Benchmark</div>
-                                <div class="card-subtitle">Ookla WAN Bandwidth Benchmark</div>
+                        <div class="card-head-left">
+                            <div class="card-title-group">
+                                <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
+                                <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/speedtest.png" class="card-logo-img" alt="Speedtest"></div>
+                                <div class="card-title-text-wrap">
+                                    <div class="card-title">Internet Speed Benchmark</div>
+                                    <div class="card-subtitle">Ookla WAN Bandwidth Benchmark</div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px">
-                            <span style="font-size:11px;color:var(--accent-blue);font-weight:600">Run Test ↗</span>
+                        <div class="card-head-right">
+                            <span style="font-size:11px;color:var(--accent-blue);font-weight:600;white-space:nowrap">Run Test ↗</span>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_speedtest')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_speedtest">
@@ -5016,19 +5142,19 @@
     <!-- ── 5. Dedicated Homelab Agenda & Maintenance Operations Hub ──── -->
     <div id="agendaViewHub" style="display:none;width:100%;margin-top:4px">
         <!-- Hero Header -->
-        <div class="agenda-hub-card" style="padding:18px 24px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(16,185,129,0.06))">
-            <div style="display:flex;align-items:center;gap:14px">
-                <div style="width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,0.2);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;font-size:22px">📅</div>
-                <div>
-                    <div style="font-size:18px;font-weight:700;color:#fff">Homelab Agenda &amp; Maintenance Operations</div>
-                    <div style="font-size:12.5px;color:var(--text-secondary)">Automated cloud backups, Proxmox cluster snapshots, SMART diagnostics &amp; daily ledger</div>
+        <div class="agenda-hub-card agenda-hub-hero" style="padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(16,185,129,0.06))">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(59,130,246,0.2);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📅</div>
+                <div style="min-width:0">
+                    <div style="font-size:15px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Homelab Agenda &amp; Operations</div>
+                    <div style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Automated backups &amp; daily ledger</div>
                 </div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <button type="button" class="btn-ctrl" onclick="jumpCalendarToToday()" style="font-size:12px;font-weight:600;padding:6px 14px;background:rgba(255,255,255,0.08)" title="Jump to Today">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <button type="button" class="btn-ctrl" onclick="jumpCalendarToToday()" style="font-size:11.5px;font-weight:600;padding:5px 12px;background:rgba(255,255,255,0.08)" title="Jump to Today">
                     📅 Today
                 </button>
-                <button type="button" class="btn-ctrl" onclick="openDateInspector(getTodayDateStr())" style="font-size:12px;font-weight:600;padding:6px 14px;background:var(--accent-blue)" title="Inspect Today or Add Maintenance Note">
+                <button type="button" class="btn-ctrl" onclick="openDateInspector(getTodayDateStr())" style="font-size:11.5px;font-weight:600;padding:5px 12px;background:var(--accent-blue);color:#fff" title="Inspect Today or Add Maintenance Note">
                     ➕ Add Event / Reminder
                 </button>
             </div>
@@ -5039,8 +5165,8 @@
             <!-- Left Column: Interactive Calendar & Selected Day Inspector -->
             <div style="display:flex;flex-direction:column;gap:16px">
                 <!-- Interactive Month Calendar Card -->
-                <div class="agenda-hub-card" style="padding:18px">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <div class="agenda-hub-card" style="padding:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
                         <div style="display:flex;align-items:center;gap:8px">
                             <span style="font-size:15px;font-weight:700;color:#fff" id="agendaHubMonthTitle">September 2026</span>
                             <span style="font-size:11px;background:rgba(16,185,129,0.18);color:#6ee7b7;padding:2px 7px;border-radius:4px;font-weight:600">Active Ledger</span>
@@ -5057,13 +5183,13 @@
                 </div>
 
                 <!-- Selected Day Inspector Card -->
-                <div class="agenda-hub-card" style="padding:18px" id="agendaHubDayInspector">
+                <div class="agenda-hub-card" style="padding:16px" id="agendaHubDayInspector">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-                        <div>
-                            <div style="font-size:14px;font-weight:700;color:#fff" id="agendaHubDayTitle">Saturday, September 19, 2026</div>
-                            <div style="font-size:11px;color:var(--text-muted)" id="agendaHubDaySub">Homelab Energy &amp; Operational Ledger</div>
+                        <div style="min-width:0;flex:1">
+                            <div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="agendaHubDayTitle">Saturday, September 19, 2026</div>
+                            <div style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="agendaHubDaySub">Homelab Energy &amp; Operational Ledger</div>
                         </div>
-                        <div id="agendaHubDayEnergyBadge" style="display:flex;align-items:center;gap:6px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--accent-amber);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600">
+                        <div id="agendaHubDayEnergyBadge" style="display:flex;align-items:center;gap:6px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--accent-amber);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;flex-shrink:0">
                             ⚡ 0.21 kWh ($0.04)
                         </div>
                     </div>
@@ -5092,7 +5218,7 @@
                         <!-- Task 1: Oracle Cloud Restic -->
                         <div class="agenda-task-item">
                             <div class="agenda-task-time">02:00 AM</div>
-                            <div style="flex:1">
+                            <div style="flex:1;min-width:0">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
                                     <strong style="font-size:13.5px;color:#fff">Oracle Cloud Restic Backup</strong>
                                     <span class="agenda-status-pill" style="background:rgba(6,182,212,0.18);color:#67e8f9">Cloud</span>
@@ -5106,7 +5232,7 @@
                         <!-- Task 2: Proxmox PBS Backup -->
                         <div class="agenda-task-item">
                             <div class="agenda-task-time">04:00 AM</div>
-                            <div style="flex:1">
+                            <div style="flex:1;min-width:0">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
                                     <strong style="font-size:13.5px;color:#fff">Proxmox Cluster Backup (PBS)</strong>
                                     <span class="agenda-status-pill" style="background:rgba(249,115,22,0.18);color:#fdba74">PVE</span>
@@ -5120,7 +5246,7 @@
                         <!-- Task 3: SMART Diagnostic -->
                         <div class="agenda-task-item">
                             <div class="agenda-task-time">06:00 AM</div>
-                            <div style="flex:1">
+                            <div style="flex:1;min-width:0">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
                                     <strong style="font-size:13.5px;color:#fff">Drive SMART Health Diagnostic</strong>
                                     <span class="agenda-status-pill" style="background:rgba(168,85,247,0.18);color:#d8b4fe">Disks</span>
@@ -5134,7 +5260,7 @@
                         <!-- Task 4: Nextcloud Rescan -->
                         <div class="agenda-task-item">
                             <div class="agenda-task-time">08:00 AM</div>
-                            <div style="flex:1">
+                            <div style="flex:1;min-width:0">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
                                     <strong style="font-size:13.5px;color:#fff">Nextcloud &amp; Memories Rescan</strong>
                                     <span class="agenda-status-pill" style="background:rgba(59,130,246,0.18);color:#93c5fd">Nextcloud</span>
@@ -5148,7 +5274,7 @@
                         <!-- Task 5: Music Trash Purge -->
                         <div class="agenda-task-item">
                             <div class="agenda-task-time">Weekly</div>
-                            <div style="flex:1">
+                            <div style="flex:1;min-width:0">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
                                     <strong style="font-size:13.5px;color:#fff">Music &amp; Media Trash Auto-Purge</strong>
                                     <span class="agenda-status-pill" style="background:rgba(236,72,153,0.18);color:#f472b6">Media</span>
@@ -11051,25 +11177,25 @@ async function fetchStats() {
 
                     return `
                     <div class="drive-row" style="${d.is_pool ? 'border-left: 2px solid var(--accent-green); padding-left: 6px;' : ''};flex-direction:column;align-items:stretch;gap:4px">
-                        <div style="display:flex;justify-content:space-between;align-items:center">
-                            <strong style="color:${d.is_pool ? 'var(--accent-green)' : '#fff'};font-size:12px;display:flex;align-items:center;gap:5px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;min-width:0">
+                            <strong style="color:${d.is_pool ? 'var(--accent-green)' : '#fff'};font-size:12px;display:flex;align-items:center;gap:5px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                                 <span>${d.is_pool ? '🗄️' : '💽'}</span>
-                                <span>${escapeHtml(d.name || d.mount)}</span>
-                                <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${escapeHtml(d.mount)})</span>
+                                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(d.name || d.mount)}</span>
+                                <span style="font-size:10px;color:var(--text-muted);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">(${escapeHtml(d.mount)})</span>
                             </strong>
-                            <div style="display:flex;align-items:center;gap:6px">
+                            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
                                 ${hasTemp ? `
-                                <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${tempBg};color:${tempColor};border:1px solid ${tempBorder}" title="Live Drive Hardware Sensor Temperature">
+                                <span style="font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:${tempBg};color:${tempColor};border:1px solid ${tempBorder}" title="Live Drive Hardware Sensor Temperature">
                                     🌡️ ${temp}°C
                                 </span>` : ''}
-                                <span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:${healthBg};color:${healthColor}" title="SMART Health Status">
+                                <span style="font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:4px;background:${healthBg};color:${healthColor}" title="SMART Health Status">
                                     ${isFail ? '⚠️ ERR' : '🛡️ ' + escapeHtml(d.health || 'ONLINE')}
                                 </span>
                             </div>
                         </div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--text-muted)">
-                            <span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(d.model || 'Disk')}</span>
-                            <span><strong style="color:var(--accent-cyan)">${d.usage ? d.usage.free_gb : 0} GB Free</strong> of ${d.usage ? d.usage.total_gb : 0} GB (${pct}%)</span>
+                        <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-muted);gap:4px;min-width:0">
+                            <span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(d.model || 'Disk')}</span>
+                            <span style="white-space:nowrap;flex-shrink:0"><strong style="color:var(--accent-cyan)">${d.usage ? d.usage.free_gb : 0} GB Free</strong> of ${d.usage ? d.usage.total_gb : 0} GB (${pct}%)</span>
                         </div>
                         <div class="drive-progress-bar" style="height:5px;width:100%"><div class="drive-progress-fill" style="width:${pct}%;background:${fillBg}"></div></div>
                     </div>
@@ -14282,6 +14408,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchStats, 10000);
     fetchWeather();
     setInterval(fetchWeather, 300000);
+
+    const urlCategory = new URLSearchParams(window.location.search).get('category');
+    if (urlCategory) {
+        setTimeout(() => filterMobileSection(urlCategory), 150);
+    }
 });
 
 
