@@ -36,7 +36,6 @@ services:
 
     environment:
       - PORT=8095
-      - TAILSCALE_DOMAIN=homelab.ts.net
       # Tell the app it's running inside Docker (adjusts smartctl call — no sudo)
       - RUNNING_IN_DOCKER=1
       # Paths to host /proc and /sys as mounted above

@@ -3061,6 +3061,9 @@ def api_complete_setup():
             settings['lan_host'] = body['lan_host'].strip()
         if 'tailscale_domain' in body and body['tailscale_domain']:
             settings['tailscale_domain'] = body['tailscale_domain'].strip()
+            if 'widgets' not in settings:
+                settings['widgets'] = {}
+            settings['widgets']['tailscale'] = True
         if 'theme' in body and body['theme']:
             settings['theme'] = body['theme'].strip()
         save_settings(settings)

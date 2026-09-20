@@ -6036,10 +6036,10 @@
                                 <div class="card-title-text-wrap">
                                     <div class="card-title" style="display:flex;align-items:center;gap:6px">
                                         Tailscale VPN &amp; Mesh
-                                        <span style="font-size:9.5px;background:rgba(16,185,129,0.2);color:#6ee7b7;padding:1px 6px;border-radius:4px;font-weight:700">ACTIVE</span>
+                                        <span id="tsStatusBadge" style="font-size:9.5px;background:rgba(148,163,184,0.15);color:#94a3b8;padding:1px 6px;border-radius:4px;font-weight:700">STANDBY</span>
                                     </div>
                                     <div class="card-subtitle" style="display:flex;align-items:center;gap:4px">
-                                        <code id="tsHostDisplay" style="color:#67e8f9;font-family:monospace;font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">homelab.ts.net</code>
+                                        <code id="tsHostDisplay" style="color:#67e8f9;font-family:monospace;font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Not Configured</code>
                                         <button class="copy-mini-btn" onclick="copyToClipboard(document.getElementById('tsHostDisplay').innerText, this)" title="Copy MagicDNS FQDN">📋</button>
                                     </div>
                                 </div>
@@ -10393,6 +10393,14 @@ function applyWidgetVisibility() {
             if (key === 'proxmox') {
                 isVis = isVis && hasPve;
             }
+            // Tailscale widget: only show if enabled AND tailscale domain/ip is configured
+            if (key === 'tailscale') {
+                isVis = isVis && Boolean(dashboardSettings.tailscale_domain || dashboardSettings.tailscale_ip);
+            }
+            // Portainer widget: only show if enabled in settings
+            if (key === 'portainer') {
+                isVis = Boolean(widgets.portainer);
+            }
             el.style.display = isVis ? '' : 'none';
         }
         const toggleEl = document.getElementById('toggle_w_' + key);
@@ -10741,6 +10749,27 @@ function applySettingsToUI() {
     renderServiceCards();
     applyWidgetsLayout(dashboardSettings.widgets_layout);
     applyWidgetVisibility();
+
+    // 6. Tailscale widget dynamic domain & badge
+    const tsHostEl = document.getElementById('tsHostDisplay');
+    const tsBadge = document.getElementById('tsStatusBadge');
+    if (tsHostEl) {
+        if (dashboardSettings.tailscale_domain) {
+            tsHostEl.textContent = dashboardSettings.tailscale_domain;
+            if (tsBadge) {
+                tsBadge.textContent = 'ACTIVE';
+                tsBadge.style.color = '#6ee7b7';
+                tsBadge.style.background = 'rgba(16,185,129,0.2)';
+            }
+        } else {
+            tsHostEl.textContent = 'Not Configured';
+            if (tsBadge) {
+                tsBadge.textContent = 'STANDBY';
+                tsBadge.style.color = '#94a3b8';
+                tsBadge.style.background = 'rgba(148,163,184,0.15)';
+            }
+        }
+    }
 }
 
 function applyWallpaper() {
@@ -16090,6 +16119,9 @@ async function completeWizard(includeCards) {
         });
         localStorage.setItem('homelab_theme', wizardSelectedTheme);
         dashboardSettings.theme = wizardSelectedTheme;
+        if (!dashboardSettings.widgets) dashboardSettings.widgets = {};
+        if (tsDomain) dashboardSettings.widgets.tailscale = true;
+        dashboardSettings.initial_setup_completed = true;
     } catch (e) {
         console.warn('Error completing setup preferences:', e);
     }
@@ -16192,11 +16224,9 @@ async function submitScanModalCards() {
 
 function checkInitialSetup() {
     if (dashboardSettings && dashboardSettings.initial_setup_completed === true) return;
-    const isCompleted = localStorage.getItem('initial_setup_completed');
-    if (isCompleted === 'true' && (!dashboardSettings || dashboardSettings.initial_setup_completed !== false)) return;
     setTimeout(() => {
         openInitialSetupModal();
-    }, 700);
+    }, 600);
 }
 
 
