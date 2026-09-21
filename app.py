@@ -3074,9 +3074,20 @@ def api_complete_setup():
 @app.route('/api/network/detect', methods=['GET'])
 def api_network_detect():
     try:
-        lan_ip = get_host_lan_ip()
+        # Extract client host from request (e.g. 192.168.0.8 from Host header)
+        req_host = request.host.split(':')[0] if request.host else ""
+        if req_host in ("127.0.0.1", "localhost", "0.0.0.0", "::1"):
+            req_host = None
+        lan_ip = get_host_lan_ip(client_host=req_host)
         ts_domain, ts_ip = get_tailscale_info()
         settings = get_settings()
+
+        # If detected lan_ip is 127.0.0.1, check if settings or req_host has a real LAN IP
+        if lan_ip in ("127.0.0.1", "localhost") and settings.get("lan_host") and settings.get("lan_host") not in ("127.0.0.1", "localhost"):
+            lan_ip = settings.get("lan_host")
+        elif lan_ip in ("127.0.0.1", "localhost") and req_host:
+            lan_ip = req_host
+
         return jsonify({
             "status": "success",
             "detected_lan_ip": lan_ip,

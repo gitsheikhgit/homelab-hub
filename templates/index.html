@@ -13747,10 +13747,19 @@ async function fetchStats() {
 
                 if (node.type === 'proxmox') {
                     const p = (proxIdx === 0) ? p1 : p2;
-                    if (p) {
+                    if (p && !p.error && (p.cpu_usage !== undefined || p.vms_count !== undefined)) {
                         if (m1) m1.innerHTML = `<span>${(p.cpu_usage !== undefined ? p.cpu_usage : '--')}%</span> CPU`;
                         if (m2) m2.innerHTML = `<strong>${(p.ram_usage || '').split('/')[0].trim() || '--'}</strong> RAM`;
                         if (m3) m3.innerHTML = `<span style="color:var(--accent-green)">${p.online_vms !== undefined ? p.online_vms : 0}/${p.vms_count !== undefined ? p.vms_count : 0} VMs</span>`;
+                    } else {
+                        const telem = (data.nodes_telemetry && data.nodes_telemetry[node.id]) ? data.nodes_telemetry[node.id] : null;
+                        if (m3) {
+                            if (telem && telem.online) {
+                                m3.innerHTML = `<span style="color:var(--accent-blue);font-weight:600;cursor:pointer" onclick="event.stopPropagation();openPveAuthModal('${node.id}')" title="Node is online. Click to enter Proxmox API credentials.">🟢 ${telem.latency_ms !== undefined ? telem.latency_ms : 'Online'}ms · Connect 🔑</span>`;
+                            } else {
+                                m3.innerHTML = `<span style="color:#f59e0b;cursor:pointer" onclick="event.stopPropagation();openPveAuthModal('${node.id}')">⚠️ Connect 🔑</span>`;
+                            }
+                        }
                     }
                     proxIdx++;
                 } else if (node.type === 'pbs' && data.pbs) {
@@ -16083,7 +16092,15 @@ async function detectNetworkConfig() {
         const res = await fetch('/api/network/detect');
         if (res.ok) {
             const data = await res.json();
-            if (data.detected_lan_ip) document.getElementById('netConfigLanHost').value = data.detected_lan_ip;
+            let lanIp = data.detected_lan_ip;
+            if (!lanIp || lanIp === '127.0.0.1' || lanIp === 'localhost') {
+                if (window.location.hostname && window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost') {
+                    lanIp = window.location.hostname;
+                } else if (dashboardSettings && dashboardSettings.lan_host && dashboardSettings.lan_host !== '127.0.0.1') {
+                    lanIp = dashboardSettings.lan_host;
+                }
+            }
+            if (lanIp) document.getElementById('netConfigLanHost').value = lanIp;
             if (data.detected_ts_domain) document.getElementById('netConfigTsDomain').value = data.detected_ts_domain;
             if (data.detected_ts_ip) document.getElementById('netConfigTsIp').value = data.detected_ts_ip;
             showToast('⚡ Detected local LAN & Tailscale settings!');

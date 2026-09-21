@@ -720,10 +720,22 @@ def get_host_lan_ip(client_host=None):
     if client_host and client_host.strip() and client_host not in ("127.0.0.1", "localhost", "0.0.0.0", "::1"):
         ch = client_host.strip()
         # Ensure it's not a container bridge IP
-        if not re.match(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.', ch):
+        if not re.match(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.', ch) and not ch.startswith("100."):
             return ch
 
-    # 2. Check host routing tables (/host/proc or /proc) for physical LAN IPs (192.168.x.x or 10.x.x.x)
+    # 2. Check settings.json for existing configured lan_host if it's a valid LAN IP
+    try:
+        settings_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "settings.json")
+        if os.path.exists(settings_file):
+            with open(settings_file, "r", encoding="utf-8") as f:
+                s = json.load(f)
+                cfg_lan = s.get("lan_host", "")
+                if cfg_lan and cfg_lan not in ("127.0.0.1", "localhost", "0.0.0.0", "::1"):
+                    return cfg_lan
+    except Exception:
+        pass
+
+    # 3. Check host routing tables (/host/proc or /proc) for physical LAN IPs (192.168.x.x or 10.x.x.x)
     for fib_path in ("/host/proc/net/fib_trie", "/proc/net/fib_trie"):
         if os.path.exists(fib_path):
             try:
