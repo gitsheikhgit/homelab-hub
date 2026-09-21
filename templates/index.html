@@ -8880,6 +8880,30 @@
                 </div>
             </div>
 
+            <!-- Proxmox VE API Token Authentication (Visible when type is proxmox) -->
+            <div id="pveTokenFieldsWrap" style="display:none;margin-top:12px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:12px">
+                <div style="font-size:12px;font-weight:700;color:#c4b5fd;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+                    <span>🔑</span> Proxmox API Token Credentials
+                </div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;line-height:1.4">
+                    Required for live VMs, LXCs &amp; cluster CPU/RAM. Created in Proxmox at <em>Datacenter &rarr; Permissions &rarr; API Tokens</em>.
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                    <div>
+                        <label class="modal-form-label" style="font-size:11px">Token ID *</label>
+                        <input type="text" id="nodePveTokenId" class="modal-form-input" placeholder="root@pam!homelab" style="font-size:11.5px">
+                    </div>
+                    <div>
+                        <label class="modal-form-label" style="font-size:11px">Token Secret (UUID) *</label>
+                        <input type="password" id="nodePveTokenSecret" class="modal-form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="font-size:11.5px">
+                    </div>
+                </div>
+                <div>
+                    <label class="modal-form-label" style="font-size:11px">Node Name in Proxmox</label>
+                    <input type="text" id="nodePveNodeName" class="modal-form-input" placeholder="e.g. pve (defaults to 'pve')" style="font-size:11.5px">
+                </div>
+            </div>
+
             <!-- Custom Metrics Tags -->
             <div style="margin-top:10px;background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -9959,6 +9983,8 @@ function onNodeTypeChanged(type, preserveCustomValues = false) {
     if (!banner) return;
 
     if (type === 'proxmox') {
+        const pveWrap = document.getElementById('pveTokenFieldsWrap');
+        if (pveWrap) pveWrap.style.display = 'block';
         banner.style.background = 'rgba(59,130,246,0.12)';
         banner.style.borderColor = 'rgba(59,130,246,0.35)';
         if (icon) icon.textContent = '⚡';
@@ -9978,6 +10004,8 @@ function onNodeTypeChanged(type, preserveCustomValues = false) {
             }
         }
     } else if (type === 'pbs') {
+        const pveWrap = document.getElementById('pveTokenFieldsWrap');
+        if (pveWrap) pveWrap.style.display = 'none';
         banner.style.background = 'rgba(16,185,129,0.12)';
         banner.style.borderColor = 'rgba(16,185,129,0.35)';
         if (icon) icon.textContent = '🛡️';
@@ -9997,6 +10025,8 @@ function onNodeTypeChanged(type, preserveCustomValues = false) {
             }
         }
     } else {
+        const pveWrap = document.getElementById('pveTokenFieldsWrap');
+        if (pveWrap) pveWrap.style.display = 'none';
         // QNAP, TrueNAS, Synology, Unraid, ESXi, Custom
         banner.style.background = 'rgba(168,85,247,0.12)';
         banner.style.borderColor = 'rgba(168,85,247,0.35)';
@@ -10053,6 +10083,9 @@ function openAddNodeModal() {
     document.getElementById('nodeModalTitle').textContent = 'Add Hypervisor / NAS Node';
     document.getElementById('nodeModalIconHeader').textContent = '➕';
     document.getElementById('nodePresetSelect').value = '';
+    if (document.getElementById('nodePveTokenId')) document.getElementById('nodePveTokenId').value = '';
+    if (document.getElementById('nodePveTokenSecret')) document.getElementById('nodePveTokenSecret').value = '';
+    if (document.getElementById('nodePveNodeName')) document.getElementById('nodePveNodeName').value = 'pve';
     document.getElementById('nodeInputName').value = '';
     document.getElementById('nodeInputType').value = 'proxmox';
     document.getElementById('nodeInputUrl').value = '';
@@ -10086,6 +10119,13 @@ function openEditNodeModal(nodeId) {
     document.getElementById('nodeMetric3Lbl').value = node.metric3_lbl || '';
     document.getElementById('nodeMetric3Val').value = node.metric3_val || '';
     document.getElementById('nodeDeleteBtn').style.display = 'block';
+
+    const tokens = dashboardSettings.proxmox_tokens || [];
+    const host = node.ip || (node.url ? node.url.replace(/^https?:\/\//, '').split(/[:\/]/)[0] : '');
+    const tok = tokens.find(t => t.host === host || t.node_id === node.id || t.nodename === node.name);
+    if (document.getElementById('nodePveTokenId')) document.getElementById('nodePveTokenId').value = tok ? (tok.token || '') : '';
+    if (document.getElementById('nodePveTokenSecret')) document.getElementById('nodePveTokenSecret').value = tok ? (tok.secret || '') : '';
+    if (document.getElementById('nodePveNodeName')) document.getElementById('nodePveNodeName').value = tok ? (tok.nodename || 'pve') : (node.name || 'pve');
 
     onNodeTypeChanged(node.type || 'custom', true);
     openDrawer('nodeEditModal');
@@ -10178,8 +10218,36 @@ function saveClusterNodeForm() {
         });
     }
 
+    if (type === 'proxmox') {
+        const tokenId = document.getElementById('nodePveTokenId')?.value.trim() || '';
+        const tokenSecret = document.getElementById('nodePveTokenSecret')?.value.trim() || '';
+        const nodeName = document.getElementById('nodePveNodeName')?.value.trim() || name || 'pve';
+
+        if (!dashboardSettings.proxmox_tokens) dashboardSettings.proxmox_tokens = [];
+        if (tokenId && tokenSecret) {
+            const host = ip || (url ? url.replace(/^https?:\/\//, '').split(/[:\/]/)[0] : '');
+            const existingIdx = dashboardSettings.proxmox_tokens.findIndex(t => t.host === host || t.node_id === (editId || name));
+            const tokenObj = {
+                node_id: editId || ('node_' + Math.random().toString(36).substr(2, 7)),
+                nodename: nodeName,
+                host: host,
+                token: tokenId,
+                secret: tokenSecret
+            };
+            if (existingIdx !== -1) {
+                dashboardSettings.proxmox_tokens[existingIdx] = tokenObj;
+            } else {
+                dashboardSettings.proxmox_tokens.push(tokenObj);
+            }
+            fetch('/api/proxmox/refresh', { method: 'POST' }).catch(() => {});
+        }
+    }
+
     renderClusterNodes();
-    debounceSaveSettings({ cluster_nodes: dashboardSettings.cluster_nodes });
+    debounceSaveSettings({
+        cluster_nodes: dashboardSettings.cluster_nodes,
+        proxmox_tokens: dashboardSettings.proxmox_tokens || []
+    });
     closeNodeEditModal();
     showToast('✓ Node saved successfully');
 }
