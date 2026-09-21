@@ -6485,6 +6485,7 @@
             </div>
             <div style="display:flex;gap:8px;align-items:center">
                 <button type="button" class="btn-ctrl" onclick="launchProxmoxWebUi()" style="background:rgba(249,115,22,0.18);border-color:rgba(249,115,22,0.38);color:#fdba74;font-weight:600" title="Open Proxmox VE Web Console">🌐 Proxmox UI ↗</button>
+                <button type="button" class="btn-ctrl" onclick="openPveAuthModal()" style="background:rgba(139,92,246,0.18);border-color:rgba(139,92,246,0.38);color:#c4b5fd;font-weight:600" title="Configure Proxmox API Credentials">🔑 Credentials</button>
                 <button type="button" class="btn-ctrl" id="btnRefreshProxmox" onclick="refreshProxmoxFleet(this)" title="Refresh Proxmox status">⟳ Refresh</button>
                 <button type="button" class="btn-ctrl" onclick="closeDrawer('vmDrawer')">✕ Close</button>
             </div>
@@ -8934,6 +8935,86 @@
     </div>
 </div>
 
+<!-- ── Proxmox VE Cluster Authentication Modal ────────────────────── -->
+<div class="drawer-overlay" id="pveAuthModal" onclick="if(event.target===this)closePveAuthModal()">
+    <div class="drawer-card" style="width:520px;max-width:95vw">
+        <div class="drawer-head">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:24px">🟣</span>
+                <div>
+                    <div style="font-size:16px;font-weight:700;color:#fff">Connect Proxmox VE Cluster</div>
+                    <div style="font-size:12px;color:var(--text-muted)">Authenticate to pull real-time VMs, containers &amp; hardware telemetry</div>
+                </div>
+            </div>
+            <button class="btn-ctrl" onclick="closePveAuthModal()">✕ Close</button>
+        </div>
+        <div class="drawer-body" style="padding:18px 22px">
+            <input type="hidden" id="pveAuthTargetNodeId" value="">
+            <!-- Node Selector / Host -->
+            <div class="modal-form-group">
+                <label class="modal-form-label">Proxmox Host / IP *</label>
+                <input type="text" id="pveAuthHost" class="modal-form-input" placeholder="e.g. 192.168.0.18" value="192.168.0.18">
+            </div>
+
+            <!-- Auth Mode Switcher -->
+            <div class="modal-form-group">
+                <label class="modal-form-label">Authentication Method</label>
+                <div style="display:flex;gap:8px">
+                    <button type="button" class="btn-ctrl active-tab" id="btnPveModeToken" onclick="switchPveAuthMode('token')" style="flex:1;padding:8px;font-size:12px">
+                        🔑 API Token (Recommended)
+                    </button>
+                    <button type="button" class="btn-ctrl" id="btnPveModePass" onclick="switchPveAuthMode('password')" style="flex:1;padding:8px;font-size:12px">
+                        🔒 User &amp; Password
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fields for API Token -->
+            <div id="pveSectionToken">
+                <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11.5px;color:#c4b5fd;line-height:1.4">
+                    💡 In Proxmox: <em>Datacenter &rarr; Permissions &rarr; API Tokens &rarr; Add</em>.<br>
+                    Uncheck "Privilege Separation" or grant PVEAuditor / Administrator role.
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">API Token ID</label>
+                    <input type="text" id="pveAuthTokenId" class="modal-form-input" placeholder="root@pam!homelab">
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">API Token Secret (UUID)</label>
+                    <input type="password" id="pveAuthSecret" class="modal-form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                </div>
+            </div>
+
+            <!-- Fields for Username & Password -->
+            <div id="pveSectionPassword" style="display:none">
+                <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11.5px;color:#93c5fd;line-height:1.4">
+                    Authenticate directly using your Proxmox login. A secure authentication ticket will be generated automatically.
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">Username</label>
+                    <input type="text" id="pveAuthUsername" class="modal-form-input" placeholder="root@pam" value="root@pam">
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">Password</label>
+                    <input type="password" id="pveAuthPassword" class="modal-form-input" placeholder="Proxmox root or user password">
+                </div>
+            </div>
+
+            <div class="modal-form-group">
+                <label class="modal-form-label">PVE Node Name (Internal Hostname)</label>
+                <input type="text" id="pveAuthNodeName" class="modal-form-input" placeholder="pve" value="pve">
+                <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">The hostname of this node in your Proxmox cluster (default: 'pve')</div>
+            </div>
+        </div>
+        <div style="padding:14px 22px;border-top:1px solid var(--border-glass);display:flex;justify-content:space-between;align-items:center">
+            <button type="button" class="btn-ctrl" onclick="closePveAuthModal()">Cancel</button>
+            <button type="button" class="btn-ctrl" id="btnSavePveAuth" onclick="savePveAuthCredentials()" style="background:var(--accent-blue);font-weight:600;padding:8px 22px">
+                ✓ Connect &amp; Fetch Telemetry
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 let statsCache = null;
 
@@ -9795,6 +9876,11 @@ function renderClusterNodes() {
                     <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                         <button class="node-menu-btn" onclick="toggleNodeMenu(event, '${escapeHtml(node.id)}')" title="Node options">⋮</button>
                         <div class="widget-menu-dropdown" id="nodemenu_${escapeHtml(node.id)}">
+                            ${node.type === 'proxmox' ? `
+                            <button type="button" class="widget-menu-item" onclick="openPveAuthModal('${escapeHtml(node.id)}')">
+                                <span>🔑</span> Connect Proxmox API
+                            </button>
+                            ` : ''}
                             <button type="button" class="widget-menu-item" onclick="openEditNodeModal('${escapeHtml(node.id)}')">
                                 <span>✏️</span> Edit Node
                             </button>
@@ -13899,6 +13985,158 @@ function openPbsConsole() { const pbs = (dashboardSettings.cluster_nodes || []).
 
 let currentVmFilter = 'all';
 
+let currentPveAuthMode = 'token';
+
+function openPveAuthModal(targetNodeId = '') {
+    const targetEl = document.getElementById('pveAuthTargetNodeId');
+    if (targetEl) targetEl.value = targetNodeId || '';
+    
+    // Find matching Proxmox node
+    const nodes = dashboardSettings.cluster_nodes || [];
+    let pveNode = targetNodeId ? nodes.find(n => n.id === targetNodeId) : null;
+    if (!pveNode) pveNode = nodes.find(n => n.type === 'proxmox') || nodes[0];
+
+    let host = '192.168.0.18';
+    if (pveNode) {
+        host = pveNode.ip || (pveNode.url ? pveNode.url.replace(/^https?:\/\//, '').split(/[:\/]/)[0] : host);
+    }
+    const hostInput = document.getElementById('pveAuthHost');
+    if (hostInput) hostInput.value = host;
+
+    // Load any existing tokens for this host
+    const tokens = dashboardSettings.proxmox_tokens || [];
+    const tok = tokens.find(t => t.host === host || (pveNode && t.node_id === pveNode.id));
+    if (tok) {
+        if (tok.username && tok.password && !tok.token) {
+            switchPveAuthMode('password');
+            if (document.getElementById('pveAuthUsername')) document.getElementById('pveAuthUsername').value = tok.username || 'root@pam';
+            if (document.getElementById('pveAuthPassword')) document.getElementById('pveAuthPassword').value = tok.password || '';
+        } else {
+            switchPveAuthMode('token');
+            if (document.getElementById('pveAuthTokenId')) document.getElementById('pveAuthTokenId').value = tok.token || '';
+            if (document.getElementById('pveAuthSecret')) document.getElementById('pveAuthSecret').value = tok.secret || '';
+        }
+        if (document.getElementById('pveAuthNodeName')) document.getElementById('pveAuthNodeName').value = tok.nodename || 'pve';
+    } else {
+        switchPveAuthMode('token');
+        if (document.getElementById('pveAuthTokenId')) document.getElementById('pveAuthTokenId').value = '';
+        if (document.getElementById('pveAuthSecret')) document.getElementById('pveAuthSecret').value = '';
+        if (document.getElementById('pveAuthUsername')) document.getElementById('pveAuthUsername').value = 'root@pam';
+        if (document.getElementById('pveAuthPassword')) document.getElementById('pveAuthPassword').value = '';
+        if (document.getElementById('pveAuthNodeName')) document.getElementById('pveAuthNodeName').value = 'pve';
+    }
+
+    openDrawer('pveAuthModal');
+}
+
+function closePveAuthModal() {
+    closeDrawer('pveAuthModal');
+}
+
+function switchPveAuthMode(mode) {
+    currentPveAuthMode = mode;
+    const btnTok = document.getElementById('btnPveModeToken');
+    const btnPass = document.getElementById('btnPveModePass');
+    const secTok = document.getElementById('pveSectionToken');
+    const secPass = document.getElementById('pveSectionPassword');
+
+    if (mode === 'token') {
+        if (btnTok) btnTok.classList.add('active-tab');
+        if (btnPass) btnPass.classList.remove('active-tab');
+        if (secTok) secTok.style.display = 'block';
+        if (secPass) secPass.style.display = 'none';
+    } else {
+        if (btnTok) btnTok.classList.remove('active-tab');
+        if (btnPass) btnPass.classList.add('active-tab');
+        if (secTok) secTok.style.display = 'none';
+        if (secPass) secPass.style.display = 'block';
+    }
+}
+
+async function savePveAuthCredentials() {
+    const btn = document.getElementById('btnSavePveAuth');
+    const origText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Connecting…';
+    }
+
+    const host = document.getElementById('pveAuthHost')?.value.trim() || '';
+    const nodeName = document.getElementById('pveAuthNodeName')?.value.trim() || 'pve';
+    const targetNodeId = document.getElementById('pveAuthTargetNodeId')?.value || '';
+
+    if (!host) {
+        alert('Please enter your Proxmox Host or IP address.');
+        if (btn) { btn.disabled = false; btn.innerHTML = origText; }
+        return;
+    }
+
+    let tokenObj = {
+        host: host,
+        node_id: targetNodeId || 'pve',
+        nodename: nodeName
+    };
+
+    if (currentPveAuthMode === 'token') {
+        const tokenId = document.getElementById('pveAuthTokenId')?.value.trim();
+        const secret = document.getElementById('pveAuthSecret')?.value.trim();
+        if (!tokenId || !secret) {
+            alert('Please enter both your Proxmox API Token ID and Token Secret.');
+            if (btn) { btn.disabled = false; btn.innerHTML = origText; }
+            return;
+        }
+        tokenObj.token = tokenId;
+        tokenObj.secret = secret;
+    } else {
+        const username = document.getElementById('pveAuthUsername')?.value.trim();
+        const password = document.getElementById('pveAuthPassword')?.value;
+        if (!username || !password) {
+            alert('Please enter your Proxmox Username and Password.');
+            if (btn) { btn.disabled = false; btn.innerHTML = origText; }
+            return;
+        }
+        tokenObj.username = username;
+        tokenObj.password = password;
+    }
+
+    if (!dashboardSettings.proxmox_tokens) dashboardSettings.proxmox_tokens = [];
+    const existingIdx = dashboardSettings.proxmox_tokens.findIndex(t => t.host === host || (targetNodeId && t.node_id === targetNodeId));
+    if (existingIdx !== -1) {
+        dashboardSettings.proxmox_tokens[existingIdx] = tokenObj;
+    } else {
+        dashboardSettings.proxmox_tokens.push(tokenObj);
+    }
+
+    // Also update cluster_nodes if target node exists
+    if (dashboardSettings.cluster_nodes && targetNodeId) {
+        const cn = dashboardSettings.cluster_nodes.find(n => n.id === targetNodeId);
+        if (cn) {
+            cn.ip = host;
+            cn.nodename = nodeName;
+        }
+    }
+
+    debounceSaveSettings({
+        proxmox_tokens: dashboardSettings.proxmox_tokens,
+        cluster_nodes: dashboardSettings.cluster_nodes || []
+    });
+
+    closePveAuthModal();
+    showToast('✓ Proxmox credentials saved! Querying cluster…', 'info');
+
+    // Trigger immediate refresh
+    try {
+        await refreshProxmoxFleet();
+    } catch (e) {
+        console.warn('Error refreshing Proxmox fleet:', e);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    }
+}
+
 function launchProxmoxWebUi() {
     const pve = (dashboardSettings.cluster_nodes || []).find(n => n.type === 'proxmox') || 
                 (dashboardSettings.proxmox_nodes || [])[0];
@@ -13975,8 +14213,13 @@ function renderVmDrawerList() {
             <div style="text-align:center;padding:30px 20px;color:var(--text-muted)">
                 <div style="font-size:32px;margin-bottom:10px">🖥️</div>
                 <div style="font-size:14px;color:#fff;font-weight:600;margin-bottom:6px">No Proxmox Hypervisor Guests Loaded</div>
-                <div style="font-size:12px;max-width:420px;margin:0 auto 16px auto">Ensure your Proxmox API tokens are configured in Settings ⚙️ or click below to query cluster nodes.</div>
-                <button type="button" class="btn-ctrl" onclick="refreshProxmoxFleet(this)" style="background:var(--accent-blue);color:#fff;padding:8px 18px">⟳ Query Proxmox Cluster Now</button>
+                <div style="font-size:12px;max-width:440px;margin:0 auto 16px auto;color:var(--text-muted);line-height:1.5">
+                    Connect your Proxmox VE cluster using either an <strong>API Token</strong> or your <strong>Proxmox User &amp; Password</strong> to load live VMs, containers, and real-time CPU/RAM telemetry.
+                </div>
+                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+                    <button type="button" class="btn-ctrl" onclick="openPveAuthModal()" style="background:linear-gradient(135deg, #8b5cf6, #3b82f6);color:#fff;font-weight:600;padding:8px 20px;box-shadow:0 4px 14px rgba(139,92,246,0.35)">🔑 Connect Proxmox Cluster</button>
+                    <button type="button" class="btn-ctrl" onclick="refreshProxmoxFleet(this)" style="background:rgba(255,255,255,0.08);color:#fff;padding:8px 16px">⟳ Query Cluster Now</button>
+                </div>
             </div>
         `;
         return;

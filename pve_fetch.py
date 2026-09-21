@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Standalone Proxmox poller - runs as subprocess, prints JSON to stdout."""
 import urllib.request
+import urllib.parse
 import ssl
 import json
-
 import os
+import time
+import re
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
 
 def load_pve_tokens():
     """Load Proxmox API tokens dynamically from env var or data/settings.json."""
@@ -23,8 +29,26 @@ def load_pve_tokens():
             with open(settings_file, "r", encoding="utf-8") as f:
                 s = json.load(f)
                 toks = s.get("proxmox_tokens") or []
-                if toks:
+                if toks and isinstance(toks, list) and len(toks) > 0:
                     return toks
+                # Fallback: check if cluster_nodes has proxmox credentials embedded
+                cluster_nodes = s.get("cluster_nodes") or []
+                derived = []
+                for n in cluster_nodes:
+                    if n.get("type") == "proxmox":
+                        host = n.get("ip") or (n.get("url", "").replace("https://", "").replace("http://", "").split("/")[0].split(":")[0])
+                        if host and (n.get("token") or n.get("password") or n.get("secret")):
+                            derived.append({
+                                "host": host,
+                                "node_id": n.get("id", "pve"),
+                                "nodename": n.get("nodename") or "pve",
+                                "token": n.get("token", ""),
+                                "secret": n.get("secret", ""),
+                                "username": n.get("username", "root@pam"),
+                                "password": n.get("password", "")
+                            })
+                if derived:
+                    return derived
         except Exception:
             pass
 
@@ -32,13 +56,44 @@ def load_pve_tokens():
 
 PVE_TOKENS = load_pve_tokens()
 
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
+_TICKETS = {}
 
-def pve_get(host, token, secret, path):
+def get_pve_auth_headers(entry):
+    """Return either PVEAPIToken or PVEAuthCookie (username/password ticket)."""
+    token = entry.get("token", "")
+    secret = entry.get("secret", "")
+    if token and secret:
+        return {"Authorization": f"PVEAPIToken={token}={secret}"}
+
+    host = entry.get("host")
+    username = entry.get("username")
+    password = entry.get("password")
+    if host and username and password:
+        now = time.time()
+        cached = _TICKETS.get(host)
+        if cached and (now - cached.get("time", 0)) < 3600:
+            return {"Cookie": f"PVEAuthCookie={cached.get('ticket')}"}
+        try:
+            t_url = f"https://{host}:8006/api2/json/access/ticket"
+            post_data = urllib.parse.urlencode({"username": username, "password": password}).encode("utf-8")
+            t_req = urllib.request.Request(t_url, data=post_data, method="POST")
+            with urllib.request.urlopen(t_req, context=ctx, timeout=5.0) as r:
+                body = json.loads(r.read().decode())
+                ticket = body.get("data", {}).get("ticket")
+                if ticket:
+                    _TICKETS[host] = {"ticket": ticket, "time": now}
+                    return {"Cookie": f"PVEAuthCookie={ticket}"}
+        except Exception as e:
+            pass
+    return {}
+
+def pve_get(entry, path):
+    host = entry.get("host")
+    headers = get_pve_auth_headers(entry)
+    if not headers:
+        return []
     url = f"https://{host}:8006/api2/json{path}"
-    req = urllib.request.Request(url, headers={"Authorization": f"PVEAPIToken={token}={secret}"})
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, context=ctx, timeout=5.0) as r:
         return json.loads(r.read().decode()).get("data", [])
 
@@ -46,7 +101,6 @@ def get_arp_map():
     """Build MAC -> IP lookup dictionary from host ARP table."""
     arp = {}
     try:
-        import os
         if os.path.exists("/proc/net/arp"):
             with open("/proc/net/arp", "r") as f:
                 for line in f.readlines()[1:]:
@@ -61,12 +115,12 @@ def get_arp_map():
 
 _ARP_CACHE = None
 
-def get_ip(host, token, secret, vmtype, vmid, nodename):
+def get_ip(entry, vmtype, vmid, nodename):
     """Try to get primary IP for a VM/LXC using Guest Agent + ARP MAC fallback."""
     global _ARP_CACHE
     try:
         if vmtype == "lxc":
-            ifaces = pve_get(host, token, secret, f"/nodes/{nodename}/lxc/{vmid}/interfaces")
+            ifaces = pve_get(entry, f"/nodes/{nodename}/lxc/{vmid}/interfaces")
             for iface in ifaces:
                 for key in ("inet", "inet6"):
                     val = iface.get(key, "")
@@ -75,7 +129,7 @@ def get_ip(host, token, secret, vmtype, vmid, nodename):
         elif vmtype == "qemu":
             # 1. Try QEMU Guest Agent first
             try:
-                ifaces = pve_get(host, token, secret, f"/nodes/{nodename}/qemu/{vmid}/agent/network-get-interfaces")
+                ifaces = pve_get(entry, f"/nodes/{nodename}/qemu/{vmid}/agent/network-get-interfaces")
                 if isinstance(ifaces, dict):
                     ifaces = ifaces.get("result", [])
                 for iface in ifaces:
@@ -90,9 +144,8 @@ def get_ip(host, token, secret, vmtype, vmid, nodename):
 
             # 2. Fallback: Lookup VM MAC address in host ARP table
             try:
-                cfg = pve_get(host, token, secret, f"/nodes/{nodename}/qemu/{vmid}/config")
+                cfg = pve_get(entry, f"/nodes/{nodename}/qemu/{vmid}/config")
                 if isinstance(cfg, dict):
-                    import re
                     for k, v in cfg.items():
                         if k.startswith("net") and isinstance(v, str):
                             match = re.search(r'([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})', v)
@@ -108,25 +161,25 @@ def get_ip(host, token, secret, vmtype, vmid, nodename):
         pass
     return "--"
 
-
 result = {"nodes": [], "vms": [], "pbs": {}}
 
 for entry in PVE_TOKENS:
-    host      = entry["host"]
-    node_id   = entry["node_id"]
-    nodename  = entry["nodename"]
-    token     = entry["token"]
-    secret    = entry["secret"]
+    host      = entry.get("host")
+    node_id   = entry.get("node_id", "pve")
+    nodename  = entry.get("nodename", "pve")
 
     # ── 1. Get cluster resources ──────────────────────────────────────────
     try:
-        resources = pve_get(host, token, secret, "/cluster/resources")
+        resources = pve_get(entry, "/cluster/resources")
     except Exception as e:
         result["nodes"].append({"id": node_id, "error": str(e)})
         continue
 
     # ── 2. Extract node stats (fall back to /nodes/{name}/status if zeroed) ──
-    node_entry = next((r for r in resources if r.get("type") == "node"), None)
+    node_entry = next((r for r in resources if r.get("type") == "node" and (r.get("node") == nodename or not nodename)), None)
+    if not node_entry:
+        node_entry = next((r for r in resources if r.get("type") == "node"), None)
+
     cpu_usage, ram_usage, maxcpu = 0.0, "N/A", 0
     if node_entry and node_entry.get("maxcpu", 0) > 0:
         maxmem = node_entry.get("maxmem", 1)
@@ -137,7 +190,7 @@ for entry in PVE_TOKENS:
     else:
         # Fallback: query /nodes/{nodename}/status directly
         try:
-            ns = pve_get(host, token, secret, f"/nodes/{nodename}/status")
+            ns = pve_get(entry, f"/nodes/{nodename}/status")
             if isinstance(ns, dict):
                 maxmem = ns.get("memory", {}).get("total", 1)
                 mem    = ns.get("memory", {}).get("used", 0)
@@ -147,11 +200,19 @@ for entry in PVE_TOKENS:
         except Exception:
             pass
 
+    # Count online VMs for this specific node
+    node_vms = [r for r in resources if r.get("type") in ("qemu", "lxc") and (r.get("node") == nodename or not nodename)]
+    online_count = sum(1 for v in node_vms if v.get("status") == "running")
+    total_count = len(node_vms)
+
     result["nodes"].append({
-        "id":        node_id,
-        "cpu_usage": cpu_usage,
-        "ram_usage": ram_usage,
-        "maxcpu":    maxcpu,
+        "id":         node_id,
+        "name":       nodename,
+        "cpu_usage":  cpu_usage,
+        "ram_usage":  ram_usage,
+        "maxcpu":     maxcpu,
+        "online_vms": online_count,
+        "vms_count":  total_count
     })
 
     # ── 3. PBS storage ────────────────────────────────────────────────────
@@ -164,7 +225,7 @@ for entry in PVE_TOKENS:
             free  = total - used
             pct   = round(used / total * 100, 1) if total > 0 else 0
             result["pbs"] = {
-                "datastore": "pbs-node1",   # canonical name in PBS
+                "datastore": "pbs-node1",
                 "used_str":  f"{round(used/1e9, 1)} GB",
                 "total_str": f"{round(total/1e9, 1)} GB",
                 "free_str":  f"{round(free/1e9, 1)} GB",
@@ -180,7 +241,7 @@ for entry in PVE_TOKENS:
             vtype  = item.get("type")
             vmid   = item.get("vmid")
             status = item.get("status", "stopped")
-            ip = get_ip(host, token, secret, vtype, vmid, nodename) if status == "running" else "--"
+            ip = get_ip(entry, vtype, vmid, nodename) if status == "running" else "--"
             result["vms"].append({
                 "vmid":    vmid,
                 "name":    item.get("name", f"vm-{vmid}"),
@@ -194,14 +255,14 @@ for entry in PVE_TOKENS:
                 "ip":      ip,
             })
     else:
-        # Fallback: query qemu and lxc endpoints directly (Node 1 case)
+        # Fallback: query qemu and lxc endpoints directly
         for vmtype, endpoint in [("qemu", f"/nodes/{nodename}/qemu"), ("lxc", f"/nodes/{nodename}/lxc")]:
             try:
-                vms = pve_get(host, token, secret, endpoint)
+                vms = pve_get(entry, endpoint)
                 for item in vms:
                     vmid   = item.get("vmid")
                     status = item.get("status", "stopped")
-                    ip = get_ip(host, token, secret, vmtype, vmid, nodename) if status == "running" else "--"
+                    ip = get_ip(entry, vmtype, vmid, nodename) if status == "running" else "--"
                     result["vms"].append({
                         "vmid":    vmid,
                         "name":    item.get("name", f"vm-{vmid}"),
