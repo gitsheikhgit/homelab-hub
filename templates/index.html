@@ -9681,6 +9681,8 @@ const HYPERVISOR_PRESETS = {
     }
 };
 
+const MAX_CLUSTER_NODES = 4;
+
 function renderClusterNodes() {
     const bar = document.getElementById('clusterNodesBar');
     if (!bar) return;
@@ -10039,8 +10041,6 @@ function onNodeTypeChanged(type, preserveCustomValues = false) {
         }
     }
 }
-
-const MAX_CLUSTER_NODES = 4;
 
 function openAddNodeModal() {
     const nodes = dashboardSettings.cluster_nodes || [];
@@ -10420,10 +10420,19 @@ function applyWidgetVisibility() {
         vmsDock.style.display = hasPve ? '' : 'none';
     }
 
-    // Top cluster nodes strip: hide if proxmox/nodes disabled
+    // Top cluster nodes strip: sync container, bar, and settings toggle
+    const isNodesVisible = (widgets.cluster_nodes_strip !== false);
+    const nodesContainer = document.getElementById('clusterNodesContainer');
+    if (nodesContainer) {
+        nodesContainer.style.display = isNodesVisible ? 'block' : 'none';
+    }
     const nodesBar = document.getElementById('clusterNodesBar');
     if (nodesBar) {
-        nodesBar.style.display = (widgets.cluster_nodes_strip !== false) ? 'grid' : 'none';
+        nodesBar.style.display = isNodesVisible ? 'grid' : 'none';
+    }
+    const nodesToggle = document.getElementById('toggle_w_cluster_nodes_strip');
+    if (nodesToggle) {
+        nodesToggle.checked = isNodesVisible;
     }
 
     // Tailscale toggle in omni search bar: hide if tailscale disabled
@@ -10437,8 +10446,14 @@ function toggleWidgetVisible(widgetKey, isVisible) {
     if (!dashboardSettings.widgets) dashboardSettings.widgets = {};
     dashboardSettings.widgets[widgetKey] = isVisible;
     applyWidgetVisibility();
+    if (widgetKey === 'cluster_nodes_strip' && typeof renderClusterNodes === 'function') {
+        renderClusterNodes();
+    }
+    if (widgetKey === 'media_row' && typeof renderServiceCards === 'function') {
+        renderServiceCards();
+    }
     debounceSaveSettings({ widgets: dashboardSettings.widgets });
-    showToast(`${widgetKey.replace('_', ' ').toUpperCase()} visibility updated`);
+    showToast(`${widgetKey.replace(/_/g, ' ').toUpperCase()} visibility updated`);
     closeAllWidgetMenus();
 }
 
