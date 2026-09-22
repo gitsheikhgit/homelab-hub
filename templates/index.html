@@ -10330,10 +10330,15 @@ function saveClusterNodeForm() {
     }
 
     renderClusterNodes();
-    debounceSaveSettings({
-        cluster_nodes: dashboardSettings.cluster_nodes,
-        proxmox_tokens: dashboardSettings.proxmox_tokens || []
-    });
+    // Save immediately so refreshing the page immediately does not lose the node
+    fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            cluster_nodes: dashboardSettings.cluster_nodes,
+            proxmox_tokens: dashboardSettings.proxmox_tokens || []
+        })
+    }).catch(e => console.warn('Could not save cluster node:', e));
     closeNodeEditModal();
     showToast('✓ Node saved successfully');
 }
@@ -10343,7 +10348,11 @@ function deleteClusterNode(nodeId) {
     if (!dashboardSettings.cluster_nodes) return;
     dashboardSettings.cluster_nodes = dashboardSettings.cluster_nodes.filter(n => n.id !== nodeId);
     renderClusterNodes();
-    debounceSaveSettings({ cluster_nodes: dashboardSettings.cluster_nodes });
+    fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cluster_nodes: dashboardSettings.cluster_nodes })
+    }).catch(e => console.warn('Could not delete node:', e));
     showToast('✓ Node removed');
     closeAllNodeMenus();
 }
@@ -16288,6 +16297,12 @@ function selectWizardTheme(themeMode) {
 
 function closeInitialSetupModal() {
     localStorage.setItem('initial_setup_completed', 'true');
+    if (dashboardSettings) dashboardSettings.initial_setup_completed = true;
+    fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initial_setup_completed: true })
+    }).catch(() => {});
     closeDrawer('initialSetupModal');
 }
 
@@ -16566,7 +16581,22 @@ async function submitScanModalCards() {
 }
 
 function checkInitialSetup() {
+    if (localStorage.getItem('initial_setup_completed') === 'true') return;
     if (dashboardSettings && dashboardSettings.initial_setup_completed === true) return;
+    if (dashboardSettings && (
+        (dashboardSettings.cluster_nodes && dashboardSettings.cluster_nodes.length > 0) ||
+        (dashboardSettings.service_cards && dashboardSettings.service_cards.length > 0) ||
+        (window.allCards && window.allCards.length > 0)
+    )) {
+        localStorage.setItem('initial_setup_completed', 'true');
+        if (dashboardSettings) dashboardSettings.initial_setup_completed = true;
+        fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ initial_setup_completed: true })
+        }).catch(() => {});
+        return;
+    }
     setTimeout(() => {
         openInitialSetupModal();
     }, 600);

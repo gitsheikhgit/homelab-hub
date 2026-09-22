@@ -2771,26 +2771,66 @@ def api_drives_check():
 @app.route("/api/drives/detect", methods=["GET"])
 def api_drives_detect():
     try:
-        parts = psutil.disk_partitions(all=False)
         detected = []
         seen = set()
-        for p in parts:
-            if p.fstype in ('squashfs', 'tmpfs', 'devtmpfs', 'overlay', 'iso9660') or p.mountpoint.startswith('/boot') or p.mountpoint in seen:
-                continue
-            try:
-                u = psutil.disk_usage(p.mountpoint)
+        
+        # 1. Collect real physical mounts from host PID 1 (or host mounts)
+        host_partitions = []
+        for mf in ("/host/proc/1/mounts", "/proc/1/mounts", "/proc/mounts"):
+            if os.path.exists(mf):
+                try:
+                    with open(mf, "r") as f:
+                        for line in f:
+                            parts = line.strip().split()
+                            if len(parts) >= 3 and parts[0].startswith("/dev/sd"):
+                                dev, mnt, fstype = parts[0], parts[1], parts[2]
+                                if mnt in ("/etc/resolv.conf", "/etc/hostname", "/etc/hosts", "/app/data") or mnt.startswith(("/etc", "/app", "/boot", "/var")):
+                                    continue
+                                if mnt not in seen:
+                                    seen.add(mnt)
+                                    host_partitions.append((dev, mnt, fstype))
+                except Exception:
+                    pass
+                if host_partitions:
+                    break
+
+        if not host_partitions:
+            for p in psutil.disk_partitions(all=False):
+                if p.fstype in ('squashfs', 'tmpfs', 'devtmpfs', 'overlay', 'iso9660') or p.mountpoint.startswith(('/boot', '/etc', '/app')) or p.mountpoint in seen:
+                    continue
                 seen.add(p.mountpoint)
-                m = re.match(r'(/dev/[a-z]+|/dev/nvme\d+n\d+)', p.device)
-                base_dev = m.group(1) if m else p.device
+                host_partitions.append((p.device, p.mountpoint, p.fstype))
+
+        for dev_path, mount_pt, fstype in host_partitions:
+            try:
+                # Disk usage: try direct mount, host mount, or /
+                check_path = mount_pt
+                if not os.path.exists(check_path) and os.path.exists(f"/host{mount_pt}"):
+                    check_path = f"/host{mount_pt}"
+                elif not os.path.exists(check_path):
+                    check_path = "/"
+                
+                u = psutil.disk_usage(check_path)
+                m = re.match(r'(/dev/[a-z]+|/dev/nvme\d+n\d+)', dev_path)
+                base_dev = m.group(1) if m else dev_path
                 smart = get_smart_info(base_dev)
-                
-                friendly = "System OS SSD" if p.mountpoint == "/" else (os.path.basename(p.mountpoint).replace("_", " ").title() + " Drive")
-                
+
+                if mount_pt == "/":
+                    friendly = "Internal OS SSD"
+                elif "storage" in mount_pt.lower():
+                    friendly = "Storage Drive (Yottamaster)"
+                elif "backup" in mount_pt.lower():
+                    friendly = "Backup Drive (Yottamaster)"
+                elif "wddata" in mount_pt.lower():
+                    friendly = "WDDATA Drive (Yottamaster)"
+                else:
+                    friendly = os.path.basename(mount_pt).replace("_", " ").title() + " Drive"
+
                 detected.append({
-                    "mount": p.mountpoint,
-                    "device": p.device,
+                    "mount": mount_pt,
+                    "device": dev_path,
                     "base_dev": base_dev,
-                    "fstype": p.fstype,
+                    "fstype": fstype,
                     "suggested_name": friendly,
                     "total_gb": round(u.total / (1024**3), 1),
                     "used_gb": round(u.used / (1024**3), 1),

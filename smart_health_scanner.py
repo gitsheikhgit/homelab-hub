@@ -13,25 +13,42 @@ if os.path.exists(settings_file):
                 dev = d.get("dev")
                 name = d.get("name") or "Storage Drive"
                 mount = d.get("mount") or "/"
+                # Ignore container virtual mount artifacts
+                if mount in ("/etc/resolv.conf", "/etc/hostname", "/etc/hosts", "/app/data") or mount.startswith("/etc/"):
+                    continue
                 if dev:
                     drives_config.append((dev, name, mount))
     except Exception:
         pass
 
 if not drives_config:
-    drives_config.append(("/dev/sda", "System OS SSD", "/"))
-    try:
-        with open("/proc/mounts", "r") as mf:
-            for line in mf:
-                parts = line.strip().split()
-                if len(parts) >= 2 and parts[0].startswith("/dev/sd"):
-                    base_dev = re.sub(r'\d+$', '', parts[0])
-                    mount_pt = parts[1]
-                    if not mount_pt.startswith("/boot") and not mount_pt.startswith("/var"):
-                        if not any(d[0] == base_dev for d in drives_config):
-                            drives_config.append((base_dev, f"Disk {os.path.basename(base_dev)}", mount_pt))
-    except Exception:
-        pass
+    # Look at host PID 1 mounts (or host mounts) first
+    for mf in ("/host/proc/1/mounts", "/proc/1/mounts", "/proc/mounts"):
+        if os.path.exists(mf):
+            try:
+                with open(mf, "r") as f:
+                    for line in f:
+                        parts = line.strip().split()
+                        if len(parts) >= 2 and parts[0].startswith("/dev/sd"):
+                            base_dev = re.sub(r'\d+$', '', parts[0])
+                            mount_pt = parts[1]
+                            if mount_pt.startswith(("/boot", "/var", "/etc", "/app")) or mount_pt in ("/etc/resolv.conf", "/etc/hostname", "/etc/hosts"):
+                                continue
+                            if not any(d[0] == base_dev for d in drives_config):
+                                friendly = "Internal OS SSD" if mount_pt == "/" else (os.path.basename(mount_pt).replace("_", " ").title() + " Drive")
+                                drives_config.append((base_dev, friendly, mount_pt))
+            except Exception:
+                pass
+            if drives_config:
+                break
+
+if not drives_config:
+    drives_config = [
+        ("/dev/sda", "Internal OS SSD", "/"),
+        ("/dev/sdb", "Backup Drive (Yottamaster)", "/mnt/backup_hdd"),
+        ("/dev/sdc", "Storage Drive (Yottamaster)", "/mnt/storage"),
+        ("/dev/sdd", "WDDATA Drive (Yottamaster)", "/mnt/WDDATA"),
+    ]
 
 results = {
     "last_scan_time": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),

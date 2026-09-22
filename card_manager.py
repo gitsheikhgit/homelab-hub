@@ -43,16 +43,16 @@ DEFAULT_SETTINGS = {
     "wallpaper_brightness": 0.95,
     "dock_position": "bottom",
     "theme": "dark",
-    "initial_setup_completed": False,
+    "initial_setup_completed": True,
     "server_name": "",
     "widgets": {
         "calendar": True,
         "host_overview": True,
         "host_power": True,
-        "proxmox": False,
-        "portainer": False,
-        "cluster_nodes_strip": False,
-        "tailscale": False,
+        "proxmox": True,
+        "portainer": True,
+        "cluster_nodes_strip": True,
+        "tailscale": True,
         "storage": True,
         "ssd_cleaner": True,
         "speedtest": True,
@@ -65,7 +65,7 @@ DEFAULT_SETTINGS = {
     "widgets_layout": {
         "col1": ["cards_apps"],
         "col2": ["widget_calendar", "widget_host_overview", "widget_host_power"],
-        "col3": ["widget_portainer", "widget_tailscale", "widget_storage", "widget_ssd_cleaner", "widget_speedtest"]
+        "col3": ["widget_proxmox", "widget_portainer", "widget_tailscale", "widget_storage", "widget_ssd_cleaner", "widget_speedtest"]
     },
     "quick_icon_size_px": 34,
     "portainer_config": {
@@ -83,25 +83,50 @@ DEFAULT_SETTINGS = {
     "base_platform_watts": 13.5
 }
 
+def atomic_save_json(filepath, data):
+    """Atomically write JSON data to file to prevent race conditions or corrupted/empty reads."""
+    dir_name = os.path.dirname(filepath)
+    os.makedirs(dir_name, exist_ok=True)
+    temp_path = os.path.join(dir_name, f".{os.path.basename(filepath)}.tmp_{uuid.uuid4().hex}")
+    try:
+        with open(temp_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, filepath)
+        return True
+    except Exception as e:
+        print(f"Error atomic saving {filepath}: {e}")
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+        return False
+
+_LAST_KNOWN_CARDS = None
+
 def get_cards():
-    """Retrieve list of cards. On fresh installations with no cards.json, returns an empty list so user sets up cleanly."""
+    """Retrieve list of cards with in-memory caching for resilience."""
+    global _LAST_KNOWN_CARDS
     if os.path.exists(CARDS_FILE):
         try:
             with open(CARDS_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            pass
+                cards = json.load(f)
+                if isinstance(cards, list):
+                    _LAST_KNOWN_CARDS = list(cards)
+                    return cards
+        except Exception as e:
+            print(f"Warning: error reading cards.json: {e}")
+            if _LAST_KNOWN_CARDS is not None:
+                return list(_LAST_KNOWN_CARDS)
     return []
 
 def save_cards(cards):
-    """Save cards list to cards.json."""
-    try:
-        with open(CARDS_FILE, "w", encoding="utf-8") as f:
-            json.dump(cards, f, indent=2)
-        return True
-    except Exception as e:
-        print(f"Error saving cards: {e}")
-        return False
+    """Save cards list atomically."""
+    global _LAST_KNOWN_CARDS
+    _LAST_KNOWN_CARDS = list(cards)
+    return atomic_save_json(CARDS_FILE, cards)
 
 def add_card(data):
     """Add a new application card."""
@@ -195,43 +220,47 @@ def reorder_cards(card_ids):
     save_cards(reordered)
     return reordered
 
+_LAST_KNOWN_SETTINGS = None
+
 def get_settings():
-    """Retrieve dashboard settings, merging missing defaults."""
+    """Retrieve dashboard settings, merging missing defaults without wiping."""
+    global _LAST_KNOWN_SETTINGS
     res = dict(DEFAULT_SETTINGS)
     if os.path.exists(SETTINGS_FILE):
         try:
             with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
                 loaded = json.load(f)
-                res.update(loaded)
-                for key in ("widgets", "widgets_layout", "search_providers", "portainer_config"):
-                    if key in DEFAULT_SETTINGS and isinstance(DEFAULT_SETTINGS[key], dict):
-                        merged = dict(DEFAULT_SETTINGS[key])
-                        if key in loaded and isinstance(loaded[key], dict):
-                            merged.update(loaded[key])
-                        res[key] = merged
-                if "cluster_nodes" not in loaded or not isinstance(loaded["cluster_nodes"], list):
-                    res["cluster_nodes"] = list(DEFAULT_SETTINGS["cluster_nodes"])
-                if "service_cards" not in loaded or not isinstance(loaded["service_cards"], list):
-                    res["service_cards"] = list(DEFAULT_SETTINGS["service_cards"])
-                if "monitored_drives" not in loaded or not isinstance(loaded["monitored_drives"], list):
-                    res["monitored_drives"] = list(DEFAULT_SETTINGS["monitored_drives"])
-                if "quick_icon_size_px" not in loaded:
-                    res["quick_icon_size_px"] = DEFAULT_SETTINGS["quick_icon_size_px"]
-                return res
-        except Exception:
-            pass
-    save_settings(DEFAULT_SETTINGS)
-    return DEFAULT_SETTINGS
+                if isinstance(loaded, dict) and loaded:
+                    res.update(loaded)
+                    for key in ("widgets", "widgets_layout", "search_providers", "portainer_config"):
+                        if key in DEFAULT_SETTINGS and isinstance(DEFAULT_SETTINGS[key], dict):
+                            merged = dict(DEFAULT_SETTINGS[key])
+                            if key in loaded and isinstance(loaded[key], dict):
+                                merged.update(loaded[key])
+                            res[key] = merged
+                    if "cluster_nodes" in loaded and isinstance(loaded["cluster_nodes"], list):
+                        res["cluster_nodes"] = loaded["cluster_nodes"]
+                    if "service_cards" in loaded and isinstance(loaded["service_cards"], list):
+                        res["service_cards"] = loaded["service_cards"]
+                    if "monitored_drives" in loaded and isinstance(loaded["monitored_drives"], list):
+                        res["monitored_drives"] = loaded["monitored_drives"]
+                    if "quick_icon_size_px" in loaded:
+                        res["quick_icon_size_px"] = loaded["quick_icon_size_px"]
+                    _LAST_KNOWN_SETTINGS = dict(res)
+                    return res
+        except Exception as e:
+            print(f"Warning: error reading settings.json: {e}")
+            if _LAST_KNOWN_SETTINGS:
+                return dict(_LAST_KNOWN_SETTINGS)
+    elif not os.path.exists(SETTINGS_FILE):
+        save_settings(DEFAULT_SETTINGS)
+    return res
 
 def save_settings(settings):
-    """Save dashboard settings."""
-    try:
-        with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
-            json.dump(settings, f, indent=2)
-        return True
-    except Exception as e:
-        print(f"Error saving settings: {e}")
-        return False
+    """Save dashboard settings atomically."""
+    global _LAST_KNOWN_SETTINGS
+    _LAST_KNOWN_SETTINGS = dict(settings)
+    return atomic_save_json(SETTINGS_FILE, settings)
 
 def get_available_icons():
     """Return all available icons (built-in + uploaded)."""
