@@ -2782,7 +2782,7 @@ def api_drives_detect():
                     with open(mf, "r") as f:
                         for line in f:
                             parts = line.strip().split()
-                            if len(parts) >= 3 and parts[0].startswith("/dev/sd"):
+                            if len(parts) >= 3 and re.match(r'^/dev/(sd[a-z]|nvme\d+n\d+|vd[a-z]|hd[a-z]|xvd[a-z]|mapper/)', parts[0]):
                                 dev, mnt, fstype = parts[0], parts[1], parts[2]
                                 if mnt in ("/etc/resolv.conf", "/etc/hostname", "/etc/hosts", "/app/data") or mnt.startswith(("/etc", "/app", "/boot", "/var")):
                                     continue

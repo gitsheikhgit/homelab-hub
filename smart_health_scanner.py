@@ -29,8 +29,8 @@ if not drives_config:
                 with open(mf, "r") as f:
                     for line in f:
                         parts = line.strip().split()
-                        if len(parts) >= 2 and parts[0].startswith("/dev/sd"):
-                            base_dev = re.sub(r'\d+$', '', parts[0])
+                        if len(parts) >= 2 and re.match(r'^/dev/(sd[a-z]|nvme\d+n\d+|vd[a-z]|hd[a-z]|xvd[a-z]|mapper/)', parts[0]):
+                            base_dev = re.sub(r'p?\d+$', '', parts[0])
                             mount_pt = parts[1]
                             if mount_pt.startswith(("/boot", "/var", "/etc", "/app")) or mount_pt in ("/etc/resolv.conf", "/etc/hostname", "/etc/hosts"):
                                 continue
