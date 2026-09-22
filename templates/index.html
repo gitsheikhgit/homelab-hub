@@ -6700,7 +6700,7 @@
 </div>
 
 <!-- ── Quick App Icons & Links Manager Modal ───────────────────────── -->
-<div class="drawer-overlay" id="quickIconsManagerModal" onclick="if(event.target===this)closeDrawer('quickIconsManagerModal')">
+<div class="drawer-overlay" id="quickIconsManagerModal" onclick="if(event.target===this)closeQuickIconsManager()">
     <div class="drawer-card" style="max-width:840px;width:96%">
         <div class="drawer-head">
             <div style="display:flex;align-items:center;gap:10px">
@@ -6710,7 +6710,7 @@
                     <div style="font-size:12px;color:var(--text-muted)">Adjust overall icon size, reorder launchpad apps, edit URLs, or remove icons</div>
                 </div>
             </div>
-            <button class="btn-ctrl" onclick="closeDrawer('quickIconsManagerModal')">✕ Close</button>
+            <button class="btn-ctrl" onclick="closeQuickIconsManager()">✕ Close</button>
         </div>
         <div class="drawer-body" style="padding:16px 20px;max-height:75vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px">
             <!-- Top Controls Bar: Size Slider & Add Button -->
@@ -10948,6 +10948,10 @@ function applySettingsToUI() {
             }
         }
     }
+
+    // 7. Quick App Launchpad Icon Size
+    const iconSize = (dashboardSettings && dashboardSettings.quick_icon_size_px) || parseInt(localStorage.getItem('quick_icon_size_px'), 10) || 34;
+    applyQuickIconSize(iconSize, false);
 }
 
 function applyWallpaper() {
@@ -11431,7 +11435,7 @@ function renderBookmarks() {
     const bar = document.getElementById('quickBookmarksBar');
     if (!bar) return;
 
-    const iconSize = (window.dashboardSettings && window.dashboardSettings.quick_icon_size_px) || 34;
+    const iconSize = (window.dashboardSettings && window.dashboardSettings.quick_icon_size_px) || parseInt(localStorage.getItem('quick_icon_size_px'), 10) || 34;
     document.documentElement.style.setProperty('--quick-icon-size', iconSize + 'px');
 
     if (!allCards || allCards.length === 0) {
@@ -16608,6 +16612,7 @@ function checkInitialSetup() {
 // ── Quick App Icons Launchpad Sizing & Reordering ───────────────────────────
 // ═════════════════════════════════════════════════════════════════════════════
 
+let _quickIconSizeDebounce = null;
 function applyQuickIconSize(sizePx, persist = true) {
     sizePx = parseInt(sizePx, 10);
     if (isNaN(sizePx) || sizePx < 22 || sizePx > 64) return;
@@ -16615,22 +16620,41 @@ function applyQuickIconSize(sizePx, persist = true) {
     const valSpan = document.getElementById('quickIconSizeVal');
     if (valSpan) valSpan.textContent = sizePx + 'px';
     const slider = document.getElementById('quickIconSizeSlider');
-    if (slider && slider.value != sizePx) slider.value = sizePx;
+    if (slider && parseInt(slider.value, 10) !== sizePx) slider.value = sizePx;
 
+    if (!window.dashboardSettings) window.dashboardSettings = {};
+    window.dashboardSettings.quick_icon_size_px = sizePx;
+    localStorage.setItem('quick_icon_size_px', sizePx);
+
+    clearTimeout(_quickIconSizeDebounce);
     if (persist) {
-        if (!window.dashboardSettings) window.dashboardSettings = {};
-        window.dashboardSettings.quick_icon_size_px = sizePx;
         fetch('/api/settings/icon-size', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ size_px: sizePx })
         }).catch(e => console.warn('Could not persist icon size:', e));
+    } else {
+        _quickIconSizeDebounce = setTimeout(() => {
+            fetch('/api/settings/icon-size', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ size_px: sizePx })
+            }).catch(e => console.warn('Could not persist icon size:', e));
+        }, 350);
     }
+}
+
+function closeQuickIconsManager() {
+    const slider = document.getElementById('quickIconSizeSlider');
+    if (slider) {
+        applyQuickIconSize(slider.value, true);
+    }
+    closeDrawer('quickIconsManagerModal');
 }
 
 function openQuickIconsManager() {
     openDrawer('quickIconsManagerModal');
-    const curSize = (window.dashboardSettings && window.dashboardSettings.quick_icon_size_px) || 34;
+    const curSize = (window.dashboardSettings && window.dashboardSettings.quick_icon_size_px) || parseInt(localStorage.getItem('quick_icon_size_px'), 10) || 34;
     applyQuickIconSize(curSize, false);
     renderQuickIconsManagerList();
 }
