@@ -359,7 +359,7 @@ def get_connected_devices():
             
     return devices
         
-ENERGY_STATS_FILE = os.path.join(BASE_DIR, "energy_stats.json")
+ENERGY_STATS_FILE = os.path.join(DATA_DIR, "energy_stats.json")
 _ENERGY_LOCK = threading.Lock()
 
 _RAPL_STATE = {

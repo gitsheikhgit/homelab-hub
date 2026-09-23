@@ -47,6 +47,8 @@ def load_calendar_data():
         print(f"[CalendarManager] Error loading calendar data: {e}")
         return _generate_initial_data()
 
+import uuid
+
 def save_calendar_data(data):
     _ensure_data_dir()
     try:
@@ -56,8 +58,13 @@ def save_calendar_data(data):
             pruned_days = {k: v for k, v in data["days"].items() if k >= cutoff}
             data["days"] = pruned_days
 
-        with open(CALENDAR_FILE, 'w', encoding='utf-8') as f:
+        dir_name = os.path.dirname(CALENDAR_FILE)
+        temp_path = os.path.join(dir_name, f".calendar_events.tmp_{uuid.uuid4().hex}")
+        with open(temp_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, CALENDAR_FILE)
         return True
     except Exception as e:
         print(f"[CalendarManager] Error saving calendar data: {e}")
@@ -86,7 +93,9 @@ def _generate_initial_data():
                 "cost": 0.0,
                 "avg_watts": 0.0,
                 "runtime_hours": 0.0,
-                "rate_kwh": rate
+                "rate_kwh": rate,
+                "kwh_raw": 0.0,
+                "runtime_sec": 0.0
             },
             "events": []
         }
@@ -107,14 +116,27 @@ def ensure_daily_ledger_event(date_str, day_rec):
     
     if kwh > 0 or hours > 0:
         events = day_rec.setdefault("events", [])
-        has_ledger = any(e.get("category") == "energy" or "Daily Energy" in e.get("title", "") for e in events)
-        if not has_ledger:
-            is_past = date_str < datetime.now().strftime("%Y-%m-%d")
+        ledger_ev = None
+        for e in events:
+            if e.get("category") == "energy" or "Daily Energy" in e.get("title", ""):
+                ledger_ev = e
+                break
+        
+        is_past = date_str < datetime.now().strftime("%Y-%m-%d")
+        title = f"⚡ Daily Energy Ledger {'Finalized' if is_past else 'Active'} ({kwh:.3f} kWh · ${cost:.2f})"
+        desc = f"Recorded {kwh:.3f} kWh energy consumption (${cost:.2f}) across {hours:.1f} hrs active runtime with {watts:.1f}W average load."
+        
+        if ledger_ev:
+            ledger_ev["title"] = title
+            ledger_ev["desc"] = desc
+            if is_past and ledger_ev.get("time") == "Live":
+                ledger_ev["time"] = "11:59 PM"
+        else:
             events.append({
                 "id": f"evt_ledger_{date_str.replace('-', '')}",
                 "time": "11:59 PM" if is_past else "Live",
-                "title": f"⚡ Daily Energy Ledger {'Finalized' if is_past else 'Active'} ({kwh:.3f} kWh · ${cost:.2f})",
-                "desc": f"Recorded {kwh:.3f} kWh energy consumption (${cost:.2f}) across {hours:.1f} hrs active runtime with {watts:.1f}W average load.",
+                "title": title,
+                "desc": desc,
                 "category": "energy",
                 "tag": "Ledger",
                 "badge_color": "rgba(245,158,11,0.2);color:#fbbf24",
@@ -132,23 +154,30 @@ def record_daily_energy(date_str, added_kwh, current_watts, rate_kwh, dt_seconds
             "cost": 0.0,
             "avg_watts": current_watts,
             "runtime_hours": 0.0,
-            "rate_kwh": rate_kwh
+            "rate_kwh": rate_kwh,
+            "kwh_raw": 0.0,
+            "runtime_sec": 0.0
         },
         "events": []
     })
     
     eng = day_rec.setdefault("energy", {})
-    eng["kwh"] = round(eng.get("kwh", 0.0) + added_kwh, 4)
-    eng["cost"] = round(eng["kwh"] * rate_kwh, 3)
+    
+    # Keep precise raw accumulators without premature rounding
+    raw_kwh = float(eng.get("kwh_raw", eng.get("kwh", 0.0))) + float(added_kwh)
+    eng["kwh_raw"] = raw_kwh
+    eng["kwh"] = round(raw_kwh, 4)
+    eng["cost"] = round(raw_kwh * rate_kwh, 2)
     eng["rate_kwh"] = rate_kwh
     
-    # Accumulate active runtime hours
-    if dt_seconds > 0:
-        eng["runtime_hours"] = round(eng.get("runtime_hours", 0.0) + (dt_seconds / 3600.0), 2)
+    # Accumulate active runtime seconds accurately
+    raw_sec = float(eng.get("runtime_sec", float(eng.get("runtime_hours", 0.0)) * 3600.0)) + float(dt_seconds)
+    eng["runtime_sec"] = raw_sec
+    eng["runtime_hours"] = round(raw_sec / 3600.0, 1)
     
     # Smooth moving average watts
-    prev_w = eng.get("avg_watts", current_watts)
-    eng["avg_watts"] = round((prev_w * 0.95) + (current_watts * 0.05), 1)
+    prev_w = float(eng.get("avg_watts", current_watts))
+    eng["avg_watts"] = round((prev_w * 0.95) + (float(current_watts) * 0.05), 1)
     
     ensure_daily_ledger_event(date_str, day_rec)
     save_calendar_data(data)
