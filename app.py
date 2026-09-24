@@ -37,7 +37,8 @@ from card_manager import (
     batch_add_cards,
     get_host_lan_ip,
     get_tailscale_info,
-    resolve_app_icon
+    resolve_app_icon,
+    atomic_save_json
 )
 
 app = Flask(__name__)
@@ -1654,9 +1655,10 @@ def api_stats():
                         ts_ip = ips[0]
         except Exception:
             pass
-    lan_ip = get_host_lan_ip()
+    req_client_host = request.host.split(":")[0] if (request and request.host) else None
+    lan_ip = get_host_lan_ip(client_host=req_client_host)
     if not ts_domain:
-        ts_domain = "homelab.local"
+        ts_domain = ""
     if not ts_ip:
         ts_ip = lan_ip
 
@@ -2676,13 +2678,7 @@ def api_docker_detect_portainer():
                 }
                 break
         if not found:
-            found = {
-                "name": "Portainer (Default Port)",
-                "status": "Configured",
-                "port": "9000",
-                "lan_url": f"http://{lan_ip}:9000",
-                "ts_url": f"http://{ts_domain}:9000" if ts_domain else ""
-            }
+            return jsonify({"status": "not_found", "message": "No running Portainer container found on host."})
         return jsonify({"status": "success", "data": found})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -2873,6 +2869,172 @@ def api_settings_icon_size():
         return jsonify({"status": "success", "quick_icon_size_px": settings["quick_icon_size_px"]})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+TASKS_FILE = os.path.join(DATA_DIR, "tasks.json")
+
+def get_tasks():
+    if os.path.exists(TASKS_FILE):
+        try:
+            with open(TASKS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    return data
+        except Exception:
+            pass
+    return []
+
+def save_tasks(tasks):
+    return atomic_save_json(TASKS_FILE, tasks)
+
+@app.route("/api/tasks", methods=["GET", "POST"])
+def api_tasks():
+    if request.method == "POST":
+        try:
+            payload = request.get_json(silent=True) or {}
+            tasks = get_tasks()
+            task_id = payload.get("id") or f"task_{uuid.uuid4().hex[:8]}"
+            time_val = (payload.get("time") or payload.get("schedule") or "Daily").strip()
+            title_val = (payload.get("title") or payload.get("name") or "Scheduled Task").strip()
+            tag_val = (payload.get("tag") or "Maintenance").strip()
+            status_val = (payload.get("status") or "Scheduled").strip()
+            desc_val = (payload.get("desc") or payload.get("description") or "").strip()
+            new_task = {
+                "id": task_id,
+                "time": time_val,
+                "schedule": time_val,
+                "title": title_val,
+                "name": title_val,
+                "tag": tag_val,
+                "status": status_val,
+                "desc": desc_val,
+                "description": desc_val,
+                "source": "user"
+            }
+            idx = next((i for i, t in enumerate(tasks) if t.get("id") == task_id), None)
+            if idx is not None:
+                tasks[idx] = new_task
+            else:
+                tasks.append(new_task)
+            save_tasks(tasks)
+            return jsonify({"status": "success", "tasks": tasks, "task": new_task})
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+    else:
+        return jsonify({"status": "success", "tasks": get_tasks()})
+
+@app.route("/api/tasks/<task_id>", methods=["DELETE"])
+def api_delete_task(task_id):
+    try:
+        tasks = get_tasks()
+        tasks = [t for t in tasks if t.get("id") != task_id]
+        save_tasks(tasks)
+        return jsonify({"status": "success", "tasks": tasks})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/tasks/auto-detect", methods=["POST"])
+def api_auto_detect_tasks():
+    try:
+        detected = []
+        # 1. Try scanning host systemd timers
+        try:
+            res = subprocess.run(["systemctl", "list-timers", "--no-pager", "--no-legend"], capture_output=True, text=True, timeout=4)
+            if res.returncode == 0:
+                for line in res.stdout.strip().splitlines():
+                    parts = line.split()
+                    if len(parts) >= 6:
+                        timer_unit = parts[-2] if len(parts) >= 2 else ""
+                        service_unit = parts[-1] if len(parts) >= 1 else ""
+                        if timer_unit.endswith(".timer"):
+                            name = timer_unit.replace(".timer", "").replace("-", " ").title()
+                            if any(k in timer_unit for k in ["fstrim", "logrotate", "apt-daily", "backup", "certbot", "smart", "docker", "pve"]):
+                                detected.append({
+                                    "id": f"sys_{timer_unit.replace('.', '_')}",
+                                    "time": "System Timer",
+                                    "schedule": "System Timer",
+                                    "title": f"{name} Automation",
+                                    "name": f"{name} Automation",
+                                    "tag": "Systemd",
+                                    "status": "Active Timer",
+                                    "desc": f"Host systemd timer: {timer_unit} triggering {service_unit}",
+                                    "description": f"Host systemd timer: {timer_unit} triggering {service_unit}",
+                                    "source": "systemd"
+                                })
+        except Exception:
+            pass
+
+        # 2. Try user crontab
+        try:
+            res_c = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=3)
+            if res_c.returncode == 0:
+                for line in res_c.stdout.strip().splitlines():
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        parts = line.split(maxsplit=5)
+                        if len(parts) == 6:
+                            sched = f"{parts[0]} {parts[1]} {parts[2]} {parts[3]} {parts[4]}"
+                            cmd = parts[5]
+                            cmd_short = os.path.basename(cmd.split()[0])
+                            detected.append({
+                                "id": f"cron_{uuid.uuid4().hex[:6]}",
+                                "time": sched,
+                                "schedule": sched,
+                                "title": f"Cron: {cmd_short}",
+                                "name": f"Cron: {cmd_short}",
+                                "tag": "Cron",
+                                "status": "Scheduled",
+                                "desc": f"Command: {cmd}",
+                                "description": f"Command: {cmd}",
+                                "source": "crontab"
+                            })
+        except Exception:
+            pass
+
+        # 3. If nothing detected, provide recommended homelab maintenance tasks
+        if not detected:
+            detected = [
+                {
+                    "id": "sys_fstrim",
+                    "time": "Weekly (Sun 00:00)",
+                    "schedule": "Weekly (Sun 00:00)",
+                    "title": "SSD TRIM & Storage Optimization",
+                    "name": "SSD TRIM & Storage Optimization",
+                    "tag": "Maintenance",
+                    "status": "Recommended",
+                    "desc": "Periodic discard of unused blocks on SSDs to maintain peak drive performance.",
+                    "description": "Periodic discard of unused blocks on SSDs to maintain peak drive performance.",
+                    "source": "suggested"
+                },
+                {
+                    "id": "sys_logrotate",
+                    "time": "Daily (00:00)",
+                    "schedule": "Daily (00:00)",
+                    "title": "Systemd & Docker Log Rotation",
+                    "name": "Systemd & Docker Log Rotation",
+                    "tag": "Storage",
+                    "status": "Recommended",
+                    "desc": "Compress and cycle container and host log files to prevent storage exhaustion.",
+                    "description": "Compress and cycle container and host log files to prevent storage exhaustion.",
+                    "source": "suggested"
+                }
+            ]
+
+        current_tasks = get_tasks()
+        existing_titles = {t.get("title", "").lower() for t in current_tasks}
+        added_count = 0
+        for dt in detected:
+            if dt.get("title", "").lower() not in existing_titles:
+                current_tasks.append(dt)
+                existing_titles.add(dt.get("title", "").lower())
+                added_count += 1
+
+        if added_count > 0:
+            save_tasks(current_tasks)
+
+        return jsonify({"status": "success", "tasks": current_tasks, "added_count": added_count})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @app.route("/api/docker/logs", methods=["GET"])
 def docker_container_logs():

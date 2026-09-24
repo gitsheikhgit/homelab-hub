@@ -42,7 +42,6 @@
     ],
     "col3": [
       "widget_portainer",
-      "widget_tailscale",
       "widget_storage",
       "widget_ssd_cleaner",
       "widget_speedtest"

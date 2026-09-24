@@ -42,3 +42,4 @@ templates/*.pre_*
 # Private Local Emergency Recovery Passport & Screenshots
 templates/passport.html
 static/oracle_*.jpg
+scripts/

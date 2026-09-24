@@ -5983,31 +5983,31 @@
                 </div>
             </div>
 
-            <!-- 3. Portainer Docker Stacks -->
+            <!-- 3. Docker / Portainer Container Fleet Hub -->
             <div class="draggable-widget-block" id="widget_portainer" data-widget-id="widget_portainer">
                 <div class="card-widget" onclick="handleWidgetCardClick(event, handlePortainerCardClick)">
                     <div class="card-head">
                         <div class="card-head-left">
                             <div class="card-title-group">
                                 <span class="widget-drag-handle" title="Drag to move card or place into another column" onclick="event.stopPropagation()">⠿</span>
-                                <div class="card-logo" style="background:rgba(59,130,246,0.18)"><img src="/static/icons/portainer.png" class="card-logo-img" alt="Portainer"></div>
+                                <div class="card-logo" id="portainerWidgetLogo" style="background:rgba(59,130,246,0.18);display:flex;align-items:center;justify-content:center"><span style="font-size:18px">🐳</span></div>
                                 <div class="card-title-text-wrap">
-                                    <div class="card-title" id="portainerWidgetTitle">Portainer CE &amp; Stacks</div>
-                                    <div class="card-subtitle" id="portainerWidgetSubtitle">Docker Fleet &amp; Power Controls</div>
+                                    <div class="card-title" id="portainerWidgetTitle">Docker Fleet &amp; Containers</div>
+                                    <div class="card-subtitle" id="portainerWidgetSubtitle">Host Container Engine &amp; Runtime</div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-head-right">
-                            <button type="button" class="btn-ctrl" id="btnPortainerWebUi" onclick="event.stopPropagation(); launchPortainerWebUi()" style="font-size:11px;padding:3px 8px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;display:inline-flex;align-items:center;gap:4px;border-radius:6px;cursor:pointer;white-space:nowrap" title="Open Portainer CE Web UI Console">
+                            <button type="button" class="btn-ctrl" id="btnPortainerWebUi" onclick="event.stopPropagation(); handlePortainerPrimaryBtnClick()" style="font-size:11px;padding:3px 8px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;display:none;align-items:center;gap:4px;border-radius:6px;cursor:pointer;white-space:nowrap" title="Open Portainer CE Web Dashboard">
                                 Web UI ↗
                             </button>
-                            <button type="button" class="btn-ctrl" onclick="event.stopPropagation(); openDockerDrawer()" style="font-size:11px;padding:3px 8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:var(--accent-blue);font-weight:600;border-radius:6px;cursor:pointer;white-space:nowrap" title="Open Container Power & Fleet Manager Drawer">
+                            <button type="button" class="btn-ctrl" id="btnDockerManage" onclick="event.stopPropagation(); openDockerDrawer()" style="font-size:11px;padding:3px 8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:var(--accent-blue);font-weight:600;border-radius:6px;cursor:pointer;white-space:nowrap" title="Open Container Power & Fleet Manager Drawer">
                                 Manage ↗
                             </button>
                             <div class="widget-menu-wrap" onclick="event.stopPropagation()">
                                 <button class="widget-menu-btn" onclick="toggleWidgetMenu('widget_portainer')" title="Card Options">⋮</button>
                                 <div class="widget-menu-dropdown" id="wmenu_widget_portainer">
-                                    <button class="widget-menu-item" onclick="openPortainerConfigModal()">⚙️ Portainer / Docker Settings</button>
+                                    <button class="widget-menu-item" onclick="openPortainerConfigModal()">⚙️ Container / Portainer Settings</button>
                                     <button class="widget-menu-item" onclick="moveWidgetUp('widget_portainer')">⬆️ Move Up</button>
                                     <button class="widget-menu-item" onclick="moveWidgetDown('widget_portainer')">⬇️ Move Down</button>
                                     <button class="widget-menu-item" onclick="moveWidgetToCol('widget_portainer', 'col1')">⬅️ Move to Left Col</button>
@@ -6025,8 +6025,8 @@
                 </div>
             </div>
 
-            <!-- 4. Tailscale VPN & Network Gateway Hub -->
-            <div class="draggable-widget-block" id="widget_tailscale" data-widget-id="widget_tailscale">
+            <!-- 4. Tailscale VPN & Network Gateway Hub (Hidden by default unless Tailscale is active or configured) -->
+            <div class="draggable-widget-block" id="widget_tailscale" data-widget-id="widget_tailscale" style="display:none">
                 <div class="card-widget" style="border-color:rgba(6,182,212,0.35);background:rgba(6,182,212,0.04)">
                     <div class="card-head">
                         <div class="card-head-left">
@@ -6064,8 +6064,8 @@
                             <div class="metric-val" id="tsMeshIpCell" style="color:var(--accent-cyan);font-family:monospace;font-size:12px">100.x.x.x <span style="font-size:10px">📋</span></div>
                             <div class="metric-lbl">Tailscale Mesh IP</div>
                         </div>
-                        <div class="metric-cell"><div class="metric-val" style="color:var(--accent-green)">Active</div><div class="metric-lbl">WireGuard</div></div>
-                        <div class="metric-cell"><div class="metric-val" style="color:var(--accent-green)">Connected</div><div class="metric-lbl">Tailscale Daemon</div></div>
+                        <div class="metric-cell"><div class="metric-val" id="tsWireguardVal" style="color:var(--accent-green)">Active</div><div class="metric-lbl">WireGuard</div></div>
+                        <div class="metric-cell"><div class="metric-val" id="tsDaemonVal" style="color:var(--accent-green)">Connected</div><div class="metric-lbl">Tailscale Daemon</div></div>
                         <div class="metric-cell"><div class="metric-val" id="tsLanBindingCell">--</div><div class="metric-lbl">LAN Binding</div></div>
                     </div>
                 </div>
@@ -6274,79 +6274,15 @@
                         <div style="font-size:14.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
                             <span>⚡</span> Automated Maintenance Schedule &amp; Cron
                         </div>
-                        <span style="font-size:11px;color:var(--accent-cyan);background:rgba(6,182,212,0.12);padding:2px 7px;border-radius:4px;font-weight:600">5 Automated Tasks</span>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span id="agendaTasksCountBadge" style="font-size:11px;color:var(--accent-cyan);background:rgba(6,182,212,0.12);padding:2px 7px;border-radius:4px;font-weight:600">0 Tasks</span>
+                            <button type="button" class="btn-ctrl" onclick="autoDetectAgendaTasks(this)" style="font-size:11px;padding:3px 9px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.35);color:#67e8f9;font-weight:600;border-radius:6px;cursor:pointer" title="Auto-detect systemd timers and cron jobs from host">⚡ Detect</button>
+                            <button type="button" class="btn-ctrl" onclick="openAddTaskModal()" style="font-size:11px;padding:3px 9px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;border-radius:6px;cursor:pointer">➕ Add Task</button>
+                        </div>
                     </div>
 
                     <div style="display:flex;flex-direction:column;gap:10px" id="agendaTasksList">
-                        <!-- Task 1: Oracle Cloud Restic -->
-                        <div class="agenda-task-item">
-                            <div class="agenda-task-time">02:00 AM</div>
-                            <div style="flex:1;min-width:0">
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-                                    <strong style="font-size:13.5px;color:#fff">Oracle Cloud Restic Backup</strong>
-                                    <span class="agenda-status-pill" style="background:rgba(6,182,212,0.18);color:#67e8f9">Cloud</span>
-                                    <span class="agenda-status-pill" style="background:rgba(16,185,129,0.15);color:#6ee7b7">Scheduled (Nightly)</span>
-                                </div>
-                                <div style="font-size:11.5px;color:var(--text-secondary)">Encrypted incremental backup stream directly to Oracle Cloud Infrastructure object bucket. Deduplication verified.</div>
-                            </div>
-                            <button type="button" class="btn-ctrl" onclick="showToast('⚡ Oracle Cloud Backup trigger queued!', 'info')" style="font-size:11px;padding:4px 8px" title="Trigger backup task">▶ Run</button>
-                        </div>
-
-                        <!-- Task 2: Proxmox PBS Backup -->
-                        <div class="agenda-task-item">
-                            <div class="agenda-task-time">04:00 AM</div>
-                            <div style="flex:1;min-width:0">
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-                                    <strong style="font-size:13.5px;color:#fff">Proxmox Cluster Backup (PBS)</strong>
-                                    <span class="agenda-status-pill" style="background:rgba(249,115,22,0.18);color:#fdba74">PVE</span>
-                                    <span class="agenda-status-pill" style="background:rgba(16,185,129,0.15);color:#6ee7b7">Active Schedule</span>
-                                </div>
-                                <div style="font-size:11.5px;color:var(--text-secondary)">Nightly incremental VM and LXC snapshot deduplication to Proxmox Backup Server (:8007). Current dedup factor: 3.85x.</div>
-                            </div>
-                            <button type="button" class="btn-ctrl" onclick="openPbsConsole()" style="font-size:11px;padding:4px 8px" title="Open PBS Console">PBS ↗</button>
-                        </div>
-
-                        <!-- Task 3: SMART Diagnostic -->
-                        <div class="agenda-task-item">
-                            <div class="agenda-task-time">06:00 AM</div>
-                            <div style="flex:1;min-width:0">
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-                                    <strong style="font-size:13.5px;color:#fff">Drive SMART Health Diagnostic</strong>
-                                    <span class="agenda-status-pill" style="background:rgba(168,85,247,0.18);color:#d8b4fe">Disks</span>
-                                    <span class="agenda-status-pill" style="background:rgba(59,130,246,0.15);color:#93c5fd">Completed Today</span>
-                                </div>
-                                <div style="font-size:11.5px;color:var(--text-secondary)">Short background self-test on NVMe SSD, SPCC Storage SSD &amp; WD Data. 0 bad sectors detected across array.</div>
-                            </div>
-                            <button type="button" class="btn-ctrl" onclick="runSmartScanNow()" style="font-size:11px;padding:4px 8px" title="Run diagnostic scan">⟳ Scan</button>
-                        </div>
-
-                        <!-- Task 4: Nextcloud Rescan -->
-                        <div class="agenda-task-item">
-                            <div class="agenda-task-time">08:00 AM</div>
-                            <div style="flex:1;min-width:0">
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-                                    <strong style="font-size:13.5px;color:#fff">Nextcloud &amp; Memories Rescan</strong>
-                                    <span class="agenda-status-pill" style="background:rgba(59,130,246,0.18);color:#93c5fd">Nextcloud</span>
-                                    <span class="agenda-status-pill" style="background:rgba(16,185,129,0.15);color:#6ee7b7">Scheduled (Daily)</span>
-                                </div>
-                                <div style="font-size:11.5px;color:var(--text-secondary)">Background photo indexing, facial recognition clustering, and OCR full-text indexing for uploaded documents.</div>
-                            </div>
-                            <button type="button" class="btn-ctrl" onclick="showToast('⚡ Nextcloud indexing scheduled', 'info')" style="font-size:11px;padding:4px 8px" title="Trigger index scan">▶ Rescan</button>
-                        </div>
-
-                        <!-- Task 5: Music Trash Purge -->
-                        <div class="agenda-task-item">
-                            <div class="agenda-task-time">Weekly</div>
-                            <div style="flex:1;min-width:0">
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-                                    <strong style="font-size:13.5px;color:#fff">Music &amp; Media Trash Auto-Purge</strong>
-                                    <span class="agenda-status-pill" style="background:rgba(236,72,153,0.18);color:#f472b6">Media</span>
-                                    <span class="agenda-status-pill" style="background:rgba(16,185,129,0.15);color:#6ee7b7">Auto-Purge (7 Days)</span>
-                                </div>
-                                <div style="font-size:11.5px;color:var(--text-secondary)">Safe recycle bin retention cleanup for Navidrome and downloaded music files older than 7 days.</div>
-                            </div>
-                            <button type="button" class="btn-ctrl" onclick="showToast('🧹 Media trash cleanup complete (0 files expired)', 'success')" style="font-size:11px;padding:4px 8px" title="Clean trash">🧹 Clean</button>
-                        </div>
+                        <!-- Populated dynamically via loadAgendaTasks() -->
                     </div>
                 </div>
 
@@ -6355,18 +6291,18 @@
                     <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:6px">
                         <span>🏆</span> Recent Homelab Milestones &amp; History
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary)">
+                    <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary)" id="agendaMilestonesList">
                         <div style="display:flex;align-items:center;gap:8px">
                             <span style="color:var(--accent-green)">●</span>
-                            <span><strong>System Stability:</strong> Continuous 16+ days server uptime achieved</span>
+                            <span id="milestoneStability"><strong>System Stability:</strong> Continuous server uptime monitored</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px">
                             <span style="color:var(--accent-cyan)">●</span>
-                            <span><strong>Storage Diagnostic:</strong> All 4 system disks passed SMART self-test with 0 pending sectors</span>
+                            <span id="milestoneStorage"><strong>Storage Diagnostic:</strong> System storage volumes online &amp; monitored</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px">
                             <span style="color:var(--accent-amber)">●</span>
-                            <span><strong>Fleet Maintenance:</strong> 8 Docker containers updated to latest upstream releases</span>
+                            <span id="milestoneContainers"><strong>Fleet Maintenance:</strong> Container runtime operational</span>
                         </div>
                     </div>
                 </div>
@@ -6521,7 +6457,7 @@
                 </div>
             </div>
             <div style="display:flex;gap:8px;align-items:center">
-                <button type="button" class="btn-ctrl" onclick="launchPortainerWebUi()" style="background:rgba(59,130,246,0.18);border-color:rgba(59,130,246,0.38);color:#93c5fd;font-weight:600" title="Open Portainer CE Web Console">🌐 Portainer UI ↗</button>
+                <button type="button" class="btn-ctrl" id="btnDrawerPortainerUi" onclick="launchPortainerWebUi()" style="background:rgba(59,130,246,0.18);border-color:rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;display:none" title="Open Portainer CE Web Console">🌐 Portainer UI ↗</button>
                 <button type="button" class="btn-ctrl" onclick="openPortainerConfigModal()" title="Edit Portainer & Docker Settings">⚙️ Config</button>
                 <button type="button" class="btn-ctrl" onclick="refreshDockerFleet()" title="Refresh container statuses">⟳ Refresh</button>
                 <button type="button" class="btn-ctrl" onclick="closeDrawer('dockerDrawer')">✕ Close</button>
@@ -6626,6 +6562,50 @@
             <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
                 <button type="button" class="btn-ctrl" onclick="closeDrawer('portainerConfigModal')" style="padding:7px 14px">Cancel</button>
                 <button type="button" class="btn-ctrl" onclick="savePortainerConfig(this)" style="background:var(--accent-blue);padding:7px 18px;font-weight:600">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Add / Edit Maintenance Task Modal ────────────────────────────── -->
+<div class="drawer-overlay" id="taskConfigModal" onclick="if(event.target===this)closeDrawer('taskConfigModal')">
+    <div class="drawer-card" style="max-width:540px;width:94%">
+        <div class="drawer-head">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(6,182,212,0.18);color:var(--accent-cyan);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+                <div>
+                    <div style="font-size:16px;font-weight:700;color:#fff" id="taskModalTitle">Add Automated Task</div>
+                    <div style="font-size:12px;color:var(--text-muted)">Configure scheduled maintenance, backup, or cron automation</div>
+                </div>
+            </div>
+            <button type="button" class="drawer-close" onclick="closeDrawer('taskConfigModal')">✕</button>
+        </div>
+        <div class="drawer-body" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div>
+                <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600">Task Name *</label>
+                <input type="text" id="taskNameInput" class="cfg-input" placeholder="e.g., Nightly Postgres Dump, System Update" style="width:100%;box-sizing:border-box">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                    <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600">Schedule / Frequency *</label>
+                    <input type="text" id="taskScheduleInput" class="cfg-input" placeholder="e.g., 03:00 AM, Daily, */30 * * * *" style="width:100%;box-sizing:border-box">
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600">Category Tag</label>
+                    <input type="text" id="taskTagInput" class="cfg-input" placeholder="e.g., Backup, Maintenance, Docker" style="width:100%;box-sizing:border-box">
+                </div>
+            </div>
+            <div>
+                <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600">Description</label>
+                <textarea id="taskDescInput" class="cfg-input" rows="2" placeholder="Brief summary of what this automated task performs..." style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
+            </div>
+            <div>
+                <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600">Status Label (optional)</label>
+                <input type="text" id="taskStatusInput" class="cfg-input" placeholder="e.g., Active Schedule, Scheduled (Nightly)" style="width:100%;box-sizing:border-box">
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
+                <button type="button" class="btn-ctrl" onclick="closeDrawer('taskConfigModal')" style="padding:7px 14px">Cancel</button>
+                <button type="button" class="btn-ctrl" onclick="saveTaskFromModal(this)" style="background:var(--accent-blue);padding:7px 18px;font-weight:600">Save Task</button>
             </div>
         </div>
     </div>
@@ -7673,6 +7653,52 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+<!-- ── Add / Edit Scheduled Task Modal ─────────────────── -->
+<div class="drawer-overlay" id="addTaskModal" onclick="if(event.target===this)closeDrawer('addTaskModal')">
+    <div class="drawer-card" style="width:520px;max-width:94vw;max-height:90vh;display:flex;flex-direction:column">
+        <div class="drawer-head" style="padding:14px 18px">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:22px">⏱️</span>
+                <div>
+                    <div style="font-size:15px;font-weight:700;color:#fff" id="addTaskModalTitle">Add Scheduled Task</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Configure cron / automation schedule for your homelab</div>
+                </div>
+            </div>
+            <button class="btn-ctrl" onclick="closeDrawer('addTaskModal')">✕ Close</button>
+        </div>
+        <div class="drawer-body" style="padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            <input type="hidden" id="taskEditId" value="">
+            <div>
+                <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Task Title / Name</label>
+                <input type="text" id="taskInputTitle" class="form-input" placeholder="e.g. ZFS Pool Scrub or Offsite Backup" style="width:100%;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:#fff">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Schedule / Interval</label>
+                    <input type="text" id="taskInputSchedule" class="form-input" placeholder="e.g. Daily 03:00 or Every Sunday" style="width:100%;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:#fff">
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Category / Tag</label>
+                    <select id="taskInputTag" class="form-input" style="width:100%;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:#fff">
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Backup">Backup</option>
+                        <option value="Security">Security</option>
+                        <option value="Diagnostic">Diagnostic</option>
+                        <option value="Docker">Docker</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Description (Optional)</label>
+                <textarea id="taskInputDesc" class="form-input" rows="2" placeholder="Brief note about what this automation does..." style="width:100%;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-glass);color:#fff;resize:vertical"></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+                <button type="button" class="btn-ctrl" onclick="closeDrawer('addTaskModal')">Cancel</button>
+                <button type="button" class="btn-ctrl" onclick="saveNewTask()" style="background:var(--accent-blue);color:#fff;font-weight:600;padding:6px 16px">Save Task</button>
+            </div>
         </div>
     </div>
 </div>
@@ -9018,6 +9044,20 @@
 <script>
 let statsCache = null;
 
+function resolveAppUrl(url) {
+    if (!url) return '';
+    try {
+        const curHost = window.location.hostname;
+        if (curHost && curHost !== '127.0.0.1' && curHost !== 'localhost') {
+            return url.replace(/:\/\/(?:127\.0\.0\.1|localhost)(?::(\d+))?/, (match, port) => {
+                return `://${curHost}${port ? ':' + port : ''}`;
+            });
+        }
+    } catch (e) {
+        console.warn('resolveAppUrl error:', e);
+    }
+    return url;
+}
 
 // ── Top Cluster, Hypervisors & NAS Nodes System ────────────────────
 let draggedNodeId = null;
@@ -10560,9 +10600,19 @@ function applyWidgetVisibility() {
             if (key === 'tailscale') {
                 isVis = isVis && Boolean(dashboardSettings.tailscale_domain || dashboardSettings.tailscale_ip);
             }
-            // Portainer widget: only show if enabled in settings
+            // Portainer / Docker fleet widget: only show if enabled in settings
+            // and on a host where Portainer is configured/running OR Docker containers exist
             if (key === 'portainer') {
-                isVis = Boolean(widgets.portainer);
+                const hasContainers = statsCache && Array.isArray(statsCache.containers) && statsCache.containers.length > 0;
+                const hasPortainerConfig = Boolean(dashboardSettings.portainer_config && (dashboardSettings.portainer_config.lan_url || dashboardSettings.portainer_config.ts_url));
+                const isPortainerDetected = statsCache && Array.isArray(statsCache.containers) && statsCache.containers.some(c => (c.name && c.name.toLowerCase().includes('portainer')) || (c.image && c.image.toLowerCase().includes('portainer')));
+                if (widgets.portainer === false) {
+                    isVis = false;
+                } else if (!widgets.portainer) {
+                    isVis = Boolean(isPortainerDetected || hasPortainerConfig);
+                } else {
+                    isVis = Boolean(hasContainers || hasPortainerConfig || isPortainerDetected);
+                }
             }
             el.style.display = isVis ? '' : 'none';
         }
@@ -10598,10 +10648,11 @@ function applyWidgetVisibility() {
         nodesToggle.checked = isNodesVisible;
     }
 
-    // Tailscale toggle in omni search bar: hide if tailscale disabled
+    // Tailscale toggle in omni search bar: hide if tailscale unconfigured or disabled
     const tsModeBtn = document.getElementById('btnNetTs');
     if (tsModeBtn) {
-        tsModeBtn.style.display = (widgets.tailscale !== false) ? '' : 'none';
+        const hasTsConfig = Boolean(dashboardSettings.tailscale_domain || dashboardSettings.tailscale_ip);
+        tsModeBtn.style.display = (widgets.tailscale !== false && hasTsConfig) ? '' : 'none';
     }
 }
 
@@ -13854,6 +13905,32 @@ async function fetchStats() {
             stoppedEls.forEach(el => el.textContent = stopped);
             totalEls.forEach(el => el.textContent = total);
 
+            // Adapt Portainer / Docker Fleet card dynamically based on actual Portainer detection
+            const isPortainerRunning = data.containers.some(c => c.is_running && ((c.name && c.name.toLowerCase().includes('portainer')) || (c.image && c.image.toLowerCase().includes('portainer'))));
+            const portTitle = document.getElementById('portainerWidgetTitle');
+            const portSub = document.getElementById('portainerWidgetSubtitle');
+            const portLogo = document.getElementById('portainerWidgetLogo');
+            const portBtn = document.getElementById('btnPortainerWebUi');
+            const pcfg = (dashboardSettings && dashboardSettings.portainer_config) ? dashboardSettings.portainer_config : {};
+
+            if (isPortainerRunning || (pcfg && pcfg.lan_url)) {
+                if (portTitle) portTitle.textContent = pcfg.title || 'Portainer CE & Stacks';
+                if (portSub) portSub.textContent = pcfg.subtitle || 'Docker Fleet & Power Controls';
+                if (portLogo) portLogo.innerHTML = '<img src="/static/icons/portainer.png" class="card-logo-img" alt="Portainer">';
+                if (portBtn) {
+                    portBtn.style.display = 'inline-flex';
+                    portBtn.textContent = 'Web UI ↗';
+                    portBtn.title = 'Open Portainer CE Web Dashboard';
+                }
+            } else {
+                if (portTitle) portTitle.textContent = pcfg.title || 'Docker Fleet & Containers';
+                if (portSub) portSub.textContent = pcfg.subtitle || 'Host Container Engine & Runtime';
+                if (portLogo) portLogo.innerHTML = '<span style="font-size:18px">🐳</span>';
+                if (portBtn) {
+                    portBtn.style.display = 'none';
+                }
+            }
+
             const dh = document.getElementById('dockerHealthy');
             const alertBanner = document.getElementById('dockerAlertBanner');
             const alertText = document.getElementById('dockerAlertText');
@@ -14377,6 +14454,12 @@ function showToast(message, type = 'info', duration = 4000) {
 
 function openDockerDrawer() {
     openDrawer('dockerDrawer');
+    const isPortainerRunning = Boolean(statsCache && statsCache.containers && statsCache.containers.some(c => c.is_running && ((c.name && c.name.toLowerCase().includes('portainer')) || (c.image && c.image.toLowerCase().includes('portainer')))));
+    const cfg = (window.dashboardSettings && window.dashboardSettings.portainer_config) ? window.dashboardSettings.portainer_config : {};
+    const drawerBtn = document.getElementById('btnDrawerPortainerUi');
+    if (drawerBtn) {
+        drawerBtn.style.display = (isPortainerRunning || (cfg && cfg.lan_url)) ? 'inline-flex' : 'none';
+    }
     renderDockerDrawerList();
     // Fast automatic check of update status on drawer open
     checkDockerUpdates(null, false);
@@ -14706,8 +14789,8 @@ function renderDockerDrawerList() {
                         </button>
                     `)}
                     ${c.url ? `
-                    <button class="btn-ctrl" style="background:var(--accent-blue);font-size:11.5px" onclick="window.open('${(currentNetworkMode === 'ts' && c.ts_url) ? c.ts_url : c.url}', '_blank')">${currentNetworkMode === 'ts' ? '🔒 Open App ↗' : 'Open App ↗'}</button>
-                    ${c.ts_url && c.ts_url !== c.url ? `<button class="btn-ctrl ts-badge" style="font-size:11.5px" onclick="window.open('${c.ts_url}', '_blank')" title="Open via Tailscale (${c.ts_url})">🔒 TS ↗</button>` : ''}
+                    <button class="btn-ctrl" style="background:var(--accent-blue);font-size:11.5px" onclick="window.open(resolveAppUrl('${(currentNetworkMode === 'ts' && c.ts_url) ? c.ts_url : c.url}'), '_blank')">${currentNetworkMode === 'ts' ? '🔒 Open App ↗' : 'Open App ↗'}</button>
+                    ${c.ts_url && c.ts_url !== c.url ? `<button class="btn-ctrl ts-badge" style="font-size:11.5px" onclick="window.open(resolveAppUrl('${c.ts_url}'), '_blank')" title="Open via Tailscale (${c.ts_url})">🔒 TS ↗</button>` : ''}
                 ` : ''}
                     <button class="btn-ctrl" style="font-size:11.5px" onclick="toggleDockerLogs('${c.name}', this)">📄 Logs</button>
                     ${c.is_running 
@@ -16784,12 +16867,28 @@ function launchPortainerWebUi() {
     let tsUrl = (cfg && cfg.ts_url) || (portainerCard && portainerCard.ts_url) || '';
     
     const targetUrl = (currentNetworkMode === 'ts' && tsUrl) ? tsUrl : (lanUrl || tsUrl);
-    window.open(targetUrl, '_blank');
+    window.open(resolveAppUrl(targetUrl), '_blank');
+}
+
+function handlePortainerPrimaryBtnClick() {
+    const isPortainerRunning = Boolean(statsCache && statsCache.containers && statsCache.containers.some(c => c.is_running && ((c.name && c.name.toLowerCase().includes('portainer')) || (c.image && c.image.toLowerCase().includes('portainer')))));
+    const cfg = (window.dashboardSettings && window.dashboardSettings.portainer_config) ? window.dashboardSettings.portainer_config : {};
+    if (isPortainerRunning || (cfg && cfg.lan_url)) {
+        launchPortainerWebUi();
+    } else {
+        openDockerDrawer();
+    }
 }
 
 function handlePortainerCardClick(event) {
     if (event && event.target && event.target.closest('.widget-menu-wrap, button, a')) return;
-    launchPortainerWebUi();
+    const isPortainerRunning = Boolean(statsCache && statsCache.containers && statsCache.containers.some(c => c.is_running && ((c.name && c.name.toLowerCase().includes('portainer')) || (c.image && c.image.toLowerCase().includes('portainer')))));
+    const cfg = (window.dashboardSettings && window.dashboardSettings.portainer_config) ? window.dashboardSettings.portainer_config : {};
+    if (cfg && cfg.click_action === 'portainer' && (isPortainerRunning || (cfg && cfg.lan_url))) {
+        launchPortainerWebUi();
+    } else {
+        openDockerDrawer();
+    }
 }
 
 function openPortainerConfigModal() {
@@ -17232,6 +17331,8 @@ async function saveMonitoredDrivesToServer(drives) {
 function renderAgendaViewHub() {
     renderAgendaHubCalendar();
     updateAgendaHubDayInspector(_selectedWidgetDate || getTodayDateStr());
+    loadAgendaTasks();
+    updateAgendaMilestones();
 }
 
 function getTodayDateStr() {
@@ -17354,6 +17455,180 @@ function updateAgendaHubDayInspector(dateStr) {
                 <span class="agenda-tag">${escapeHtml(ev.category || 'Maintenance')}</span>
             </div>
         `).join('');
+    }
+}
+
+// ── Homelab Dynamic Scheduled Tasks & Milestones ──────────────────
+async function loadAgendaTasks() {
+    const listEl = document.getElementById('agendaTasksList');
+    const badgeEl = document.getElementById('agendaTasksCountBadge');
+    if (!listEl) return;
+    try {
+        const res = await fetch('/api/tasks');
+        const data = await res.json();
+        const tasks = (data && data.tasks) ? data.tasks : [];
+        if (badgeEl) badgeEl.textContent = `${tasks.length} Task${tasks.length === 1 ? '' : 's'}`;
+        renderAgendaTasks(tasks);
+    } catch (e) {
+        console.warn('Failed to load tasks:', e);
+    }
+}
+
+function renderAgendaTasks(tasks) {
+    const listEl = document.getElementById('agendaTasksList');
+    if (!listEl) return;
+    if (!tasks || !tasks.length) {
+        listEl.innerHTML = `
+            <div style="padding:22px;text-align:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border-glass);border-radius:10px;color:var(--text-muted);font-size:12px">
+                <div>No automated tasks or cron jobs configured yet.</div>
+                <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+                    <button type="button" class="btn-ctrl" onclick="autoDetectAgendaTasks(this)" style="font-size:11px;padding:4px 10px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.35);color:#67e8f9;font-weight:600;border-radius:6px;cursor:pointer">⚡ Auto-Detect System Timers</button>
+                    <button type="button" class="btn-ctrl" onclick="openAddTaskModal()" style="font-size:11px;padding:4px 10px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;border-radius:6px;cursor:pointer">➕ Add Scheduled Task</button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    listEl.innerHTML = tasks.map(t => `
+        <div class="agenda-item" style="padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid var(--border-glass);display:flex;align-items:center;justify-content:space-between;gap:12px;transition:all 0.15s ease">
+            <div style="display:flex;align-items:flex-start;gap:10px;min-width:0;flex:1">
+                <span style="font-size:18px;line-height:1;margin-top:2px">⚡</span>
+                <div style="min-width:0;flex:1">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <strong style="font-size:13px;color:#fff">${escapeHtml(t.title || t.name)}</strong>
+                        <span class="agenda-tag" style="font-size:10px;padding:1px 6px">${escapeHtml(t.tag || 'Maintenance')}</span>
+                        ${t.source === 'systemd' ? '<span style="font-size:10px;color:var(--accent-cyan);background:rgba(6,182,212,0.1);padding:1px 5px;border-radius:4px">systemd</span>' : ''}
+                    </div>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                        <span>🕒 ${escapeHtml(t.time || t.schedule || 'Scheduled')}</span>
+                        ${t.desc || t.description ? `<span style="color:var(--text-muted)">· ${escapeHtml(t.desc || t.description)}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                <button type="button" class="btn-ctrl" onclick="deleteAgendaTask('${t.id}')" title="Delete Task" style="padding:3px 7px;font-size:11px;color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:6px;cursor:pointer">✕</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddTaskModal(taskId = null) {
+    const titleEl = document.getElementById('addTaskModalTitle');
+    const idInput = document.getElementById('taskEditId');
+    const titleInput = document.getElementById('taskInputTitle');
+    const schedInput = document.getElementById('taskInputSchedule');
+    const tagInput = document.getElementById('taskInputTag');
+    const descInput = document.getElementById('taskInputDesc');
+
+    if (idInput) idInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (schedInput) schedInput.value = 'Daily 03:00';
+    if (tagInput) tagInput.value = 'Maintenance';
+    if (descInput) descInput.value = '';
+    if (titleEl) titleEl.textContent = 'Add Scheduled Task';
+
+    openDrawer('addTaskModal');
+}
+
+async function saveNewTask() {
+    const id = document.getElementById('taskEditId')?.value?.trim();
+    const title = document.getElementById('taskInputTitle')?.value?.trim();
+    const schedule = document.getElementById('taskInputSchedule')?.value?.trim();
+    const tag = document.getElementById('taskInputTag')?.value?.trim() || 'Maintenance';
+    const desc = document.getElementById('taskInputDesc')?.value?.trim() || '';
+
+    if (!title) {
+        showToast('Please enter a task title', 'warning');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: id || undefined,
+                title,
+                time: schedule || 'Daily',
+                tag,
+                desc,
+                status: 'Scheduled'
+            })
+        });
+        if (res.ok) {
+            closeDrawer('addTaskModal');
+            showToast('✅ Task saved successfully', 'success');
+            await loadAgendaTasks();
+        } else {
+            showToast('Failed to save task', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Error saving task', 'error');
+    }
+}
+
+async function deleteAgendaTask(taskId) {
+    if (!confirm('Are you sure you want to remove this scheduled task?')) return;
+    try {
+        const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast('Task removed', 'info');
+            await loadAgendaTasks();
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function autoDetectAgendaTasks(btn) {
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⚡ Detecting...';
+    }
+    try {
+        const res = await fetch('/api/tasks/auto-detect', { method: 'POST' });
+        const data = await res.json();
+        if (data && data.status === 'success') {
+            const count = data.detected_count || 0;
+            showToast(`✅ Auto-detected ${count} host automation timers`, 'success');
+            await loadAgendaTasks();
+        } else {
+            showToast(data.message || 'No system timers found', 'info');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Failed to detect system tasks', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '⚡ Detect';
+        }
+    }
+}
+
+function updateAgendaMilestones() {
+    const elStability = document.getElementById('milestoneStability');
+    const elStorage = document.getElementById('milestoneStorage');
+    const elContainers = document.getElementById('milestoneContainers');
+
+    if (statsCache) {
+        // System uptime
+        if (elStability && statsCache.system) {
+            const uptime = statsCache.system.uptime || (statsCache.system.uptime_days ? `${statsCache.system.uptime_days} days` : 'Active');
+            elStability.innerHTML = `<strong>System Stability:</strong> Continuous host uptime of ${escapeHtml(uptime)}`;
+        }
+        // Storage count
+        if (elStorage) {
+            const driveCount = (statsCache.drives && Array.isArray(statsCache.drives)) ? statsCache.drives.length : 1;
+            elStorage.innerHTML = `<strong>Storage Diagnostic:</strong> ${driveCount} storage volume${driveCount === 1 ? '' : 's'} mounted &amp; healthy`;
+        }
+        // Containers
+        if (elContainers) {
+            const conts = (statsCache.containers && Array.isArray(statsCache.containers)) ? statsCache.containers.filter(c => c.is_running).length : 0;
+            elContainers.innerHTML = `<strong>Fleet Maintenance:</strong> ${conts} active container${conts === 1 ? '' : 's'} running without crash loops`;
+        }
     }
 }
 

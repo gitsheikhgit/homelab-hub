@@ -49,10 +49,10 @@ DEFAULT_SETTINGS = {
         "calendar": True,
         "host_overview": True,
         "host_power": True,
-        "proxmox": True,
-        "portainer": True,
-        "cluster_nodes_strip": True,
-        "tailscale": True,
+        "proxmox": False,
+        "portainer": False,
+        "cluster_nodes_strip": False,
+        "tailscale": False,
         "storage": True,
         "ssd_cleaner": True,
         "speedtest": True,
@@ -65,12 +65,12 @@ DEFAULT_SETTINGS = {
     "widgets_layout": {
         "col1": ["cards_apps"],
         "col2": ["widget_calendar", "widget_host_overview", "widget_host_power"],
-        "col3": ["widget_proxmox", "widget_portainer", "widget_tailscale", "widget_storage", "widget_ssd_cleaner", "widget_speedtest"]
+        "col3": ["widget_portainer", "widget_storage", "widget_ssd_cleaner", "widget_speedtest"]
     },
     "quick_icon_size_px": 34,
     "portainer_config": {
-        "title": "Portainer CE",
-        "subtitle": "Docker Container Fleet",
+        "title": "",
+        "subtitle": "",
         "lan_url": "",
         "ts_url": "",
         "click_action": "drawer"
