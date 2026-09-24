@@ -4285,8 +4285,13 @@
             display: flex;
             gap: 6px;
             border-bottom: 1px solid var(--border-glass);
-            padding: 0 20px;
+            padding: 0 16px;
             background: rgba(255, 255, 255, 0.02);
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-tab-btn {
@@ -4302,6 +4307,8 @@
             align-items: center;
             gap: 6px;
             transition: all 0.15s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
 
         .modal-tab-btn:hover {
@@ -5336,7 +5343,7 @@
             <div class="mobile-brand-text">
                 <div class="mobile-brand-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                     <span>HOMELAB <span style="color:var(--accent-blue)">HUB</span></span>
-                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.1.1') }} · Click to view updates">{{ app_version | default('v1.1.1') }}</span>
+                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.1.2') }} · Click to view updates">{{ app_version | default('v1.1.2') }}</span>
                     <span class="hub-update-available-flag" id="headerUpdateFlag" style="display:none" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Click to view update details and release notes">
                         <span class="flag-pulse-dot"></span> <span id="headerUpdateVer">Update Available</span>
                     </span>
@@ -6406,8 +6413,12 @@
                         <span>☀️ Change Weather Location</span>
                         <span style="color:#eab308;font-size:12px">Settings ⚙️</span>
                     </button>
+                    <button class="mobile-tool-btn" onclick="closeDrawer('mobileMenuDrawer'); openSettingsWithTab('backup');">
+                        <span>💾 Backup &amp; Restore Settings</span>
+                        <span style="color:var(--accent-blue);font-size:12px">Backup ↗</span>
+                    </button>
                     <button class="mobile-tool-btn" onclick="closeDrawer('mobileMenuDrawer'); openSettingsWithTab('updates');">
-                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.1.1') }}</span>)</span>
+                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.1.2') }}</span>)</span>
                         <span id="menuUpdateBadge" style="color:var(--accent-blue);font-size:12px">Check ↗</span>
                     </button>
                 </div>
@@ -10623,9 +10634,12 @@ function hasActiveHypervisor() {
 
 function resetWidgetsLayout() {
     const hasPve = hasActiveHypervisor();
-    const col3Widgets = hasPve 
-        ? ["widget_proxmox", "widget_portainer", "widget_tailscale", "widget_storage", "widget_speedtest"]
-        : ["widget_portainer", "widget_tailscale", "widget_storage", "widget_speedtest"];
+    const hasTs = Boolean(dashboardSettings.tailscale_domain || dashboardSettings.tailscale_ip);
+    const col3Widgets = [];
+    if (hasPve) col3Widgets.push("widget_proxmox");
+    col3Widgets.push("widget_portainer");
+    if (hasTs) col3Widgets.push("widget_tailscale");
+    col3Widgets.push("widget_storage", "widget_speedtest");
     const defaultLayout = {
         col1: ["cards_apps"],
         col2: ["widget_calendar", "widget_host_overview", "widget_telemetry_graphs", "widget_host_power"],
