@@ -7120,12 +7120,6 @@
     </div>
 </div>
 
-<!-- End of Drawers -->
-
-        </div>
-    </div>
-</div>
-
 <!-- ── Host Power, Metrics & Process Matrix Modal ─────────────── -->
 <div class="drawer-overlay" id="powerProcessModal" onclick="if(event.target===this)closeDrawer('powerProcessModal')">
     <div class="drawer-card" style="max-width:920px;width:96%">
@@ -7663,6 +7657,7 @@
 
         </div>
     </div>
+</div>
 <!-- ── Add / Edit Scheduled Task Modal ─────────────────── -->
 <div class="drawer-overlay" id="addTaskModal" onclick="if(event.target===this)closeDrawer('addTaskModal')">
     <div class="drawer-card" style="width:520px;max-width:94vw;max-height:90vh;display:flex;flex-direction:column">
@@ -17735,19 +17730,13 @@ async function saveMonitoredDrivesToServer(drives) {
 // ── Dedicated Homelab Agenda & Maintenance Operations Hub ──────────────────
 // ═════════════════════════════════════════════════════════════════════════════
 
+let _currentCalendarDate = _calDate || new Date();
+
 function renderAgendaViewHub() {
     renderAgendaHubCalendar();
     updateAgendaHubDayInspector(_selectedWidgetDate || getTodayDateStr());
     loadAgendaTasks();
     updateAgendaMilestones();
-}
-
-function getTodayDateStr() {
-    const now = new Date();
-    const yr = now.getFullYear();
-    const mo = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${yr}-${mo}-${day}`;
 }
 
 function jumpCalendarToToday() {

@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import json
+import uuid
 import re
 import calendar_manager
 import socket
