@@ -75,6 +75,7 @@ Homelab Hub adheres to [Semantic Versioning](https://semver.org/). Full version 
 
 | Version | Release Date | Key Focus & Highlights | Full Notes |
 | :--- | :--- | :--- | :---: |
+| **v1.1.1** | 2026-09-24 | **1-Click Container Updates & Dynamic Ecosystem**: Robust native container recreation for standalone/compose workloads, dynamic Portainer/Docker card, conditional Tailscale, remote URL resolution, dynamic agenda tasks, and energy telemetry precision. | [Details ↗](CHANGELOG.md#v111---2026-09-24) |
 | **v1.1.0** | 2026-09-20 | **Beszel-Style Silicon Waveforms & Live Telemetry Matrix**: High-resolution 1s real-time streaming graphs (CPU, RAM, Net, Disk I/O), per-core topology, live Docker container resource allocation table, full dark/light theme contrast parity. | [Details ↗](CHANGELOG.md#v110---2026-09-20) |
 | **v1.0.9** | 2026-09-20 | **Mobile Viewport Overhaul & Automated History**: Zero-overflow card constraints, responsive drive arrays, automated timeline logging, universal speedtest engine. | [Details ↗](CHANGELOG.md#v109---2026-09-20) |
 | **v1.0.8** | 2026-09-19 | **Proxmox Hypervisor Overhaul**: 1-click LXC/VM power controls, multi-node telemetry, Docker LAN reachability fix. | [Details ↗](CHANGELOG.md#v108---2026-09-19) |

@@ -4,6 +4,18 @@ All notable changes to **Homelab Hub** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [[v1.1.1](https://github.com/gitsheikhgit/homelab-hub/releases/tag/v1.1.1)] - 2026-09-24
+
+### Fixed
+- **Docker Container In-Place Recreation & 1-Click Update**: Fixed issue where container updates repeatedly showed "Update Available" because standalone containers or containers without accessible compose files were only restarted instead of being recreated with the newly pulled image. Implemented robust native container recreation preserving all volumes, mounts, ports, environment variables, restart policies, labels, and networks, with automatic rollback protection.
+- **Dynamic Portainer vs. Docker Fleet Adapter**: Widget dynamically detects whether Portainer is running. If not installed/running, dynamically switches to "Docker Fleet & Containers" with "Containers ↗" opening the container manager drawer instead of attempting to load unreachable port `:9000`.
+- **Conditional Tailscale Visibility**: Automatically hides the `#widget_tailscale` card and the top bar `[🔒 Tailscale Remote]` button on systems where Tailscale is unconfigured or disabled in settings.
+- **Remote Host Container Link Resolution**: Added dynamic URL hostname resolution (`resolveAppUrl`) across all container badges and drawer action links, ensuring links point to the server's real LAN IP rather than `127.0.0.1` or `localhost` when accessed from client devices.
+- **Dynamic Agenda Tasks & System Automation**: Replaced hardcoded static HTML tasks with dynamic persistence backed by `/api/tasks` and host timer auto-detection via `systemctl list-timers`.
+- **Energy Meter Telemetry Precision**: Eliminated premature rounding in energy calculations that trapped daily kWh and runtime hours at zero.
+
+---
+
 ## [[v1.1.0](https://github.com/gitsheikhgit/homelab-hub/releases/tag/v1.1.0)] - 2026-09-20
 
 ### Added

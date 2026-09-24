@@ -23,8 +23,14 @@ def is_aio_managed_container(name):
     return name.startswith("nextcloud-aio-") and name != "nextcloud-aio-mastercontainer"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CACHE_FILE = os.path.join(BASE_DIR, "docker_updates_cache.json")
-PINNED_FILE = os.path.join(BASE_DIR, "pinned_containers.json")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+if os.path.isdir(DATA_DIR):
+    CACHE_FILE = os.path.join(DATA_DIR, "docker_updates_cache.json")
+    PINNED_FILE = os.path.join(DATA_DIR, "pinned_containers.json")
+else:
+    CACHE_FILE = os.path.join(BASE_DIR, "docker_updates_cache.json")
+    PINNED_FILE = os.path.join(BASE_DIR, "pinned_containers.json")
+
 
 def get_pinned_containers():
     """Returns dict of pinned containers {name: reason}."""
@@ -282,10 +288,229 @@ def get_cached_updates():
     # If no cache exists, do a fast local check
     return check_all_container_updates(pull_remote=False)
 
+def recreate_container_native(container_name, target):
+    """
+    Natively recreates and restarts a Docker container using the Docker CLI/daemon.
+    Preserves all mounts, volume binds, ports, environment variables, restart policies,
+    networks, labels, and capabilities. Includes automatic backup and rollback.
+    """
+    img_ref = target.get("image_ref")
+    if not img_ref:
+        return {"status": "error", "message": f"No image reference found for container '{container_name}'"}
+
+    try:
+        # 1. Pull the newest image
+        pull_cmd = ["docker", "pull", img_ref]
+        subprocess.check_output(pull_cmd, stderr=subprocess.STDOUT, timeout=180)
+    except subprocess.CalledProcessError as e:
+        return {"status": "error", "container": container_name, "message": f"Failed to pull image {img_ref}: {e.output.decode('utf-8', errors='ignore') if hasattr(e, 'output') else str(e)}"}
+    except Exception as e:
+        return {"status": "error", "container": container_name, "message": f"Failed to pull image {img_ref}: {e}"}
+
+    try:
+        # 2. Inspect existing container
+        inspect_raw = subprocess.check_output(["docker", "inspect", container_name], stderr=subprocess.DEVNULL, timeout=12).decode("utf-8")
+        c_info = json.loads(inspect_raw)[0]
+    except Exception as e:
+        return {"status": "error", "container": container_name, "message": f"Failed to inspect container: {e}"}
+
+    old_img_id = c_info.get("Image", "")
+    raw_repo = img_ref.split(":")[0]
+
+    # Tag current image for instant rollback
+    if raw_repo and old_img_id:
+        try:
+            subprocess.run(["docker", "tag", old_img_id, f"{raw_repo}:rollback-backup"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+        except Exception:
+            pass
+
+    # Extract configuration parameters
+    # Ports
+    port_args = []
+    port_bindings = c_info.get("HostConfig", {}).get("PortBindings") or {}
+    for cont_port, bindings in port_bindings.items():
+        if bindings:
+            for b in bindings:
+                h_ip = b.get("HostIp", "")
+                h_port = b.get("HostPort", "")
+                if h_ip:
+                    port_args.extend(["-p", f"{h_ip}:{h_port}:{cont_port}"])
+                elif h_port:
+                    port_args.extend(["-p", f"{h_port}:{cont_port}"])
+
+    # Binds & Mounts
+    volume_args = []
+    binds = c_info.get("HostConfig", {}).get("Binds") or []
+    for b in binds:
+        volume_args.extend(["-v", b])
+    mounts = c_info.get("Mounts") or []
+    for m in mounts:
+        if m.get("Type") == "volume" and m.get("Name") and m.get("Destination"):
+            v_str = f"{m['Name']}:{m['Destination']}"
+            if m.get("RW") is False or m.get("Mode") == "ro":
+                v_str += ":ro"
+            if not any(v_str in b for b in volume_args):
+                volume_args.extend(["-v", v_str])
+
+    # Environment variables (preserve custom/user vars, avoid clobbering new image internal vars)
+    env_args = []
+    old_img_envs = set()
+    if old_img_id:
+        try:
+            old_img_raw = subprocess.check_output(["docker", "inspect", old_img_id], stderr=subprocess.DEVNULL, timeout=8).decode("utf-8")
+            old_img_envs = set(json.loads(old_img_raw)[0].get("Config", {}).get("Env") or [])
+        except Exception:
+            pass
+    container_envs = c_info.get("Config", {}).get("Env") or []
+    if old_img_envs:
+        user_envs = [e for e in container_envs if e not in old_img_envs]
+    else:
+        system_keys = {"PATH", "HOSTNAME", "HOME"}
+        user_envs = [e for e in container_envs if e.split("=")[0] not in system_keys]
+    for e in user_envs:
+        env_args.extend(["-e", e])
+
+    # Restart policy
+    restart_args = []
+    rp = c_info.get("HostConfig", {}).get("RestartPolicy", {}).get("Name")
+    if rp and rp != "no":
+        if rp == "on-failure":
+            max_retries = c_info.get("HostConfig", {}).get("RestartPolicy", {}).get("MaximumRetryCount", 0)
+            restart_args.extend(["--restart", f"on-failure:{max_retries}" if max_retries else "on-failure"])
+        else:
+            restart_args.extend(["--restart", rp])
+
+    # Networks
+    net_args = []
+    net_mode = c_info.get("HostConfig", {}).get("NetworkMode") or "default"
+    networks = list(c_info.get("NetworkSettings", {}).get("Networks", {}).keys())
+    if net_mode.startswith("container:"):
+        net_args.extend(["--network", net_mode])
+    elif networks:
+        net_args.extend(["--network", networks[0]])
+    elif net_mode and net_mode not in ("default", "bridge"):
+        net_args.extend(["--network", net_mode])
+
+    # Privileged & Capabilities
+    priv_args = []
+    if c_info.get("HostConfig", {}).get("Privileged"):
+        priv_args.append("--privileged")
+    for cap in c_info.get("HostConfig", {}).get("CapAdd") or []:
+        priv_args.extend(["--cap-add", cap])
+    for cap in c_info.get("HostConfig", {}).get("CapDrop") or []:
+        priv_args.extend(["--cap-drop", cap])
+
+    # Devices
+    device_args = []
+    for dev in c_info.get("HostConfig", {}).get("Devices") or []:
+        device_args.extend(["--device", f"{dev.get('PathOnHost')}:{dev.get('PathInContainer')}"])
+
+    # Labels
+    label_args = []
+    labels = c_info.get("Config", {}).get("Labels") or {}
+    for k, v in labels.items():
+        label_args.extend(["-l", f"{k}={v}"])
+
+    # User & WorkDir
+    user_args = []
+    if c_info.get("Config", {}).get("User"):
+        user_args.extend(["--user", c_info["Config"]["User"]])
+    if c_info.get("Config", {}).get("WorkingDir"):
+        user_args.extend(["--workdir", c_info["Config"]["WorkingDir"]])
+
+    # Healthcheck
+    health_args = []
+    hc = c_info.get("Config", {}).get("Healthcheck")
+    if hc:
+        test = hc.get("Test")
+        if test and len(test) > 1:
+            if test[0] == "CMD-SHELL":
+                health_args.extend(["--health-cmd", test[1]])
+            elif test[0] == "CMD":
+                health_args.extend(["--health-cmd", " ".join(test[1:])])
+        if hc.get("Interval"):
+            health_args.extend(["--health-interval", f"{int(hc['Interval'] / 1e9)}s"])
+        if hc.get("Timeout"):
+            health_args.extend(["--health-timeout", f"{int(hc['Timeout'] / 1e9)}s"])
+        if hc.get("StartPeriod"):
+            health_args.extend(["--health-start-period", f"{int(hc['StartPeriod'] / 1e9)}s"])
+        if hc.get("Retries"):
+            health_args.extend(["--health-retries", str(hc["Retries"])])
+
+    # Build docker run command
+    run_cmd = ["docker", "run", "-d", "--name", container_name]
+    run_cmd.extend(restart_args)
+    run_cmd.extend(net_args)
+    run_cmd.extend(port_args)
+    run_cmd.extend(volume_args)
+    run_cmd.extend(env_args)
+    run_cmd.extend(priv_args)
+    run_cmd.extend(device_args)
+    run_cmd.extend(user_args)
+    run_cmd.extend(health_args)
+    run_cmd.extend(label_args)
+    run_cmd.append(img_ref)
+
+    # Atomic swap with backup & rollback
+    ts = int(time.time())
+    backup_name = f"{container_name}_backup_{ts}"
+
+    try:
+        # Stop existing container
+        subprocess.run(["docker", "stop", container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=40)
+        # Rename existing container to backup
+        subprocess.run(["docker", "rename", container_name, backup_name], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+    except Exception as e:
+        return {"status": "error", "container": container_name, "message": f"Failed to prepare container for recreation: {e}"}
+
+    # Start new container
+    try:
+        new_cid = subprocess.check_output(run_cmd, stderr=subprocess.STDOUT, timeout=90).decode("utf-8").strip()
+        # Connect secondary networks if any
+        if networks and len(networks) > 1:
+            for sec_net in networks[1:]:
+                subprocess.run(["docker", "network", "connect", sec_net, container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=8)
+
+        # Verify new container is running or starting
+        time.sleep(1)
+        stat = subprocess.check_output(["docker", "inspect", "-f", "{{.State.Status}}", container_name], stderr=subprocess.DEVNULL, timeout=5).decode().strip()
+        if stat in ("running", "created", "restarting"):
+            # Clean up backup container
+            subprocess.run(["docker", "rm", "-f", backup_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            
+            # Immediately refresh cache
+            check_all_container_updates(pull_remote=False)
+
+            return {
+                "status": "success",
+                "container": container_name,
+                "type": "native_recreate",
+                "message": f"Successfully updated and restarted {container_name} on newest image."
+            }
+        else:
+            raise RuntimeError(f"Container status is '{stat}' after start")
+
+    except Exception as e:
+        # ROLLBACK: remove failed new container and restore backup
+        try:
+            subprocess.run(["docker", "rm", "-f", container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            subprocess.run(["docker", "rename", backup_name, container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            subprocess.run(["docker", "start", container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
+        except Exception as rb_ex:
+            print(f"Rollback error for {container_name}: {rb_ex}")
+
+        err_detail = e.output.decode("utf-8", errors="ignore") if hasattr(e, 'output') else str(e)
+        return {
+            "status": "error",
+            "container": container_name,
+            "message": f"Recreation failed, rolled back to original container: {err_detail}"
+        }
+
 def recreate_container(container_name):
     """
     Safely recreate and start a container with its newest image.
-    Uses 'docker compose up -d' when compose-managed to preserve all mounts, envs, and network settings.
+    Uses 'docker compose up -d' when compose-managed and compose file exists.
+    Otherwise uses native safe container recreation preserving all configs.
     """
     containers = get_all_container_configs()
     target = next((c for c in containers if c["name"] == container_name), None)
@@ -299,8 +524,8 @@ def recreate_container(container_name):
             "message": "Nextcloud AIO child containers must be updated via the Nextcloud AIO management portal (https://<ip>:8080)."
         }
 
-    # 1. Compose Managed Containers
-    if target["is_compose"]:
+    # 1. Compose Managed Containers (when compose file exists and is accessible)
+    if target.get("is_compose") and target.get("compose_file") and os.path.exists(target["compose_file"]):
         c_file = target["compose_file"]
         c_service = target["compose_service"] or target["name"]
         try:
@@ -315,7 +540,6 @@ def recreate_container(container_name):
             except Exception:
                 pass
 
-            # 1. Pull the newest image
             pull_cmd = ["docker", "compose", "-f", c_file, "pull", c_service]
             try:
                 pull_out = subprocess.check_output(pull_cmd, stderr=subprocess.STDOUT, timeout=90).decode("utf-8", errors="ignore")
@@ -327,28 +551,19 @@ def recreate_container(container_name):
                 else:
                     raise e
             
-            # 2. Recreate and start with new image
-            up_cmd = ["docker", "compose", "-f", c_file, "up", "-d", c_service]
+            up_cmd = ["docker", "compose", "-f", c_file, "up", "-d", "--force-recreate", c_service]
             try:
                 up_out = subprocess.check_output(up_cmd, stderr=subprocess.STDOUT, timeout=90).decode("utf-8", errors="ignore")
             except subprocess.CalledProcessError as e:
                 err_msg = e.output.decode("utf-8", errors="ignore") if hasattr(e, 'output') else str(e)
                 if "permission denied" in err_msg.lower():
-                    up_cmd = ["sudo", "docker", "compose", "-f", c_file, "up", "-d", c_service]
+                    up_cmd = ["sudo", "docker", "compose", "-f", c_file, "up", "-d", "--force-recreate", c_service]
                     up_out = subprocess.check_output(up_cmd, stderr=subprocess.STDOUT, timeout=90).decode("utf-8", errors="ignore")
                 else:
                     raise e
             
-            # Update cache entry for this container
-            cached = get_cached_updates() or {"containers": {}}
-            if container_name in cached.get("containers", {}):
-                cached["containers"][container_name]["update_available"] = False
-                cached["containers"][container_name]["message"] = "Updated to newest image and restarted."
-                try:
-                    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-                        json.dump(cached, f, indent=2)
-                except Exception:
-                    pass
+            # Immediately refresh cache
+            check_all_container_updates(pull_remote=False)
 
             return {
                 "status": "success",
@@ -358,44 +573,11 @@ def recreate_container(container_name):
                 "pull_output": pull_out.strip(),
                 "up_output": up_out.strip()
             }
-        except subprocess.CalledProcessError as e:
-            return {
-                "status": "error",
-                "container": container_name,
-                "message": e.output.decode("utf-8", errors="ignore") if hasattr(e, 'output') else str(e)
-            }
         except Exception as e:
-            return {"status": "error", "container": container_name, "message": str(e)}
+            print(f"Compose recreate failed for {container_name}, falling back to native recreation: {e}")
 
-    # 2. Standalone Containers
-    img_ref = target["image_ref"]
-    if not img_ref:
-        return {"status": "error", "message": "No image reference found for standalone container."}
-        
-    try:
-        # Pull latest image
-        subprocess.check_output(["docker", "pull", img_ref], stderr=subprocess.STDOUT, timeout=90)
-        # Restart container
-        subprocess.check_output(["docker", "restart", container_name], timeout=35)
-        
-        cached = get_cached_updates() or {"containers": {}}
-        if container_name in cached.get("containers", {}):
-            cached["containers"][container_name]["update_available"] = False
-            cached["containers"][container_name]["message"] = "Restarted with newest image"
-            try:
-                with open(CACHE_FILE, "w", encoding="utf-8") as f:
-                    json.dump(cached, f, indent=2)
-            except Exception:
-                pass
-
-        return {
-            "status": "success",
-            "container": container_name,
-            "type": "standalone",
-            "message": f"Pulled newest image {img_ref} and restarted {container_name}."
-        }
-    except Exception as e:
-        return {"status": "error", "container": container_name, "message": str(e)}
+    # 2. Native Safe Container Recreation (works for standalone, CasaOS, Portainer, or docker containers without mounted compose files)
+    return recreate_container_native(container_name, target)
 
 def update_all_containers():
     """Update all containers that have an update available."""

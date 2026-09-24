@@ -17,7 +17,7 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 
 import task_manager
 from card_manager import (
@@ -1715,7 +1715,9 @@ def api_stats():
     
     docker_updates = {}
     try:
-        updates_cache_file = os.path.join(BASE_DIR, "docker_updates_cache.json")
+        updates_cache_file = os.path.join(DATA_DIR, "docker_updates_cache.json")
+        if not os.path.exists(updates_cache_file):
+            updates_cache_file = os.path.join(BASE_DIR, "docker_updates_cache.json")
         if os.path.exists(updates_cache_file):
             with open(updates_cache_file, "r") as f:
                 docker_updates = json.load(f).get("containers", {})

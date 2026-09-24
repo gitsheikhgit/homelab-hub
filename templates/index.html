@@ -5328,7 +5328,7 @@
             <div class="mobile-brand-text">
                 <div class="mobile-brand-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                     <span>HOMELAB <span style="color:var(--accent-blue)">HUB</span></span>
-                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.1.0') }} · Click to view updates">{{ app_version | default('v1.1.0') }}</span>
+                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.1.1') }} · Click to view updates">{{ app_version | default('v1.1.1') }}</span>
                     <span class="hub-update-available-flag" id="headerUpdateFlag" style="display:none" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Click to view update details and release notes">
                         <span class="flag-pulse-dot"></span> <span id="headerUpdateVer">Update Available</span>
                     </span>
@@ -6399,7 +6399,7 @@
                         <span style="color:#eab308;font-size:12px">Settings ⚙️</span>
                     </button>
                     <button class="mobile-tool-btn" onclick="closeDrawer('mobileMenuDrawer'); openSettingsWithTab('updates');">
-                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.1.0') }}</span>)</span>
+                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.1.1') }}</span>)</span>
                         <span id="menuUpdateBadge" style="color:var(--accent-blue);font-size:12px">Check ↗</span>
                     </button>
                 </div>
@@ -8336,7 +8336,7 @@
                         <div>
                             <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
                                 <span>🛰️</span> Homelab Hub
-                                <span id="hubCurrentVersionBadge" style="background:rgba(59,130,246,0.25);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700">{{ app_version | default('v1.1.0') }}</span>
+                                <span id="hubCurrentVersionBadge" style="background:rgba(59,130,246,0.25);border:1px solid rgba(59,130,246,0.5);color:#93c5fd;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700">{{ app_version | default('v1.1.1') }}</span>
                             </div>
                             <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="hubUpdateStatusText">
                                 Automatic update sentinel active. Check for newer Docker releases anytime.
