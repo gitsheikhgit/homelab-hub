@@ -17,8 +17,13 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-APP_VERSION = "1.1.1"
+APP_VERSION = "1.1.2"
 
+from backup_manager import (
+    generate_backup_package,
+    inspect_backup_package,
+    restore_backup_package
+)
 import task_manager
 from card_manager import (
     UPLOAD_DIR,
@@ -3196,6 +3201,62 @@ def api_auto_create_cards():
         return jsonify(result)
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+# ── Backup & Migration Management ──────────────────────────────────────────
+@app.route("/api/backup/export", methods=["GET"])
+def api_backup_export():
+    try:
+        pkg = generate_backup_package()
+        hostname = pkg.get("system_fingerprint", {}).get("hostname", "homelab")
+        date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"homelab_hub_backup_{hostname}_{date_str}.json"
+        json_data = json.dumps(pkg, indent=2)
+        return Response(
+            json_data,
+            mimetype="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Type": "application/json"
+            }
+        )
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/backup/inspect", methods=["POST"])
+def api_backup_inspect():
+    try:
+        pkg = None
+        if "backup_file" in request.files:
+            file = request.files["backup_file"]
+            pkg = json.load(file)
+        else:
+            payload = request.get_json(silent=True) or {}
+            pkg = payload.get("backup") or payload
+        if not pkg:
+            return jsonify({"status": "error", "message": "No backup data provided"}), 400
+        result = inspect_backup_package(pkg)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Failed to inspect backup: {e}"}), 500
+
+@app.route("/api/backup/restore", methods=["POST"])
+def api_backup_restore():
+    try:
+        pkg = None
+        if "backup_file" in request.files:
+            file = request.files["backup_file"]
+            pkg = json.load(file)
+        else:
+            payload = request.get_json(silent=True) or {}
+            pkg = payload.get("backup") or payload
+        if not pkg:
+            return jsonify({"status": "error", "message": "No backup data provided"}), 400
+        preserve_host = request.args.get("preserve_host", "true").lower() == "true"
+        result = restore_backup_package(pkg, preserve_lan_host=preserve_host)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Failed to restore backup: {e}"}), 500
+
 
 # ── System Maintenance Tasks & Live Timers ──────────────────────────────────
 @app.route("/api/system/tasks", methods=["GET"])
