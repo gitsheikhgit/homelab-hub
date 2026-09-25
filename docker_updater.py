@@ -154,6 +154,20 @@ def check_single_container(c, pull_remote=False):
                 pull_result_msg = "Newer image pulled from registry."
         except subprocess.TimeoutExpired:
             pull_result_msg = "Registry check timed out."
+        except subprocess.CalledProcessError as e:
+            err_str = e.output.decode("utf-8", errors="ignore") if hasattr(e, 'output') else str(e)
+            # If image has no remote registry namespace (like homelab-hub:latest), attempt fallback to ghcr.io
+            if img_ref in ["homelab-hub", "homelab-hub:latest"] or "homelab-hub" in name.lower():
+                try:
+                    fb_ref = "ghcr.io/gitsheikhgit/homelab-hub:latest"
+                    fb_out = subprocess.check_output(["docker", "pull", fb_ref], stderr=subprocess.STDOUT, timeout=60).decode("utf-8", errors="ignore")
+                    subprocess.run(["docker", "tag", fb_ref, img_ref], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    if "Downloaded newer image" in fb_out:
+                        pull_result_msg = "Newer image pulled from GHCR."
+                except Exception:
+                    pull_result_msg = "Custom/local image (no remote registry)."
+            else:
+                pull_result_msg = f"Registry check: {err_str[:60]}"
         except Exception as e:
             pull_result_msg = f"Registry check error: {e}"
 
@@ -298,12 +312,36 @@ def recreate_container_native(container_name, target):
     if not img_ref:
         return {"status": "error", "message": f"No image reference found for container '{container_name}'"}
 
+    fallback_ref = None
+    if img_ref in ["homelab-hub", "homelab-hub:latest"] or "homelab-hub" in container_name.lower():
+        fallback_ref = "ghcr.io/gitsheikhgit/homelab-hub:latest"
+
     try:
         # 1. Pull the newest image
         pull_cmd = ["docker", "pull", img_ref]
         subprocess.check_output(pull_cmd, stderr=subprocess.STDOUT, timeout=180)
     except subprocess.CalledProcessError as e:
-        return {"status": "error", "container": container_name, "message": f"Failed to pull image {img_ref}: {e.output.decode('utf-8', errors='ignore') if hasattr(e, 'output') else str(e)}"}
+        err_out = e.output.decode('utf-8', errors='ignore') if hasattr(e, 'output') else str(e)
+        pulled_fallback = False
+        if fallback_ref and ("pull access denied" in err_out.lower() or "repository does not exist" in err_out.lower()):
+            try:
+                subprocess.check_output(["docker", "pull", fallback_ref], stderr=subprocess.STDOUT, timeout=180)
+                subprocess.run(["docker", "tag", fallback_ref, img_ref], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                pulled_fallback = True
+            except Exception as fb_err:
+                return {
+                    "status": "error",
+                    "container": container_name,
+                    "message": f"Failed to pull image '{img_ref}' from Docker Hub, and fallback '{fallback_ref}' from GHCR failed: {fb_err}"
+                }
+        if not pulled_fallback:
+            if "pull access denied" in err_out.lower() or "repository does not exist" in err_out.lower():
+                return {
+                    "status": "error",
+                    "container": container_name,
+                    "message": f"Image '{img_ref}' is not on Docker Hub or requires login. If this is a local build, rebuild it using 'docker build' or tag it with a remote registry."
+                }
+            return {"status": "error", "container": container_name, "message": f"Failed to pull image {img_ref}: {err_out.strip()}"}
     except Exception as e:
         return {"status": "error", "container": container_name, "message": f"Failed to pull image {img_ref}: {e}"}
 

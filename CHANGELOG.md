@@ -4,6 +4,21 @@ All notable changes to **Homelab Hub** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [[v1.2.0](https://github.com/gitsheikhgit/homelab-hub/releases/tag/v1.2.0)] - 2026-09-25
+
+### Added
+- **Next-Gen Modular Settings Command Center**: Redesigned settings architecture with a split glassmorphic layout, grouped categories (General, Automation & Feeds, Maintenance), live real-time settings search filter, and responsive tab navigation.
+- **Dedicated Integrations Hub**: Centralized configuration pane for Portainer CE, Proxmox VE hypervisors, Tailscale mesh VPN, and LAN host networking with instant connection testing and auto-discovery triggers.
+- **Native Automated Tasks & Cron Engine**: Added complete task lifecycle management (`/api/tasks`) with manual task creation, custom scheduling tags (Daily, Weekly, Monthly), 1-click auto-detection of host systemd timers, and dynamic dashboard agenda sync.
+- **Unified Version & Container Update Manager**: Real-time GitHub Container Registry update sentinel with 1-click update checks, clipboard copy of zero-downtime pull commands, and automated release channel detection (`latest`, `v1`, immutable version tags).
+- **Comprehensive Privacy & Demo Mode Sanitization**: Built-in sanitization layer (`?demo=1`) that scrubs private local hostnames, personal tailnets, and home network IPs from all public screenshots, showcases, and diagnostic views.
+
+### Fixed
+- **Settings Modal Tab Activation & CSS Stacking**: Resolved tab pane activation conflicts and flexbox height clipping in `#tabPaneTasks` and `#tabPaneIntegrations`.
+- **System Version Harmonization**: Synchronized version identifiers to `v1.2.0` across backend modules (`app.py`, `card_manager.py`, `backup_manager.py`, `docker_updater.py`) and frontend headers/badges.
+
+---
+
 ## [[v1.1.1](https://github.com/gitsheikhgit/homelab-hub/releases/tag/v1.1.1)] - 2026-09-24
 
 ### Fixed

@@ -18,7 +18,7 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-APP_VERSION = "1.1.2"
+APP_VERSION = "1.2.0"
 
 from backup_manager import (
     generate_backup_package,

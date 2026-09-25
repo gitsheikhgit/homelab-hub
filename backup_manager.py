@@ -161,7 +161,7 @@ def generate_backup_package():
 
     package = {
         "format": "homelab_hub_backup",
-        "version": "1.1.2",
+        "version": "1.2.0",
         "created_at": datetime.now().isoformat(),
         "system_fingerprint": fingerprint,
         "settings": settings,

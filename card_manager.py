@@ -65,7 +65,7 @@ DEFAULT_SETTINGS = {
     "widgets_layout": {
         "col1": ["cards_apps"],
         "col2": ["widget_calendar", "widget_host_overview", "widget_host_power"],
-        "col3": ["widget_portainer", "widget_storage", "widget_ssd_cleaner", "widget_speedtest"]
+        "col3": ["widget_storage", "widget_ssd_cleaner", "widget_speedtest"]
     },
     "quick_icon_size_px": 34,
     "portainer_config": {

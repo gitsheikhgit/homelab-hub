@@ -41,7 +41,6 @@
       "widget_host_power"
     ],
     "col3": [
-      "widget_portainer",
       "widget_storage",
       "widget_ssd_cleaner",
       "widget_speedtest"

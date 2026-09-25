@@ -438,7 +438,7 @@
             color: #0f172a !important;
         }
 
-        /* ── Modal Tabs Navigation ── */
+        /* ── Modal Tabs Navigation & Settings Sidebar (Light Mode) ── */
         :root[data-active-theme="light"] .modal-tabs-nav {
             border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
             background: #f8fafc !important;
@@ -453,6 +453,30 @@
             border-bottom: 2px solid #2563eb !important;
             background: rgba(37, 99, 235, 0.05) !important;
             font-weight: 600 !important;
+        }
+
+        :root[data-active-theme="light"] .settings-nav-sidebar {
+            background: #f1f5f9 !important;
+            border-right: 1px solid #e2e8f0 !important;
+        }
+
+        :root[data-active-theme="light"] .settings-nav-item {
+            color: #475569 !important;
+        }
+
+        :root[data-active-theme="light"] .settings-nav-item:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        :root[data-active-theme="light"] .settings-nav-item.active {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: rgba(2, 132, 199, 0.3) !important;
+        }
+
+        :root[data-active-theme="light"] .settings-nav-item.active .settings-nav-sub {
+            color: #0369a1 !important;
         }
 
         /* ── Form Controls & Inputs ── */
@@ -4320,12 +4344,616 @@
             border-bottom-color: var(--accent-blue);
         }
 
-        .modal-tab-pane {
-            display: none;
+        /* ══════════════════════════════════════════════════════════════════
+           SETTINGS MODAL — MODERN SCROLLER-FREE DESIGN SYSTEM
+        ══════════════════════════════════════════════════════════════════ */
+        @keyframes settingsPaneIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
+        .settings-dialog-card {
+            width: 1040px !important;
+            max-width: 96vw !important;
+            height: 740px !important;
+            max-height: 89vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 16px !important;
+            box-shadow:
+                0 40px 100px rgba(0,0,0,0.85),
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 0 80px rgba(59,130,246,0.08) !important;
+            background: rgba(9, 13, 25, 0.98) !important;
+            overflow: hidden !important;
+        }
+
+        .settings-modal-head-bar {
+            padding: 13px 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.015);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .settings-head-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+        .settings-head-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .settings-head-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-active-breadcrumb {
+            font-size: 11px;
+            font-weight: 500;
+            color: #93c5fd;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            padding: 1px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .settings-head-search {
+            position: relative;
+            width: 260px;
+            max-width: 35vw;
+        }
+        .settings-head-search input {
+            width: 100%;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            color: #fff;
+            font-size: 12px;
+            padding: 0 10px 0 28px;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+        .settings-head-search input:focus {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .settings-head-search-icon {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: rgba(148, 163, 184, 0.7);
+            pointer-events: none;
+        }
+
+        .settings-modal-layout {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* ── Sidebar: Compact, sleek, NO SCROLLER on desktop ── */
+        .settings-nav-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: rgba(6, 9, 18, 0.65);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .settings-nav-sidebar::-webkit-scrollbar { width: 3px; }
+        .settings-nav-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+        .settings-nav-section-title {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: rgba(148, 163, 184, 0.45);
+            letter-spacing: 1.1px;
+            padding: 8px 10px 2px;
+            text-transform: uppercase;
+        }
+
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: rgba(148, 163, 184, 0.85);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.16s ease;
+            position: relative;
+            width: 100%;
+            height: 35px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        .settings-nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f1f5f9;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+        .settings-nav-item.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.18), rgba(99, 102, 241, 0.08));
+            color: #ffffff;
+            border-color: rgba(59, 130, 246, 0.32);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.12);
+        }
+        .settings-nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            bottom: 5px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: linear-gradient(180deg, #60a5fa, #a78bfa);
+            box-shadow: 0 0 8px rgba(96, 165, 250, 0.7);
+        }
+
+        .snav-left-group {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            flex: 1;
+        }
+        .snav-icon-pill {
+            width: 25px;
+            height: 25px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .settings-nav-item:hover .snav-icon-pill { transform: scale(1.1); }
+        .snav-blue   { background: linear-gradient(145deg,#1d4ed8,#3b82f6); box-shadow: 0 2px 6px rgba(59,130,246,0.35); }
+        .snav-violet { background: linear-gradient(145deg,#6d28d9,#8b5cf6); box-shadow: 0 2px 6px rgba(139,92,246,0.35); }
+        .snav-indigo { background: linear-gradient(145deg,#3730a3,#6366f1); box-shadow: 0 2px 6px rgba(99,102,241,0.35); }
+        .snav-green  { background: linear-gradient(145deg,#047857,#10b981); box-shadow: 0 2px 6px rgba(16,185,129,0.35); }
+        .snav-amber  { background: linear-gradient(145deg,#b45309,#f59e0b); box-shadow: 0 2px 6px rgba(245,158,11,0.35); }
+        .snav-cyan   { background: linear-gradient(145deg,#0e7490,#06b6d4); box-shadow: 0 2px 6px rgba(6,182,212,0.35); }
+        .snav-orange { background: linear-gradient(145deg,#c2410c,#f97316); box-shadow: 0 2px 6px rgba(249,115,22,0.35); }
+        .snav-rose   { background: linear-gradient(145deg,#9f1239,#f43f5e); box-shadow: 0 2px 6px rgba(244,63,94,0.35); }
+
+        .settings-nav-label {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .settings-nav-item.active .settings-nav-label {
+            font-weight: 600;
+        }
+
+        .settings-nav-pill-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(203, 213, 225, 0.7);
+            flex-shrink: 0;
+        }
+        .settings-nav-item.active .settings-nav-pill-badge {
+            background: rgba(59, 130, 246, 0.25);
+            color: #93c5fd;
+        }
+        .snav-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 6px #4ade80;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+
+        /* ── Content Panel ── */
+        .settings-modal-content-panel {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 22px 28px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .settings-modal-content-panel::-webkit-scrollbar { width: 5px; }
+        .settings-modal-content-panel::-webkit-scrollbar-track { background: transparent; }
+        .settings-modal-content-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+        .settings-modal-content-panel::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+        /* Tab pane: unified clean show/hide */
+        .modal-tab-pane {
+            display: none !important;
+            flex-direction: column;
+            width: 100%;
+        }
         .modal-tab-pane.active {
-            display: block;
+            display: flex !important;
+            flex-direction: column;
+            width: 100%;
+            animation: settingsPaneIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* ── Section header inside content pane ── */
+        .spane-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-wrap: wrap;
+        }
+        .spane-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .spane-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .spane-header-text h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f8fafc;
+            margin: 0;
+            letter-spacing: -0.2px;
+        }
+        .spane-header-text p {
+            font-size: 11.5px;
+            color: rgba(148, 163, 184, 0.85);
+            margin: 2px 0 0;
+        }
+        .spane-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ── Mini stats row for panes ── */
+        .spane-stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .spane-stat-card {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .spane-stat-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(148, 163, 184, 0.65);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .spane-stat-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── General Glass Card inside Panes ── */
+        .scard {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.075);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        .scard:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.042);
+        }
+        .scard-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .scard-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .scard-desc {
+            font-size: 11px;
+            color: rgba(148, 163, 184, 0.8);
+            margin-top: 2px;
+            line-height: 1.45;
+        }
+
+        /* ── Task rows inside Automated Tasks ── */
+        .stask-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            transition: all 0.15s ease;
+            margin-bottom: 8px;
+        }
+        .stask-item:hover {
+            background: rgba(255, 255, 255, 0.055);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+        .stask-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+        }
+
+        /* ── Template Card Pills ── */
+        .template-pills-wrap {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .template-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 6px 11px;
+            font-size: 11px;
+            color: rgba(203, 213, 225, 0.85);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .template-pill:hover {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.35);
+            color: #93c5fd;
+            transform: translateY(-1px);
+        }
+
+        /* ── Settings Modal Responsive Layout Rules ── */
+        .settings-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .settings-tasks-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .integration-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .settings-dialog-card {
+                width: 98vw !important;
+                max-width: calc(100vw - 10px) !important;
+                height: 92vh !important;
+                height: 92dvh !important;
+                max-height: calc(100dvh - 16px) !important;
+                border-radius: 14px !important;
+                margin: auto !important;
+            }
+            .settings-modal-head-bar {
+                padding: 10px 14px !important;
+                gap: 8px !important;
+            }
+            .settings-head-title {
+                font-size: 13.5px !important;
+            }
+            .settings-active-breadcrumb {
+                font-size: 10.5px !important;
+                padding: 1px 6px !important;
+            }
+            .settings-head-search { display: none !important; }
+            .settings-modal-layout {
+                flex-direction: column !important;
+                height: 100% !important;
+                min-height: 0 !important;
+            }
+            .settings-nav-sidebar {
+                width: 100% !important;
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+                flex-direction: row !important;
+                gap: 5px !important;
+                padding: 8px 10px !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                flex-shrink: 0 !important;
+                background: rgba(8, 12, 22, 0.95) !important;
+            }
+            .settings-nav-sidebar::-webkit-scrollbar { display: none !important; }
+            .settings-nav-section-title { display: none !important; }
+            .settings-nav-item {
+                padding: 6px 11px !important;
+                width: auto !important;
+                flex-shrink: 0 !important;
+                height: 36px !important;
+                border-radius: 8px !important;
+            }
+            .settings-nav-label { font-size: 11.5px !important; }
+            .snav-icon-pill { width: 22px !important; height: 22px !important; font-size: 12px !important; }
+            .settings-nav-item.active::before {
+                left: 8px !important;
+                right: 8px !important;
+                bottom: 0 !important;
+                top: auto !important;
+                width: auto !important;
+                height: 2.5px !important;
+                border-radius: 3px 3px 0 0 !important;
+            }
+            .settings-modal-content-panel {
+                padding: 14px 14px !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .integration-form-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .settings-stats-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 6px !important;
+            }
+            .settings-stats-grid > div {
+                padding: 8px 8px !important;
+                gap: 6px !important;
+            }
+            .settings-stats-grid > div > span {
+                font-size: 16px !important;
+            }
+            .settings-stats-grid > div > div > div:first-child {
+                font-size: 9px !important;
+                letter-spacing: 0 !important;
+            }
+            .settings-stats-grid > div > div > div:last-child {
+                font-size: 14px !important;
+            }
+            .settings-tasks-controls {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .settings-tasks-controls > div:first-child {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+            .settings-tasks-controls > div:last-child {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                width: 100% !important;
+                gap: 6px !important;
+            }
+            .settings-tasks-controls > div:last-child > button {
+                width: 100% !important;
+                padding: 7px 6px !important;
+                font-size: 11px !important;
+                justify-content: center !important;
+                text-align: center !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .settings-dialog-card {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                border-radius: 0 !important;
+                border: none !important;
+            }
+            .settings-head-title > span:first-child {
+                display: none !important;
+            }
+            .settings-head-title::before {
+                content: 'Settings';
+                font-weight: 700;
+            }
+            .settings-stats-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+            .settings-stats-grid > div:last-child {
+                grid-column: span 2 !important;
+            }
+            .settings-task-card {
+                flex-wrap: wrap !important;
+                padding: 10px !important;
+                gap: 8px !important;
+            }
+            .settings-task-actions {
+                width: 100% !important;
+                justify-content: flex-end !important;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                padding-top: 6px !important;
+                margin-top: 2px !important;
+            }
         }
 
         .widget-toggle-row {
@@ -5343,7 +5971,7 @@
             <div class="mobile-brand-text">
                 <div class="mobile-brand-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                     <span>HOMELAB <span style="color:var(--accent-blue)">HUB</span></span>
-                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.1.2') }} · Click to view updates">{{ app_version | default('v1.1.2') }}</span>
+                    <span class="app-version-pill" id="headerAppVersionBadge" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Homelab Hub {{ app_version | default('v1.2.0') }} · Click to view updates">{{ app_version | default('v1.2.0') }}</span>
                     <span class="hub-update-available-flag" id="headerUpdateFlag" style="display:none" onclick="event.stopPropagation(); openSettingsWithTab('updates')" title="Click to view update details and release notes">
                         <span class="flag-pulse-dot"></span> <span id="headerUpdateVer">Update Available</span>
                     </span>
@@ -5431,7 +6059,7 @@
                 <span class="net-status-dot lan"></span>
                 <span class="net-label" id="lblNetLan">🏠 LAN <span class="net-host-hint" id="hintNetLan">Local</span></span>
             </button>
-            <button class="net-toggle-btn" id="btnNetTs" onclick="setNetworkMode('ts')" title="Switch Portal Routing to Remote Tailscale Mode">
+            <button class="net-toggle-btn" id="btnNetTs" onclick="setNetworkMode('ts')" title="Switch Portal Routing to Remote Tailscale Mode" style="display:none">
                 <span class="net-status-dot ts"></span>
                 <span class="net-label" id="lblNetTs">🔒 Tailscale <span class="net-host-hint" id="hintNetTs">Remote</span></span>
             </button>
@@ -6418,7 +7046,7 @@
                         <span style="color:var(--accent-blue);font-size:12px">Backup ↗</span>
                     </button>
                     <button class="mobile-tool-btn" onclick="closeDrawer('mobileMenuDrawer'); openSettingsWithTab('updates');">
-                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.1.2') }}</span>)</span>
+                        <span>🛰️ Version &amp; Updates (<span id="menuAppVersionText">{{ app_version | default('v1.2.0') }}</span>)</span>
                         <span id="menuUpdateBadge" style="color:var(--accent-blue);font-size:12px">Check ↗</span>
                     </button>
                 </div>
@@ -7907,41 +8535,101 @@
 
 <!-- ── Appearance, Wallpaper & Settings Modal ────────────────────── -->
 <div class="drawer-overlay" id="appearanceModal" onclick="if(event.target===this)closeAppearanceModal()">
-    <div class="drawer-card" style="width:600px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column">
-        <div class="drawer-head">
-            <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-size:22px">⚙️</span>
-                <div>
-                    <div style="font-size:16px;font-weight:700;color:#fff">Dashboard & System Settings</div>
-                    <div style="font-size:12px;color:var(--text-muted)">Customize appearance, system identity, and active widgets</div>
+    <div class="drawer-card settings-dialog-card">
+        <div class="settings-modal-head-bar">
+            <div class="settings-head-left">
+                <span style="font-size:22px;filter:drop-shadow(0 2px 8px rgba(59,130,246,0.5))">⚙️</span>
+                <div class="settings-head-title-wrap">
+                    <div class="settings-head-title">
+                        <span>Dashboard &amp; System Settings</span>
+                        <span class="settings-active-breadcrumb" id="settingsActiveBreadcrumb">
+                            <span>🎨</span> Appearance &amp; Dock
+                        </span>
+                    </div>
                 </div>
             </div>
-            <button class="btn-ctrl" onclick="closeAppearanceModal()">✕ Close</button>
-        </div>
 
-        <!-- Settings Modal Navigation Tabs -->
-        <div class="modal-tabs-nav">
-            <button type="button" class="modal-tab-btn active" id="tabBtnTheme" onclick="switchSettingsTab('theme')">
-                <span>🎨</span> Appearance & Dock
-            </button>
-            <button type="button" class="modal-tab-btn" id="tabBtnSystem" onclick="switchSettingsTab('system')">
-                <span>🖥️</span> System & Hardware
-            </button>
-            <button type="button" class="modal-tab-btn" id="tabBtnWidgets" onclick="switchSettingsTab('widgets')">
-                <span>🎛️</span> Widgets & Layout
-            </button>
-            <button type="button" class="modal-tab-btn" id="tabBtnCalendar" onclick="switchSettingsTab('calendar')">
-                <span>📅</span> Calendar & Sync
-            </button>
-            <button type="button" class="modal-tab-btn" id="tabBtnUpdates" onclick="switchSettingsTab('updates')">
-                <span>📦</span> Updates &amp; Versions
-            </button>
-            <button type="button" class="modal-tab-btn" id="tabBtnBackup" onclick="switchSettingsTab('backup')">
-                <span>💾</span> Backup &amp; Migration
+            <!-- Instant Settings Search / Filter -->
+            <div class="settings-head-search">
+                <span class="settings-head-search-icon">🔍</span>
+                <input type="text" id="settingsSearchInput" placeholder="Quick search settings..." oninput="filterSettingsTabs(this.value)" autocomplete="off">
+            </div>
+
+            <button class="btn-ctrl" onclick="closeAppearanceModal()" style="border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
+                <span>✕</span> Close
             </button>
         </div>
 
-        <div class="drawer-body" style="padding:16px 20px;overflow-y:auto;flex:1">
+        <div class="settings-modal-layout">
+            <!-- Sidebar Navigation: Compact macOS System Settings style (fits completely without vertical scroll) -->
+            <div class="settings-nav-sidebar" id="settingsNavSidebar">
+                <div class="settings-nav-section-title">General</div>
+
+                <button type="button" class="settings-nav-item active" id="tabBtnTheme" data-tab="theme" onclick="switchSettingsTab('theme')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-blue">🎨</span>
+                        <span class="settings-nav-label">Appearance &amp; Dock</span>
+                    </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" id="tabBtnSystem" data-tab="system" onclick="switchSettingsTab('system')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-violet">🖥️</span>
+                        <span class="settings-nav-label">System Identity</span>
+                    </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" id="tabBtnWidgets" data-tab="widgets" onclick="switchSettingsTab('widgets')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-indigo">🎛️</span>
+                        <span class="settings-nav-label">Widgets &amp; Layout</span>
+                    </div>
+                </button>
+
+                <div class="settings-nav-section-title">Automation &amp; Feeds</div>
+
+                <button type="button" class="settings-nav-item" id="tabBtnCalendar" data-tab="calendar" onclick="switchSettingsTab('calendar')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-green">📅</span>
+                        <span class="settings-nav-label">Calendar &amp; Sync</span>
+                    </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" id="tabBtnTasks" data-tab="tasks" onclick="switchSettingsTab('tasks')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-amber">⚡</span>
+                        <span class="settings-nav-label">Automated Tasks</span>
+                    </div>
+                    <span class="settings-nav-pill-badge" id="settingsNavTasksCount">--</span>
+                </button>
+
+                <button type="button" class="settings-nav-item" id="tabBtnIntegrations" data-tab="integrations" onclick="switchSettingsTab('integrations')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-cyan">🔌</span>
+                        <span class="settings-nav-label">Integrations Hub</span>
+                    </div>
+                    <span class="snav-dot" id="settingsNavIntegrationsDot" title="Configured" style="display:none"></span>
+                </button>
+
+                <div class="settings-nav-section-title">Maintenance</div>
+
+                <button type="button" class="settings-nav-item" id="tabBtnUpdates" data-tab="updates" onclick="switchSettingsTab('updates')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-orange">📦</span>
+                        <span class="settings-nav-label">Updates &amp; Releases</span>
+                    </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" id="tabBtnBackup" data-tab="backup" onclick="switchSettingsTab('backup')">
+                    <div class="snav-left-group">
+                        <span class="snav-icon-pill snav-rose">💾</span>
+                        <span class="settings-nav-label">Backup &amp; Migration</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Content Panel -->
+            <div class="settings-modal-content-panel">
             <!-- TAB 1: APPEARANCE & DOCK -->
             <div class="modal-tab-pane active" id="tabPaneTheme">
                 <!-- Re-launch Initial Setup Wizard Card -->
@@ -8492,8 +9180,211 @@
                         <!-- Content dynamically rendered by JS -->
                     </div>
                 </div>
+            </div><!-- /tabPaneBackup -->
+
+            <!-- ── Tab Pane: Automated Tasks ── -->
+            <div class="modal-tab-pane" id="tabPaneTasks" data-tab="tasks">
+                <div class="spane-header">
+                    <span class="spane-header-icon snav-amber">⚡</span>
+                    <div class="spane-header-text">
+                        <h3>Automated Tasks &amp; Cron Schedules</h3>
+                        <p>Manage scheduled maintenance, backups, and systemd automation displayed on the Agenda widget</p>
+                    </div>
+                </div>
+
+                <!-- Stats summary chips -->
+                <div class="settings-stats-grid">
+                    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.22);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+                        <span style="font-size:20px">📋</span>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:0.5px">Total Tasks</div>
+                            <div style="font-size:17px;font-weight:700;color:#fcd34d" id="settingsTasksStatTotal">--</div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.22);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+                        <span style="font-size:20px">⚙️</span>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:0.5px">System Timers</div>
+                            <div style="font-size:17px;font-weight:700;color:#67e8f9" id="settingsTasksStatSystemd">--</div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+                        <span style="font-size:20px">📅</span>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:0.5px">Agenda Sync</div>
+                            <div style="font-size:17px;font-weight:700;color:#6ee7b7">Active</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action & Filter Bar -->
+                <div class="settings-tasks-controls">
+                    <div style="position:relative;flex:1;min-width:180px">
+                        <input type="text" id="settingsTasksSearchInput" class="modal-form-input" 
+                               placeholder="Filter tasks by name, tag, or schedule..." 
+                               oninput="filterSettingsTasksList(this.value)" 
+                               style="padding-left:30px;font-size:12px;height:34px;background:rgba(0,0,0,0.25)">
+                        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted)">🔍</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <button type="button" class="btn-ctrl" onclick="autoDetectAgendaTasks(this).then(()=>loadSettingsTasks())" style="font-size:11.5px;padding:6px 12px;background:rgba(6,182,212,0.18);border:1px solid rgba(6,182,212,0.4);color:#67e8f9;font-weight:600;border-radius:8px">⚡ Auto-Detect Timers</button>
+                        <button type="button" class="btn-ctrl" onclick="openAddTaskModal()" style="font-size:11.5px;padding:6px 12px;background:rgba(59,130,246,0.22);border:1px solid rgba(59,130,246,0.45);color:#93c5fd;font-weight:600;border-radius:8px">➕ Add Task</button>
+                    </div>
+                </div>
+
+                <!-- Tasks List Container -->
+                <div id="settingsTasksListContainer" style="display:flex;flex-direction:column;gap:8px;min-height:100px">
+                    <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">⏳ Loading tasks...</div>
+                </div>
+
+                <!-- Quick Help Footer Tip -->
+                <div style="margin-top:14px;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border-glass);font-size:11.5px;color:var(--text-muted);line-height:1.5;display:flex;align-items:center;gap:10px">
+                    <span style="font-size:18px">💡</span>
+                    <div>Automated tasks populate the calendar on the <strong>Agenda &amp; Scheduled Tasks</strong> widget on the dashboard. Click any date or task to inspect details or run manual executions.</div>
+                </div>
             </div>
-        </div>
+
+            <!-- ── Tab Pane: Integrations Hub ── -->
+            <div class="modal-tab-pane" id="tabPaneIntegrations" data-tab="integrations">
+                <div class="spane-header">
+                    <span class="spane-header-icon snav-cyan">🔌</span>
+                    <div class="spane-header-text">
+                        <h3>Connected Services &amp; Integrations Hub</h3>
+                        <p>Configure Tailscale mesh VPN, Docker container engines, Proxmox hypervisors, and alert webhooks</p>
+                    </div>
+                </div>
+
+                <!-- Overview summary status pills -->
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+                    <span style="font-size:11.5px;padding:4px 10px;border-radius:20px;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.3);color:#67e8f9;display:flex;align-items:center;gap:6px">
+                        <span>🔒</span> Tailscale: <strong id="integrationSummaryTs">Checking...</strong>
+                    </span>
+                    <span style="font-size:11.5px;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;display:flex;align-items:center;gap:6px">
+                        <span>🐳</span> Docker: <strong id="integrationSummaryDocker">Active</strong>
+                    </span>
+                    <span style="font-size:11.5px;padding:4px 10px;border-radius:20px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#fcd34d;display:flex;align-items:center;gap:6px">
+                        <span>⚡</span> Proxmox PVE: <strong id="integrationSummaryPve">Optional</strong>
+                    </span>
+                </div>
+
+                <!-- Tailscale VPN Card -->
+                <div style="background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.22);border-radius:12px;padding:16px;margin-bottom:14px;transition:border-color 0.2s ease">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0284c7,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(6,182,212,0.3)">🔒</div>
+                            <div>
+                                <div style="font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+                                    <span>Tailscale Mesh VPN</span>
+                                    <span id="integrationTailscaleStatusBadge" style="font-size:10.5px;padding:2px 8px;background:rgba(255,255,255,0.08);border-radius:10px;color:var(--text-muted);font-weight:600">Unconfigured</span>
+                                </div>
+                                <div style="font-size:11.5px;color:#a5f3fc;margin-top:2px">Zero-config secure remote access via MagicDNS and mesh overlay network</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="integrationTailscaleToggle" onchange="toggleTailscaleIntegration(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="integration-form-grid" style="margin-bottom:12px">
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">Tailscale MagicDNS Node / Domain</label>
+                            <input type="text" id="integrationTailscaleDomain" class="modal-form-input" placeholder="e.g. homelab.tailnet.ts.net" style="font-size:12px;padding:8px 12px;background:rgba(0,0,0,0.3)">
+                            <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px">Used when switching between Local IP and Tailscale Remote mode in the header</div>
+                        </div>
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">Quick Actions</label>
+                            <div style="display:flex;gap:8px;margin-top:4px">
+                                <a href="https://login.tailscale.com/admin/machines" target="_blank" rel="noopener" class="btn-ctrl" style="text-decoration:none;font-size:11.5px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.05);color:var(--text-secondary);display:inline-flex;align-items:center;gap:6px">
+                                    <span>↗️</span> Tailscale Admin
+                                </a>
+                                <button type="button" class="btn-ctrl" onclick="saveTailscaleIntegration()" style="background:rgba(6,182,212,0.22);border:1px solid rgba(6,182,212,0.45);color:#67e8f9;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;display:inline-flex;align-items:center;gap:6px">
+                                    <span>💾</span> Save Tailscale
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Docker / Portainer Card -->
+                <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.22);border-radius:12px;padding:16px;margin-bottom:14px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(59,130,246,0.3)">🐳</div>
+                            <div>
+                                <div style="font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+                                    <span>Docker Fleet &amp; Portainer Engine</span>
+                                    <span id="integrationDockerBadge" style="font-size:10.5px;padding:2px 8px;border-radius:10px;background:rgba(59,130,246,0.2);color:#93c5fd;font-weight:600">Auto-Detected</span>
+                                </div>
+                                <div style="font-size:11.5px;color:#bfdbfe;margin-top:2px">Monitors Docker sockets, container lifecycle, memory limits, and Portainer stacks</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:11.5px;color:var(--text-muted);line-height:1.55;background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+                        🐳 Portainer integration auto-detects stack templates and provides one-click direct access to container management. 
+                        Native Docker socket `/var/run/docker.sock` provides real-time telemetry, logs, and restart controls.
+                    </div>
+                    <div class="integration-form-grid">
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">Portainer Web UI URL (Optional)</label>
+                            <input type="text" id="integrationPortainerUrl" class="modal-form-input" placeholder="http://192.168.0.x:9000" style="font-size:12px;padding:8px 12px;background:rgba(0,0,0,0.3)" onchange="savePortainerSetting(this.value)">
+                        </div>
+                        <div style="display:flex;align-items:flex-end">
+                            <button type="button" class="btn-ctrl" onclick="testDockerConnection()" style="font-size:11.5px;padding:8px 14px;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;font-weight:600;border-radius:8px;display:inline-flex;align-items:center;gap:6px">
+                                <span>🔄</span> Test Docker Socket
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proxmox PVE Card -->
+                <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.22);border-radius:12px;padding:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#b45309,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(245,158,11,0.3)">⚡</div>
+                            <div>
+                                <div style="font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+                                    <span>Proxmox Virtual Environment (PVE)</span>
+                                    <span id="integrationProxmoxBadge" style="font-size:10.5px;padding:2px 8px;border-radius:10px;background:rgba(245,158,11,0.2);color:#fcd34d;font-weight:600">Optional</span>
+                                </div>
+                                <div style="font-size:11.5px;color:#fde68a;margin-top:2px">Cluster telemetry, QEMU Virtual Machines, and LXC Containers widget card</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="integrationProxmoxToggle" onchange="toggleProxmoxIntegration(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:12px;background:rgba(0,0,0,0.2);border-radius:8px;padding:9px 12px">
+                        Create API tokens in PVE under <strong>Datacenter → Permissions → API Tokens</strong>. Format: <code style="color:var(--accent-amber);background:rgba(245,158,11,0.15);padding:1px 5px;border-radius:4px">root@pam!tokenid</code>. Non-PVE systems (unRAID, TrueNAS, bare-metal) can leave this disabled.
+                    </div>
+
+                    <div class="integration-form-grid" style="margin-bottom:12px">
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">Proxmox Host URL</label>
+                            <input type="text" id="integrationPveUrl" class="modal-form-input" placeholder="https://192.168.0.x:8006" style="font-size:12px;padding:8px 12px;background:rgba(0,0,0,0.3)" onchange="savePveSetting('url', this.value)">
+                        </div>
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">Cluster Node Name</label>
+                            <input type="text" id="integrationPveNode" class="modal-form-input" placeholder="pve" style="font-size:12px;padding:8px 12px;background:rgba(0,0,0,0.3)" onchange="savePveSetting('node', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="integration-form-grid">
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">API Token ID</label>
+                            <input type="text" id="integrationPveTokenId" class="modal-form-input" placeholder="root@pam!tokenid" style="font-size:12px;padding:8px 12px;background:rgba(0,0,0,0.3)" onchange="savePveSetting('token_id', this.value)">
+                        </div>
+                        <div>
+                            <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px">API Token UUID / Secret</label>
+                            <input type="password" id="integrationPveTokenSecret" class="modal-form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="font-size:12px;padding:8px 12px;background:rgba(0,0,0,0.3)" onchange="savePveSetting('token_secret', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div><!-- /settings-modal-content-panel -->
+        </div><!-- /settings-modal-layout -->
 
         <div style="padding:12px 20px;border-top:1px solid var(--border-glass);background:rgba(255,255,255,0.02);display:flex;justify-content:flex-end">
             <button class="btn-ctrl" onclick="closeAppearanceModal()" style="background:var(--accent-blue);padding:6px 18px;font-weight:600">Done</button>
@@ -10482,14 +11373,98 @@ function deleteCurrentEditingNode() {
     }
 }
 
-// ── Settings Modal Tabs Switching ─────────────────────────────────
+// ── Settings Modal Tabs Switching & Search ─────────────────────────
+const SETTINGS_TAB_CONFIG = {
+    theme: { icon: '🎨', title: 'Appearance & Dock', section: 'General' },
+    system: { icon: '🖥️', title: 'System Identity', section: 'General' },
+    widgets: { icon: '🎛️', title: 'Widgets & Layout', section: 'General' },
+    calendar: { icon: '📅', title: 'Calendar & Feeds', section: 'Automation & Feeds' },
+    tasks: { icon: '⚡', title: 'Automated Tasks', section: 'Automation & Feeds' },
+    integrations: { icon: '🔌', title: 'Integrations Hub', section: 'Automation & Feeds' },
+    updates: { icon: '📦', title: 'Updates & Releases', section: 'Maintenance' },
+    backup: { icon: '💾', title: 'Backup & Migration', section: 'Maintenance' }
+};
+
 function switchSettingsTab(tabKey) {
-    document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
-    const btn = document.getElementById('tabBtn' + tabKey.charAt(0).toUpperCase() + tabKey.slice(1));
-    const pane = document.getElementById('tabPane' + tabKey.charAt(0).toUpperCase() + tabKey.slice(1));
+    if (!tabKey) return;
+    const modal = document.getElementById('appearanceModal');
+    if (!modal) return;
+
+    // 1. Deactivate all sidebar nav items
+    modal.querySelectorAll('.settings-nav-item, .modal-tab-btn').forEach(b => b.classList.remove('active'));
+    // 2. Hide all tab panes
+    modal.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
+
+    // 3. Activate the matching button (support data-tab, id convention, and lowercase class)
+    const tKey = tabKey.charAt(0).toUpperCase() + tabKey.slice(1);
+    const btnById  = modal.querySelector('#tabBtn' + tKey);
+    const btnByAttr = modal.querySelector(`.settings-nav-item[data-tab="${tabKey}"]`);
+    const btn = btnByAttr || btnById;
     if (btn) btn.classList.add('active');
-    if (pane) pane.classList.add('active');
+
+    // 4. Activate matching pane
+    const paneById   = modal.querySelector('#tabPane' + tKey);
+    const paneByAttr = modal.querySelector(`.modal-tab-pane[data-tab="${tabKey}"]`);
+    const pane = paneByAttr || paneById;
+    if (pane) {
+        pane.classList.add('active');
+        const contentPanel = modal.querySelector('.settings-modal-content-panel');
+        if (contentPanel) contentPanel.scrollTop = 0;
+    }
+
+    // 5. Update header breadcrumb
+    const bcEl = document.getElementById('settingsActiveBreadcrumb');
+    const tabMeta = SETTINGS_TAB_CONFIG[tabKey];
+    if (bcEl && tabMeta) {
+        bcEl.innerHTML = `<span style="opacity:0.7">${tabMeta.section}</span> <span style="opacity:0.4">›</span> <span>${tabMeta.icon} ${tabMeta.title}</span>`;
+    }
+
+    // 6. Lazy-load dynamic data when tab becomes visible
+    try {
+        if (tabKey === 'tasks')        loadSettingsTasks();
+        if (tabKey === 'integrations') populateIntegrationsTab();
+        if (tabKey === 'calendar')     loadExternalFeeds();
+        if (tabKey === 'updates')      checkHubUpdates();
+    } catch(err) {
+        console.warn('Error loading settings tab data:', err);
+    }
+}
+
+function filterSettingsTabs(query) {
+    const q = (query || '').toLowerCase().trim();
+    const navItems = document.querySelectorAll('.settings-nav-item');
+    const sections = document.querySelectorAll('.settings-nav-section-title');
+    
+    if (!q) {
+        navItems.forEach(item => item.style.display = '');
+        sections.forEach(sec => sec.style.display = '');
+        return;
+    }
+
+    let firstMatch = null;
+    navItems.forEach(item => {
+        const text = (item.textContent || '').toLowerCase();
+        const tabKey = item.dataset.tab || '';
+        const meta = SETTINGS_TAB_CONFIG[tabKey];
+        const keywords = meta ? `${meta.title} ${meta.section}`.toLowerCase() : '';
+        const isMatch = text.includes(q) || keywords.includes(q) || tabKey.includes(q);
+        
+        item.style.display = isMatch ? '' : 'none';
+        if (isMatch && !firstMatch) firstMatch = tabKey;
+    });
+
+    sections.forEach(sec => {
+        let sibling = sec.nextElementSibling;
+        let hasVisible = false;
+        while (sibling && !sibling.classList.contains('settings-nav-section-title')) {
+            if (sibling.classList.contains('settings-nav-item') && sibling.style.display !== 'none') {
+                hasVisible = true;
+                break;
+            }
+            sibling = sibling.nextElementSibling;
+        }
+        sec.style.display = hasVisible ? '' : 'none';
+    });
 }
 
 // ── Multi-Column Widget Drag-and-Drop & Layout Persistence ─────────
@@ -18140,6 +19115,301 @@ function runHubUpdateCheck(force = false) {
 setTimeout(() => runHubUpdateCheck(), 600);
 // Automatic continuous poll every 15 minutes
 setInterval(() => runHubUpdateCheck(), 15 * 60 * 1000);
+
+// ── Settings: Automated Tasks Tab ──────────────────────────────────────────
+let _allSettingsTasks = [];
+
+async function loadSettingsTasks() {
+    const container = document.getElementById('settingsTasksListContainer');
+    if (!container) return;
+    container.innerHTML = `<div style="text-align:center;padding:36px;color:var(--text-muted);font-size:12px"><div class="stat-spinner" style="margin:0 auto 10px auto;width:24px;height:24px;border:2px solid var(--border-glass);border-top-color:var(--accent-primary);border-radius:50%;animation:spin 0.8s linear infinite"></div>Loading tasks & timers...</div>`;
+    try {
+        const res = await fetch('/api/tasks');
+        const data = await res.json();
+        _allSettingsTasks = (data && data.tasks) ? data.tasks : [];
+        updateSettingsTasksStats(_allSettingsTasks);
+        renderSettingsTasks(_allSettingsTasks, container);
+    } catch (e) {
+        container.innerHTML = `<div style="text-align:center;padding:30px;color:#f87171;font-size:12px">⚠️ Failed to load tasks. Check connection.</div>`;
+        console.warn('loadSettingsTasks error:', e);
+    }
+}
+
+function updateSettingsTasksStats(tasks) {
+    const totalEl = document.getElementById('settingsTasksStatTotal');
+    const systemdEl = document.getElementById('settingsTasksStatSystemd');
+    const navBadge = document.getElementById('settingsNavTasksCount');
+    
+    const total = tasks ? tasks.length : 0;
+    const systemdCount = tasks ? tasks.filter(t => t.source === 'systemd').length : 0;
+    
+    if (totalEl) totalEl.textContent = total;
+    if (systemdEl) systemdEl.textContent = systemdCount;
+    if (navBadge) {
+        navBadge.textContent = total;
+        navBadge.style.display = total > 0 ? 'inline-block' : 'none';
+    }
+}
+
+function filterSettingsTasksList(query) {
+    const q = (query || '').toLowerCase().trim();
+    const container = document.getElementById('settingsTasksListContainer');
+    if (!container) return;
+    
+    if (!q) {
+        renderSettingsTasks(_allSettingsTasks, container);
+        return;
+    }
+
+    const filtered = _allSettingsTasks.filter(t => {
+        const title = (t.title || t.name || '').toLowerCase();
+        const tag = (t.tag || '').toLowerCase();
+        const sched = (t.time || t.schedule || '').toLowerCase();
+        const desc = (t.desc || t.description || '').toLowerCase();
+        const src = (t.source || '').toLowerCase();
+        return title.includes(q) || tag.includes(q) || sched.includes(q) || desc.includes(q) || src.includes(q);
+    });
+
+    renderSettingsTasks(filtered, container);
+}
+
+function renderSettingsTasks(tasks, container) {
+    if (!container) return;
+    if (!tasks || !tasks.length) {
+        container.innerHTML = `
+            <div style="padding:32px 20px;text-align:center;background:rgba(255,255,255,0.015);border:1px dashed var(--border-glass);border-radius:12px;color:var(--text-muted);font-size:12px">
+                <div style="font-size:32px;margin-bottom:8px">⚡</div>
+                <div style="font-weight:600;color:var(--text-secondary);font-size:13px;margin-bottom:4px">No matching automated tasks</div>
+                <div style="margin-bottom:14px;color:var(--text-muted);font-size:11px">Auto-detect systemd timers on this machine or configure custom scheduled jobs.</div>
+                <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+                    <button type="button" class="btn-ctrl" onclick="autoDetectAgendaTasks(this).then(()=>loadSettingsTasks())" style="font-size:11px;padding:6px 14px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.35);color:#67e8f9;font-weight:600;border-radius:8px">⚡ Auto-Detect Timers</button>
+                    <button type="button" class="btn-ctrl" onclick="openAddTaskModal()" style="font-size:11px;padding:6px 14px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.38);color:#93c5fd;font-weight:600;border-radius:8px">➕ Add Task</button>
+                </div>
+            </div>`;
+        return;
+    }
+    const tagColors = {
+        'Maintenance': { bg: 'rgba(245,158,11,0.16)', text: '#fcd34d', border: 'rgba(245,158,11,0.3)' },
+        'Backup':      { bg: 'rgba(59,130,246,0.16)', text: '#93c5fd', border: 'rgba(59,130,246,0.3)' },
+        'Security':    { bg: 'rgba(239,68,68,0.16)',  text: '#fca5a5', border: 'rgba(239,68,68,0.3)' },
+        'Monitor':     { bg: 'rgba(16,185,129,0.16)', text: '#6ee7b7', border: 'rgba(16,185,129,0.3)' },
+        'Cleanup':     { bg: 'rgba(168,85,247,0.16)', text: '#d8b4fe', border: 'rgba(168,85,247,0.3)' },
+        'System':      { bg: 'rgba(6,182,212,0.16)',  text: '#67e8f9', border: 'rgba(6,182,212,0.3)' }
+    };
+    container.innerHTML = tasks.map(t => {
+        const tagStyle = tagColors[t.tag] || { bg: 'rgba(255,255,255,0.06)', text: 'var(--text-secondary)', border: 'var(--border-glass)' };
+        const isSystemd = t.source === 'systemd';
+        const sourceBadge = isSystemd 
+            ? `<span style="font-size:9.5px;color:#67e8f9;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.25);padding:1px 6px;border-radius:4px;font-weight:600;letter-spacing:0.02em">systemd timer</span>` 
+            : `<span style="font-size:9.5px;color:#a1a1aa;background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);padding:1px 6px;border-radius:4px;font-weight:500">custom</span>`;
+        return `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid var(--border-glass);transition:all 0.15s ease" onmouseenter="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.14)'" onmouseleave="this.style.background='rgba(255,255,255,0.025)';this.style.borderColor='var(--border-glass)'">
+            <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(217,119,6,0.3));border:1px solid rgba(245,158,11,0.4);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 2px 8px rgba(245,158,11,0.15)">⚡</div>
+            <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px">
+                    <span style="font-size:12.5px;font-weight:600;color:#fff">${escapeHtml(t.title || t.name || 'Untitled Task')}</span>
+                    <span style="font-size:10px;padding:1px 7px;border-radius:5px;font-weight:600;background:${tagStyle.bg};color:${tagStyle.text};border:1px solid ${tagStyle.border}">${escapeHtml(t.tag || 'Task')}</span>
+                    ${sourceBadge}
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="color:#d4d4d8">🕒 ${escapeHtml(t.time || t.schedule || 'Scheduled')}</span>
+                    ${(t.desc || t.description) ? `<span style="opacity:0.75">· ${escapeHtml(t.desc || t.description)}</span>` : ''}
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                <button type="button" class="btn-ctrl" title="Edit Task" onclick="openAddTaskModal('${t.id}')" style="padding:4px 9px;font-size:11px;border-radius:6px;color:#93c5fd;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25)">✏️</button>
+                <button type="button" class="btn-ctrl" title="Delete Task" onclick="deleteSettingsTask('${t.id}')" style="padding:4px 9px;font-size:11px;border-radius:6px;color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)">✕</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function deleteSettingsTask(taskId) {
+    if (!confirm('Remove this scheduled task?')) return;
+    try {
+        const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast('Task removed', 'info');
+            await loadSettingsTasks();
+            if (typeof loadAgendaTasks === 'function') await loadAgendaTasks();
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Failed to remove task', 'error');
+    }
+}
+
+// ── Settings: Integrations Tab ─────────────────────────────────────────────
+function populateIntegrationsTab() {
+    const settings = (typeof dashboardSettings !== 'undefined' && dashboardSettings) ? dashboardSettings : {};
+
+    // 1. Docker
+    const dockerPill = document.getElementById('integrationSummaryDocker');
+    if (dockerPill) {
+        dockerPill.textContent = 'Ready';
+        dockerPill.className = 'integration-pill active';
+    }
+
+    // 2. Tailscale
+    const tsToggle = document.getElementById('integrationTailscaleToggle');
+    const tsDomain = document.getElementById('integrationTailscaleDomain');
+    const tsBadge  = document.getElementById('integrationTailscaleStatusBadge');
+    const tsPill   = document.getElementById('integrationSummaryTs');
+    const hasTailscale = Boolean(settings.tailscale_domain || settings.tailscale_ip);
+    if (tsToggle) tsToggle.checked = hasTailscale;
+    if (tsDomain) tsDomain.value = settings.tailscale_domain || settings.tailscale_ip || '';
+    if (tsBadge) {
+        if (hasTailscale) {
+            tsBadge.textContent = '✅ Connected';
+            tsBadge.style.color = '#4ade80';
+        } else {
+            tsBadge.textContent = 'Not configured';
+            tsBadge.style.color = 'var(--text-muted)';
+        }
+    }
+    if (tsPill) {
+        tsPill.textContent = hasTailscale ? 'Connected' : 'Optional';
+        tsPill.className = `integration-pill ${hasTailscale ? 'active' : ''}`;
+    }
+
+    // 3. Portainer
+    const portainerInput = document.getElementById('integrationPortainerUrl');
+    const portainerPill  = document.getElementById('integrationSummaryPortainer');
+    const hasPortainer = Boolean(settings.portainer_url);
+    if (portainerInput && settings.portainer_url) portainerInput.value = settings.portainer_url;
+    if (portainerPill) {
+        portainerPill.textContent = hasPortainer ? 'Configured' : 'Optional';
+        portainerPill.className = `integration-pill ${hasPortainer ? 'active' : ''}`;
+    }
+
+    // 4. Proxmox PVE
+    const pveToggle = document.getElementById('integrationProxmoxToggle');
+    const pveUrl    = document.getElementById('integrationPveUrl');
+    const pveNode   = document.getElementById('integrationPveNode');
+    const pveTokenId = document.getElementById('integrationPveTokenId');
+    const pveTokenSecret = document.getElementById('integrationPveTokenSecret');
+    const pvePill   = document.getElementById('integrationSummaryPve');
+    const hasPve = Boolean(settings.proxmox_nodes?.length || settings.proxmox_tokens?.length);
+    if (pveToggle) pveToggle.checked = hasPve;
+    if (pveUrl && settings.proxmox_nodes?.[0]?.url) pveUrl.value = settings.proxmox_nodes[0].url;
+    if (pveNode && settings.proxmox_nodes?.[0]?.node) pveNode.value = settings.proxmox_nodes[0].node;
+    if (pveTokenId && settings.proxmox_tokens?.[0]?.token_id) pveTokenId.value = settings.proxmox_tokens[0].token_id;
+    if (pveTokenSecret && settings.proxmox_tokens?.[0]?.token_secret) pveTokenSecret.value = settings.proxmox_tokens[0].token_secret;
+    if (pvePill) {
+        pvePill.textContent = hasPve ? 'Configured' : 'Optional';
+        pvePill.className = `integration-pill ${hasPve ? 'active' : ''}`;
+    }
+}
+
+function toggleTailscaleIntegration(enabled) {
+    const badge = document.getElementById('integrationTailscaleStatusBadge');
+    if (!enabled) {
+        if (typeof dashboardSettings !== 'undefined') {
+            dashboardSettings.tailscale_domain = '';
+            dashboardSettings.tailscale_ip = '';
+        }
+        if (badge) { badge.textContent = 'Disabled'; badge.style.color = 'var(--text-muted)'; }
+    } else {
+        if (badge) { badge.textContent = 'Ready — enter domain below'; badge.style.color = '#fcd34d'; }
+    }
+}
+
+async function saveTailscaleIntegration() {
+    const domain = document.getElementById('integrationTailscaleDomain')?.value?.trim() || '';
+    if (typeof dashboardSettings !== 'undefined') {
+        dashboardSettings.tailscale_domain = domain;
+        dashboardSettings.tailscale_ip = '';
+    }
+    try {
+        const res = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tailscale_domain: domain, tailscale_ip: '' })
+        });
+        if (res.ok) {
+            showToast('✅ Tailscale settings saved', 'success');
+            const badge = document.getElementById('integrationTailscaleStatusBadge');
+            const pill  = document.getElementById('integrationSummaryTs');
+            if (badge && domain) { badge.textContent = '✅ Connected'; badge.style.color = '#4ade80'; }
+            if (pill) { pill.textContent = domain ? 'Connected' : 'Optional'; pill.className = `integration-pill ${domain ? 'active' : ''}`; }
+        } else {
+            showToast('Failed to save Tailscale settings', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Error saving Tailscale settings', 'error');
+    }
+}
+
+function testDockerConnection() {
+    showToast('Testing Docker connection...', 'info');
+    fetch('/api/docker')
+        .then(r => r.json())
+        .then(data => {
+            const containers = (data && data.containers) ? data.containers : [];
+            const running = containers.filter(c => c.status === 'running' || c.State === 'running').length;
+            showToast(`✅ Docker connected: ${containers.length} containers (${running} running)`, 'success');
+        })
+        .catch(err => {
+            console.warn('Docker test failed:', err);
+            showToast('⚠️ Docker socket check returned an error', 'warning');
+        });
+}
+
+function savePortainerSetting(url) {
+    const val = (url || '').trim();
+    if (typeof dashboardSettings !== 'undefined') dashboardSettings.portainer_url = val;
+    clearTimeout(savePortainerSetting._timer);
+    savePortainerSetting._timer = setTimeout(async () => {
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ portainer_url: val })
+            });
+            const pill = document.getElementById('integrationSummaryPortainer');
+            if (pill) {
+                pill.textContent = val ? 'Configured' : 'Optional';
+                pill.className = `integration-pill ${val ? 'active' : ''}`;
+            }
+            showToast('Portainer setting saved', 'info');
+        } catch(e) { console.warn('Portainer save error:', e); }
+    }, 800);
+}
+
+function toggleProxmoxIntegration(enabled) {
+    const pveUrl  = document.getElementById('integrationPveUrl');
+    const pveNode = document.getElementById('integrationPveNode');
+    if (!enabled) {
+        if (typeof dashboardSettings !== 'undefined') dashboardSettings.proxmox_nodes = [];
+        if (pveUrl)  pveUrl.value = '';
+        if (pveNode) pveNode.value = '';
+        showToast('Proxmox integration disabled', 'info');
+    }
+}
+
+function savePveSetting(field, value) {
+    if (typeof dashboardSettings === 'undefined') return;
+    if (!dashboardSettings.proxmox_nodes) dashboardSettings.proxmox_nodes = [{}];
+    if (!dashboardSettings.proxmox_nodes[0]) dashboardSettings.proxmox_nodes[0] = {};
+    dashboardSettings.proxmox_nodes[0][field] = value;
+    clearTimeout(savePveSetting._timer);
+    savePveSetting._timer = setTimeout(async () => {
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proxmox_nodes: dashboardSettings.proxmox_nodes })
+            });
+            const pill = document.getElementById('integrationSummaryPve');
+            if (pill) {
+                pill.textContent = 'Configured';
+                pill.className = 'integration-pill active';
+            }
+            showToast('✅ Proxmox settings saved', 'success');
+        } catch(e) { console.warn('PVE save error:', e); }
+    }, 800);
+}
 
 </script>
 
